@@ -9,7 +9,8 @@ import {
   BarChart3, 
   Plug, 
   Settings,
-  ChevronLeft
+  ChevronLeft,
+  Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useState } from 'react';
@@ -27,6 +28,7 @@ const navSections = [
       { icon: Home, label: 'Home', href: '/' },
       { icon: FolderKanban, label: 'Projects', href: '/projects' },
       { icon: Bot, label: 'Agents', href: '/agents' },
+      { icon: Zap, label: 'Skills', href: '/skills' },
     ]
   },
   {

@@ -514,7 +514,7 @@ outputs:
 
 ### 5. Skills Execution Engine
 
-**Location**: `/packages/skills-engine/`
+**Location**: `/packages/skills_engine/`
 
 ```python
 # skills_engine.py

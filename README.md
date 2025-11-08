@@ -35,7 +35,7 @@ This is a production-ready, AI-native software engineering platform built on a l
 │   ├── ui/                     # shadcn/ui component library
 │   ├── config/                 # Shared configs (ESLint, TS, etc)
 │   ├── db/                     # Database schemas & migrations
-│   ├── moe-router/             # MoE routing intelligence
+│   ├── moe_router/             # MoE routing intelligence
 │   ├── agents/                 # Specialized agent implementations
 │   ├── integrations/           # External API connectors
 │   ├── contracts/              # Pydantic schemas & TypeScript types
@@ -69,6 +69,7 @@ pnpm build
 - **🧠 MoE Router**: Intelligent model selection across Claude, GPT-5, Gemini, Granite, Qwen, etc.
 - **🤖 18+ Specialized Agents**: Architect, Planner, Codegen, Reviewer, Tester, Security, Deployer, etc.
 - **🎨 Premium UI**: AI-native interface with Command Palette, AI Dock, Narrated Diffs
+- **⚡ Skills Marketplace**: 16+ built-in Skills for code generation, testing, review, documentation
 - **📊 Evidence-Driven**: Every decision backed by Evidence IDs from trusted sources
 - **🔒 Security-First**: OWASP compliance, secrets management, audit trails
 - **💰 Cost-Optimized**: <$12 per small PR, <$60 per medium refactor

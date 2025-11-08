@@ -17,7 +17,7 @@ from openai import AsyncOpenAI
 # Import from MoE Router
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent / "moe-router"))
+sys.path.append(str(Path(__file__).parent.parent / "moe_router"))
 from models import (
     TaskType, RoutingRequest, RoutingDecision, Evidence, Provider
 )
@@ -70,6 +70,9 @@ class Context:
     shared_state: Dict[str, Any] = field(default_factory=dict)
     evidence: List[Evidence] = field(default_factory=list)
     parent_task_id: Optional[str] = None
+    user_id: Optional[str] = None  # User ID for Skills execution logging
+    agent_id: Optional[str] = None  # Agent ID for Skills execution logging
+    task_id: Optional[str] = None  # Task ID for Skills execution logging
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 

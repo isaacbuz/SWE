@@ -445,7 +445,7 @@ Similar structure to OpenAI provider but using Anthropic's SDK and message forma
 Create an intelligent router that selects the best LLM provider for each task based on cost, latency, capabilities, and historical performance.
 
 **Acceptance Criteria:**
-- [ ] Create `packages/moe-router` package
+- [ ] Create `packages/moe_router` package
 - [ ] Implement scoring algorithm for provider selection
 - [ ] Add task classification (code generation, analysis, planning, etc.)
 - [ ] Include cost optimization logic
@@ -458,7 +458,7 @@ Create an intelligent router that selects the best LLM provider for each task ba
 
 **Routing Logic:**
 ```typescript
-// packages/moe-router/src/Router.ts
+// packages/moe_router/src/Router.ts
 export interface RoutingPolicy {
   taskType: TaskType;
   preferredProviders: string[];
