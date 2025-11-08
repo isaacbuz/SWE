@@ -1,0 +1,20 @@
+
+version: 1
+roles:
+  - name: CEO
+    allow_tools: ["*"]
+  - name: DevAgent
+    allow_tools: ["mcp:github","mcp:ci","mcp:deploy"]
+models:
+  allowlist:
+    - gpt-5
+    - claude-4-sonnet
+    - gemini-2.5-pro
+    - grok-4
+    - qwen2.5-coder-32b-instruct
+    - deepseek-v3
+    - llama-3.1-405b-instruct
+    - codestral-25.01
+    - ibm-granite-code-8b
+cost_caps:
+  monthly_usd: 2000

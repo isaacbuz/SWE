@@ -1,0 +1,15 @@
+{
+  "title": "Civic Grants Finder",
+  "tags": [
+    "gov",
+    "rag"
+  ],
+  "inputs": {
+    "gsa_endpoint": "/technology-transformation-services/tts-api/some-example",
+    "rag_topics": [
+      "grants",
+      "eligibility",
+      "deadlines"
+    ]
+  }
+}

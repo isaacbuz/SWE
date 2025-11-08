@@ -1,0 +1,10 @@
+
+run:
+  max_cost_usd: 5.0
+  max_latency_s: 60
+  prefer_open_models: false
+
+routing:
+  diversify_vendors: true
+  allow_fallbacks: true
+  temperature: 0.2

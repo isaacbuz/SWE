@@ -1,0 +1,13 @@
+# Database dependencies for AI-First Software Engineering Platform
+
+# PostgreSQL
+psycopg2-binary>=2.9.9
+sqlalchemy>=2.0.23
+alembic>=1.13.0
+
+# Redis
+redis>=5.0.1
+hiredis>=2.2.3
+
+# Database utilities
+sqlparse>=0.4.4

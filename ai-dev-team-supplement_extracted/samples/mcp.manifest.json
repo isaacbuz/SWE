@@ -1,0 +1,43 @@
+{
+  "name": "github.mcp",
+  "description": "Manage GitHub repos, issues, PRs, labels, projects",
+  "tools": [
+    {
+      "name": "create_repo",
+      "args": {
+        "name": "str",
+        "private": "bool"
+      }
+    },
+    {
+      "name": "create_issue",
+      "args": {
+        "repo": "str",
+        "title": "str",
+        "body": "str"
+      }
+    },
+    {
+      "name": "create_pr",
+      "args": {
+        "repo": "str",
+        "head": "str",
+        "base": "str",
+        "title": "str",
+        "body": "str"
+      }
+    },
+    {
+      "name": "add_label",
+      "args": {
+        "repo": "str",
+        "issue_number": "int",
+        "label": "str"
+      }
+    }
+  ],
+  "auth": {
+    "type": "env",
+    "var": "GITHUB_TOKEN"
+  }
+}

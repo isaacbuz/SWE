@@ -1,0 +1,11 @@
+
+[project]
+name = "ai-dev-team-moe"
+version = "0.1.0"
+requires-python = ">=3.10"
+description = "AI Dev Team with MoE router, MCP plan, and GitHub integration stubs"
+authors = [{name="AI Architect"}]
+dependencies = []
+
+[tool.ruff]
+line-length = 100

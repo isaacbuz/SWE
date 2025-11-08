@@ -1,0 +1,254 @@
+# Prometheus Alerting Rules for SWE Platform
+groups:
+  - name: system_health
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          rate(http_requests_total{status=~"5.."}[5m]) > 10
+        for: 5m
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors/sec for {{ $labels.endpoint }}"
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 10m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "High request latency"
+          description: "P95 latency is {{ $value }}s for {{ $labels.endpoint }}"
+
+      - alert: HighCPUUsage
+        expr: system_cpu_usage_percent > 90
+        for: 10m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}%"
+
+      - alert: HighMemoryUsage
+        expr: system_memory_usage_percent > 95
+        for: 5m
+        labels:
+          severity: critical
+          category: resources
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}%"
+
+      - alert: DatabaseConnectionPoolExhausted
+        expr: |
+          db_active_connections / db_connection_pool_size > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          category: database
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "{{ $value | humanizePercentage }} of connections in use for {{ $labels.pool_name }}"
+
+  - name: agent_performance
+    interval: 1m
+    rules:
+      - alert: AgentHighFailureRate
+        expr: |
+          rate(agent_executions_total{status="error"}[10m]) /
+          rate(agent_executions_total[10m]) > 0.2
+        for: 10m
+        labels:
+          severity: warning
+          category: agent_quality
+        annotations:
+          summary: "High agent failure rate"
+          description: "Agent {{ $labels.agent_name }} has {{ $value | humanizePercentage }} failure rate"
+
+      - alert: AgentQueueBacklog
+        expr: agent_queue_depth > 100
+        for: 15m
+        labels:
+          severity: warning
+          category: agent_capacity
+        annotations:
+          summary: "Agent queue backlog"
+          description: "Agent {{ $labels.agent_name }} has {{ $value }} tasks in queue"
+
+      - alert: AgentSlowExecution
+        expr: |
+          histogram_quantile(0.95, rate(agent_execution_duration_seconds_bucket[10m])) > 600
+        for: 15m
+        labels:
+          severity: warning
+          category: agent_performance
+        annotations:
+          summary: "Slow agent execution"
+          description: "Agent {{ $labels.agent_name }} P95 execution time is {{ $value }}s"
+
+      - alert: LLMHighLatency
+        expr: |
+          histogram_quantile(0.95, rate(llm_request_duration_seconds_bucket[5m])) > 30
+        for: 10m
+        labels:
+          severity: warning
+          category: llm_performance
+        annotations:
+          summary: "High LLM request latency"
+          description: "{{ $labels.provider }}/{{ $labels.model }} P95 latency is {{ $value }}s"
+
+  - name: cost_management
+    interval: 5m
+    rules:
+      - alert: HighCostRate
+        expr: |
+          rate(llm_cost_usd_total[1h]) * 3600 > 100
+        for: 30m
+        labels:
+          severity: warning
+          category: cost
+        annotations:
+          summary: "High cost burn rate"
+          description: "Current cost rate is ${{ $value }}/hour"
+
+      - alert: CriticalCostRate
+        expr: |
+          rate(llm_cost_usd_total[1h]) * 3600 > 500
+        for: 15m
+        labels:
+          severity: critical
+          category: cost
+        annotations:
+          summary: "Critical cost burn rate"
+          description: "Current cost rate is ${{ $value }}/hour - immediate action required"
+
+      - alert: BudgetThresholdExceeded
+        expr: budget_utilization_percent > 90
+        for: 10m
+        labels:
+          severity: critical
+          category: cost
+        annotations:
+          summary: "Budget threshold exceeded"
+          description: "Project {{ $labels.project_id }} is at {{ $value }}% budget utilization"
+
+      - alert: UnexpectedCostSpike
+        expr: |
+          (rate(llm_cost_usd_total[5m]) / rate(llm_cost_usd_total[1h] offset 1h)) > 3
+        for: 10m
+        labels:
+          severity: warning
+          category: cost
+        annotations:
+          summary: "Unexpected cost spike detected"
+          description: "Cost rate is {{ $value }}x higher than 1 hour ago"
+
+  - name: quality_gates
+    interval: 1m
+    rules:
+      - alert: QualityGateFailureRateHigh
+        expr: |
+          rate(quality_gates_total{status="failed"}[15m]) /
+          rate(quality_gates_total[15m]) > 0.3
+        for: 15m
+        labels:
+          severity: warning
+          category: quality
+        annotations:
+          summary: "High quality gate failure rate"
+          description: "{{ $labels.gate_type }} has {{ $value | humanizePercentage }} failure rate"
+
+      - alert: LowCodeCoverage
+        expr: code_coverage_percent < 70
+        for: 30m
+        labels:
+          severity: warning
+          category: quality
+        annotations:
+          summary: "Low code coverage"
+          description: "Project {{ $labels.project_id }} has {{ $value }}% code coverage"
+
+      - alert: CriticalSecurityVulnerabilities
+        expr: security_vulnerabilities{severity="critical"} > 0
+        for: 1m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Critical security vulnerabilities detected"
+          description: "{{ $value }} critical vulnerabilities in {{ $labels.project_id }}"
+
+      - alert: HighSecurityVulnerabilities
+        expr: security_vulnerabilities{severity="high"} > 5
+        for: 15m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "High number of security vulnerabilities"
+          description: "{{ $value }} high-severity vulnerabilities in {{ $labels.project_id }}"
+
+      - alert: CodeQualityDegradation
+        expr: |
+          code_quality_score < 70
+        for: 1h
+        labels:
+          severity: warning
+          category: quality
+        annotations:
+          summary: "Code quality degradation"
+          description: "Project {{ $labels.project_id }} quality score dropped to {{ $value }}"
+
+  - name: cache_performance
+    interval: 1m
+    rules:
+      - alert: LowCacheHitRatio
+        expr: cache_hit_ratio < 0.5
+        for: 30m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "Low cache hit ratio"
+          description: "Cache {{ $labels.cache_name }} hit ratio is {{ $value | humanizePercentage }}"
+
+  - name: business_metrics
+    interval: 5m
+    rules:
+      - alert: HighTaskFailureRate
+        expr: |
+          rate(tasks_failed_total[1h]) /
+          (rate(tasks_completed_total[1h]) + rate(tasks_failed_total[1h])) > 0.2
+        for: 30m
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "High task failure rate"
+          description: "{{ $value | humanizePercentage }} of tasks are failing for {{ $labels.task_type }}"
+
+      - alert: LowUserSatisfaction
+        expr: user_satisfaction_score < 3.5
+        for: 1h
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "Low user satisfaction"
+          description: "User satisfaction score is {{ $value }}/5 for {{ $labels.project_id }}"
+
+      - alert: NegativeROI
+        expr: roi_percent < 0
+        for: 24h
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "Negative ROI detected"
+          description: "Project {{ $labels.project_id }} has {{ $value }}% ROI"

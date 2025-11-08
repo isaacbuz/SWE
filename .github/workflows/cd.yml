@@ -1,0 +1,466 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*.*.*'
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  STAGING_ENVIRONMENT: staging
+  PRODUCTION_ENVIRONMENT: production
+
+jobs:
+  # Job 1: Prepare deployment
+  prepare:
+    name: Prepare Deployment
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.image.outputs.tag }}
+      is-prod: ${{ steps.version.outputs.is-prod }}
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine version and environment
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+            echo "is-prod=true" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "DEPLOYING TO PRODUCTION: $VERSION"
+          else
+            VERSION="latest"
+            echo "is-prod=false" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "DEPLOYING TO STAGING: $VERSION"
+          fi
+
+      - name: Set image tag
+        id: image
+        run: |
+          if [ "${{ steps.version.outputs.is-prod }}" = "true" ]; then
+            TAG="${{ steps.version.outputs.version }}"
+          else
+            TAG="sha-${{ github.sha }}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+  # Job 2: Build and push Docker images
+  build-and-push:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    needs: prepare
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/api
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Image digest
+        run: echo "Image pushed: ${{ steps.meta.outputs.tags }}"
+
+  # Job 3: Deploy to staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [prepare, build-and-push]
+    if: needs.prepare.outputs.is-prod == 'false'
+    environment:
+      name: staging
+      url: https://staging-api.example.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure deployment credentials
+        run: |
+          # IMPORTANT: In production, use GitHub Secrets for credentials
+          # This is a placeholder - actual implementation depends on your infrastructure
+          echo "Configuring credentials for staging deployment"
+          # Example:
+          # mkdir -p ~/.ssh
+          # echo "${{ secrets.STAGING_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+          # chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy to staging environment
+        env:
+          IMAGE_TAG: ${{ needs.prepare.outputs.image-tag }}
+          ENVIRONMENT: staging
+        run: |
+          echo "Deploying image: ${{ env.REGISTRY }}/${{ github.repository }}/api:${{ env.IMAGE_TAG }}"
+
+          # IMPORTANT: Replace these with your actual deployment commands
+          # Examples:
+          # - kubectl set image deployment/api-server api-service=${{ env.REGISTRY }}/${{ github.repository }}/api:${{ env.IMAGE_TAG }} --namespace=staging
+          # - docker-compose -f docker-compose.staging.yml up -d
+          # - AWS ECS: aws ecs update-service --cluster staging --service api --force-new-deployment
+          # - Vercel: vercel deploy --prod
+
+          echo "Running pre-deployment checks..."
+          # Database migrations
+          # Health checks
+          # Smoke tests
+
+          echo "Staging deployment initiated successfully"
+
+      - name: Run smoke tests
+        env:
+          API_URL: https://staging-api.example.com
+        run: |
+          # Wait for service to be ready
+          for i in {1..30}; do
+            if curl -f -s "${{ env.API_URL }}/health" > /dev/null 2>&1; then
+              echo "Service is healthy"
+              break
+            fi
+            echo "Waiting for service to be ready... (attempt $i/30)"
+            sleep 10
+          done
+
+          # Run basic smoke tests
+          curl -f "${{ env.API_URL }}/health" || exit 1
+          echo "Smoke tests passed for staging"
+
+      - name: Notify deployment status
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const status = '${{ job.status }}' === 'success' ? 'success' : 'failure';
+            github.rest.deployments.createStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: context.payload.deployment.id || 0,
+              state: status,
+              description: `Staging deployment ${status}`,
+              environment_url: 'https://staging-api.example.com'
+            });
+
+  # Job 4: Deploy to production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [prepare, build-and-push]
+    if: needs.prepare.outputs.is-prod == 'true'
+    environment:
+      name: production
+      url: https://api.example.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure production credentials
+        run: |
+          # IMPORTANT: In production, use GitHub Secrets for credentials
+          echo "Configuring credentials for production deployment"
+
+      - name: Pre-deployment safety checks
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          echo "Pre-deployment safety checks for version: ${{ env.VERSION }}"
+
+          # Verify tag exists and is signed
+          git verify-tag ${{ env.VERSION }} || {
+            echo "WARNING: Tag ${{ env.VERSION }} is not GPG signed"
+            # Optionally fail if unsigned tags are not allowed
+          }
+
+          # Check changelog
+          if [ ! -f "CHANGELOG.md" ]; then
+            echo "WARNING: No CHANGELOG.md found"
+          fi
+
+          echo "Pre-deployment checks completed"
+
+      - name: Create production backup
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          # IMPORTANT: Implement actual backup strategy
+          echo "Creating production backup before deployment"
+          echo "Backup timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          echo "Version to deploy: ${{ env.VERSION }}"
+          # In production: backup database, configs, etc.
+
+      - name: Deploy to production environment
+        env:
+          IMAGE_TAG: ${{ needs.prepare.outputs.image-tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          echo "Deploying version ${{ env.VERSION }} to production"
+          echo "Image: ${{ env.REGISTRY }}/${{ github.repository }}/api:${{ env.IMAGE_TAG }}"
+
+          # IMPORTANT: Replace with your actual deployment commands
+          # Examples:
+          # - kubectl set image deployment/api-server api-service=${{ env.REGISTRY }}/${{ github.repository }}/api:${{ env.IMAGE_TAG }} --namespace=production
+          # - Rolling deployment with canary validation
+          # - Blue-green deployment
+
+          echo "Production deployment initiated"
+
+      - name: Health checks post-deployment
+        env:
+          API_URL: https://api.example.com
+          MAX_RETRIES: 60
+          RETRY_DELAY: 10
+        run: |
+          echo "Running post-deployment health checks..."
+
+          attempt=0
+          while [ $attempt -lt ${{ env.MAX_RETRIES }} ]; do
+            if curl -f -s "${{ env.API_URL }}/health" > /dev/null 2>&1; then
+              echo "Service is healthy"
+              exit 0
+            fi
+            attempt=$((attempt + 1))
+            echo "Health check attempt $attempt/${{ env.MAX_RETRIES }}"
+            sleep ${{ env.RETRY_DELAY }}
+          done
+
+          echo "Service did not become healthy - triggering rollback"
+          exit 1
+
+      - name: Smoke tests in production
+        env:
+          API_URL: https://api.example.com
+        run: |
+          echo "Running smoke tests in production"
+
+          # Test basic endpoints
+          curl -f "${{ env.API_URL }}/health" || exit 1
+          echo "Health endpoint: OK"
+
+          # Test critical features
+          # curl -f "${{ env.API_URL }}/api/v1/agents" || exit 1
+          # echo "Agents endpoint: OK"
+
+          echo "Production smoke tests passed"
+
+      - name: Trigger rollback on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const version = '${{ needs.prepare.outputs.version }}';
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number || 1,
+              body: `⚠️ **Production Deployment Failed** for version ${version}\n\nInitiating automatic rollback...\n\nPlease check the deployment logs for details.`
+            });
+
+            console.log('Failure notification created, rollback triggered');
+
+  # Job 5: Automated rollback on failure
+  rollback:
+    name: Automated Rollback
+    runs-on: ubuntu-latest
+    needs: [prepare, deploy-production]
+    if: failure() && needs.prepare.outputs.is-prod == 'true'
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Identify previous stable version
+        id: previous-version
+        run: |
+          # Get the previous tag before current deployment
+          PREVIOUS_VERSION=$(git tag -l 'v*.*.*' --sort=-v:refname | head -n 2 | tail -n 1)
+          echo "version=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT
+          echo "Identified previous stable version: $PREVIOUS_VERSION"
+
+      - name: Rollback to previous version
+        env:
+          ROLLBACK_VERSION: ${{ steps.previous-version.outputs.version }}
+          CURRENT_VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          echo "Rolling back from ${{ env.CURRENT_VERSION }} to ${{ env.ROLLBACK_VERSION }}"
+
+          # IMPORTANT: Implement actual rollback strategy
+          # Examples:
+          # - kubectl set image deployment/api-server api-service=${{ env.REGISTRY }}/${{ github.repository }}/api:${{ env.ROLLBACK_VERSION }} --namespace=production
+          # - Restore from database backup
+          # - Switch traffic back to previous version
+
+          echo "Rollback initiated for version ${{ env.ROLLBACK_VERSION }}"
+
+      - name: Verify rollback health
+        env:
+          API_URL: https://api.example.com
+        run: |
+          echo "Verifying rollback health..."
+
+          for i in {1..30}; do
+            if curl -f -s "${{ env.API_URL }}/health" > /dev/null 2>&1; then
+              echo "Rollback successful - service is healthy"
+              exit 0
+            fi
+            echo "Waiting for service to be ready after rollback... (attempt $i/30)"
+            sleep 10
+          done
+
+          echo "ERROR: Service did not become healthy after rollback"
+          exit 1
+
+      - name: Create incident notification
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const version = '${{ needs.prepare.outputs.version }}';
+            const rollbackVersion = '${{ steps.previous-version.outputs.version }}';
+
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `INCIDENT: Production Deployment Rollback for ${version}`,
+              body: `## Production Deployment Failure & Automatic Rollback
+
+### Deployment Details
+- **Failed Version**: ${version}
+- **Rolled Back To**: ${rollbackVersion}
+- **Timestamp**: ${new Date().toISOString()}
+
+### Action Required
+Please investigate:
+1. Review deployment logs at: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+2. Check application logs in production
+3. Review recent code changes
+4. Post-incident analysis required
+
+### Next Steps
+1. Identify root cause
+2. Fix issues in development/staging
+3. Validate thoroughly before re-deployment
+4. Close this incident after resolution`,
+              labels: ['incident', 'production', 'auto-generated']
+            });
+
+  # Job 6: Post-deployment monitoring
+  monitoring:
+    name: Monitor Deployment
+    runs-on: ubuntu-latest
+    needs: [prepare, deploy-production]
+    if: always() && needs.prepare.outputs.is-prod == 'true'
+
+    steps:
+      - name: Check application metrics
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          echo "Monitoring application metrics for version ${{ env.VERSION }}"
+
+          # IMPORTANT: Integrate with your monitoring solution
+          # Examples:
+          # - Datadog API check
+          # - Prometheus queries
+          # - CloudWatch metrics
+          # - Custom health dashboard
+
+          echo "Metrics check completed"
+
+      - name: Alert on anomalies
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          echo "Checking for deployment anomalies in version ${{ env.VERSION }}"
+
+          # IMPORTANT: Implement anomaly detection
+          # - Error rate spike
+          # - Latency increase
+          # - Resource utilization changes
+          # - Database query performance
+
+          echo "Anomaly check completed"
+
+  # Job 7: Deployment summary
+  summary:
+    name: Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [prepare, build-and-push, deploy-staging, deploy-production, rollback, monitoring]
+    if: always()
+
+    steps:
+      - name: Generate deployment report
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          IS_PROD: ${{ needs.prepare.outputs.is-prod }}
+        run: |
+          echo "## Deployment Summary"
+          echo "### Version: ${{ env.VERSION }}"
+          echo "### Environment: $([ '${{ env.IS_PROD }}' = 'true' ] && echo 'PRODUCTION' || echo 'STAGING')"
+          echo "### Status: ${{ job.status }}"
+          echo "### Timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+
+      - name: Create deployment notification
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const version = '${{ needs.prepare.outputs.version }}';
+            const isProd = '${{ needs.prepare.outputs.is-prod }}' === 'true';
+            const status = '${{ job.status }}';
+
+            const environment = isProd ? 'PRODUCTION' : 'STAGING';
+            const statusEmoji = status === 'success' ? '✅' : '❌';
+
+            github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: 0,
+              state: status === 'success' ? 'success' : 'failure',
+              description: `${environment} deployment ${status}`
+            });

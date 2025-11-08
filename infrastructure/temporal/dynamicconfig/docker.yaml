@@ -1,0 +1,62 @@
+# Temporal Dynamic Configuration for Docker development environment
+# IMPORTANT: This is for development. Production configs should be more restrictive.
+
+# Workflow configuration
+workflow.WorkflowMaximumDuration:
+  - value: 2592000s  # 30 days
+    constraints:
+      domainName: "default"
+
+workflow.WorkflowRetentionPeriod:
+  - value: 604800s  # 7 days
+    constraints:
+      domainName: "default"
+
+# Activity configuration
+activity.ActivityMaximumScheduleToStartTimeout:
+  - value: 300s  # 5 minutes
+    constraints:
+      domainName: "default"
+
+activity.ActivityMaximumStartToCloseTimeout:
+  - value: 600s  # 10 minutes
+    constraints:
+      domainName: "default"
+
+# History policy
+history.EventsRemovedDueToHardLimit:
+  - value: false
+    constraints:
+      domainName: "default"
+
+# Rate limiting (disabled for development)
+worker.HistoryMaxPageSize:
+  - value: 256
+    constraints:
+      domainName: "default"
+
+# Replication policy
+replication.ReplicationTaskMaxRetryCount:
+  - value: 5
+    constraints:
+      domainName: "default"
+
+# System workflow configuration
+system.WorkflowMaxConcurrentActivityExecutionSize:
+  - value: 1000
+    constraints:
+      domainName: "default"
+
+# Visibility configuration
+visibility.ESVisibilityListMaxQueueDepth:
+  - value: 1000
+    constraints:
+      domainName: "default"
+
+# Notes for production environment:
+# - Reduce workflow duration limits
+# - Implement shorter retention periods
+# - Enable rate limiting
+# - Add authentication and TLS
+# - Configure proper logging and monitoring
+# - Set up proper backup and disaster recovery

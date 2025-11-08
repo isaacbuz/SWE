@@ -1,0 +1,32 @@
+defaults:
+  provider: openai
+  model: gpt-5
+  max_cost_usd: 5.0
+  latency_slo_ms: 60000
+
+rules:
+  - match:
+      task_type: planning
+    route:
+      provider: openai
+      model: gpt-5
+      mode: structured_outputs
+  - match:
+      task_type: repo_edit
+    route:
+      provider: anthropic
+      model: claude-4.1
+      mode: sub_agents
+  - match:
+      task_type: codemod
+      repo_size: large
+    route:
+      provider: local
+      model: qwen2.5-coder-32b
+      mode: local_vllm
+  - match:
+      task_type: compliance
+    route:
+      provider: anthropic
+      model: claude-4.1
+      mode: tool_use

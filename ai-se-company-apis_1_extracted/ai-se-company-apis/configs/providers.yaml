@@ -1,0 +1,47 @@
+# configs/providers.yaml
+#
+# Central registry of external APIs and corpora. The router reads these and
+# enables/blocks tools at runtime based on scope, seat, and compliance policy.
+providers:
+  google:
+    enabled: true
+    auth:
+      mode: "oauth_client"  # or 'service_account'
+      scopes:
+        - "https://www.googleapis.com/auth/drive.readonly"
+        - "https://www.googleapis.com/auth/spreadsheets.readonly"
+    apis:
+      - name: "sheets"
+        base_url: "https://sheets.googleapis.com/v4"
+      - name: "drive"
+        base_url: "https://www.googleapis.com/drive/v3"
+      - name: "bigquery"
+        base_url: "https://bigquery.googleapis.com"
+  us_gov_gsa:
+    enabled: true
+    base_url: "https://api.gsa.gov"
+    # Many endpoints require an API key via 'X-API-Key' or query param.
+    headers:
+      X-API-Key: "${GSA_API_KEY}"
+    catalogs:
+      - "open.gsa.gov/api"
+      - "api.data.gov"
+  github_public:
+    enabled: true
+    base_url: "https://api.github.com"
+    auth:
+      mode: "token_optional"   # public endpoints do not require auth, but token raises rate limits
+    rag:
+      org_allowlist:
+        - "airbnb"
+        - "vercel"
+        - "microsoft"
+        - "pytorch"
+        - "open-telemetry"
+      topic_tags:
+        - "architecture"
+        - "styleguide"
+        - "coding-standards"
+        - "adr"
+        - "security"
+        - "contributing"

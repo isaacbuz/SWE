@@ -1,0 +1,9 @@
+PRESENTATION -> ORCHESTRATOR/MoE -> EXPERTS -> CONSENSUS -> QUALITY -> MCP -> GITHUB/CI/DEPLOY/DOCS
+
+[UI/API]
+   |
+[Decompose] -> [Route] -> {CEO, Architect, VP Eng, CTO, CFO, UX, SA, OSS Coders}
+   |                                                (parallel)
+[Consensus] -> [Quality Gates] -> [MCP: github/tests/security/deploy/docs]
+   |
+[Outputs: PR + issues + diagrams + preview]

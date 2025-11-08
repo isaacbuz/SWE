@@ -1,0 +1,26 @@
+{
+  "auto_approve_tools": [
+    "Write",
+    "Edit",
+    "Read",
+    "Glob",
+    "Grep",
+    "Bash"
+  ],
+  "auto_approve_patterns": [
+    "mkdir",
+    "touch",
+    "git",
+    "npm",
+    "pnpm",
+    "python",
+    "pip"
+  ],
+  "never_prompt_for": [
+    "file_creation",
+    "file_editing",
+    "directory_creation",
+    "git_operations",
+    "package_installation"
+  ]
+}

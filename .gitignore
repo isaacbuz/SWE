@@ -1,0 +1,253 @@
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+.env.backup
+.env.*.backup
+.secret-backups/
+
+# Credentials and keys
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+**/credentials.json
+**/service-account.json
+~/.ssh/
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.AppleDouble
+.LSOverride
+*.iml
+.workspace
+.ionide/
+.vim/
+.emacs.d/
+*.sublime-workspace
+*.sublime-project
+
+# Build and Distribution
+dist/
+build/
+.next/
+out/
+.nuxt/
+.cache/
+.parcel-cache/
+.vuepress/dist
+
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output/
+.pytest_cache/
+__pycache__/
+*.egg-info/
+.coverage
+htmlcov/
+.tox/
+
+# Logging
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+setup.log
+secret-rotation.log
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.postgres
+data/
+postgres_data/
+redis_data/
+mongodb_data/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+.docker/
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+.kube/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# OS and System files
+Thumbs.db
+.vagrant/
+.cache/
+dist-ssr/
+
+# Application specific
+.next
+.vercel
+.turbo
+turbo.json.log
+
+# Development temp files
+temp/
+tmp/
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+*.swp
+.~*
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+.installed.cfg
+*.egg
+
+# Ruby
+*.gem
+*.rbc
+/.config
+/InstalledFiles
+/pkg/
+/spec/reports/
+/spec/tmp
+**/.ruby-version
+**/.ruby-gemset
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+.gradle/
+
+# Go
+*.out
+vendor/
+go.sum
+
+# Rust
+target/
+Cargo.lock
+
+# Package managers
+.pnp
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# CI/CD
+.github/workflows/secrets.yml
+
+# Temporary API documentation
+swagger.json
+openapi.yaml
+
+# Generated files
+generated/
+dist/
+
+# Local configuration overrides
+local.config.json
+.env.local.json
+
+# Prisma
+prisma/.env
+
+# Node
+.node_modules/
+npm-shrinkwrap.json
+
+# Security and Compliance
+audit/
+compliance/
+
+# Performance profiling
+*.cpuprofile
+perf/
+*.flamegraph
+
+# IDE plugins
+.eslintcache
+.stylelintcache
+tsconfig.tsbuildinfo
+
+# Project specific
+.project-local/
+uploads/
+temp-uploads/
+
+# System files to never commit
+.AppleDouble
+.LSOverride
+*.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Any files with sensitive naming patterns
+*secret*
+*private*
+*credential*
+*password*
+*token*
+*key*
+
+# Except whitelisted examples
+!.env.example
+!credentials.example.json
+!.github/workflows/
+
+# Architecture specific files
+.aws-sam/
+.chalice/
+sam-tests/

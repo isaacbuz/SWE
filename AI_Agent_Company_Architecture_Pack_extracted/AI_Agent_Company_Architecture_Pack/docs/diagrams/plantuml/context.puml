@@ -1,0 +1,31 @@
+
+@startuml
+actor Client
+actor CEO
+rectangle "Board of Agents" as Board {
+  component CRO
+  component CPTO
+  component COO
+  component CFO
+  component CISO
+}
+rectangle "Studio Pods" as Pods {
+  component PM
+  component Architect
+  component Dev
+  component QA
+  component Sec
+  component SRE
+}
+component "MoE Orchestrator + Policy" as Orchestrator
+node "MCP Toolchest" as MCP
+database "Artifacts/Vector/Audit" as Data
+cloud "GitHub/CI/Deploy/Obs/Sec" as Platforms
+Client --> CEO
+CEO --> Board
+Board --> Pods
+Pods --> Orchestrator
+Orchestrator --> MCP
+MCP --> Platforms
+Orchestrator --> Data
+@enduml

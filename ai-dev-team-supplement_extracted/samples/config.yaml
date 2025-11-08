@@ -1,0 +1,30 @@
+app:
+  name: ai-dev-team
+  environment: dev
+
+models:
+  primary_ceo: openai:gpt-5
+  architect: anthropic:claude-opus
+  vp_eng: google:gemini-2.5-pro
+  cto: xai:grok-4
+  cfo: deepseek:r1
+  ux: google:gemini-2.5-flash
+  solutions_arch: anthropic:claude-sonnet
+  oss_coders:
+    - qwen:2.5-coder-32b-instruct
+    - meta:llama-3.1-405b-instruct
+    - ibm:granite-code-8b
+    - ibm:granite-4.0-h-small
+
+budgets:
+  max_run_usd: 15.00
+  soft_cap_usd: 10.00
+
+providers:
+  retries: 2
+  backoff_ms: 400
+
+storage:
+  db: sqlite:///ai_dev_team.db
+  vector_store: local
+  artifacts_dir: ./artifacts

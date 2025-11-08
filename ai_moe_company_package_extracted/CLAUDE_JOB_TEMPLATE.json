@@ -1,0 +1,43 @@
+{
+  "job_id": "JOB-YYYY-MM-DD-###",
+  "brief": "Build a grants-finder web app for U.S. federal programs: search/filter by agency, eligibility, location; favorites; CSV export.",
+  "tags": [
+    "gov",
+    "web",
+    "rag",
+    "google-sheets-intake"
+  ],
+  "inputs": {
+    "google_sheet": {
+      "spreadsheet_id": "SPREADSHEET_ID",
+      "range": "Requirements!A1:F50"
+    },
+    "gov_queries": [
+      {
+        "endpoint": "api.data.gov/search/grants",
+        "query": "STEM small business"
+      },
+      {
+        "endpoint": "open.gsa.gov/api/service-catalog",
+        "query": "grants"
+      }
+    ],
+    "rag_filters": {
+      "repos_allowlist": [
+        "owasp/cheat-sheet-series",
+        "joelparkerhenderson/architecture_decision_record",
+        "vercel/next.js"
+      ]
+    }
+  },
+  "budgets": {
+    "usd": 25,
+    "max_input_tokens": 300000,
+    "max_output_tokens": 50000
+  },
+  "delivery": {
+    "github_repo_name": "grants-finder-mvp",
+    "private": false,
+    "enable_actions": true
+  }
+}

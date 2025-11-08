@@ -1,0 +1,126 @@
+{
+  "SystemSpec": {
+    "title": "string",
+    "summary": "string",
+    "non_functional_reqs": [
+      "string"
+    ],
+    "architectural_style": "string",
+    "tech_choices": [
+      {
+        "area": "string",
+        "choice": "string",
+        "why": "string",
+        "evidence_ids": [
+          "string"
+        ]
+      }
+    ],
+    "apis_needed": [
+      {
+        "name": "string",
+        "scope": "string",
+        "rate_limit": "string"
+      }
+    ],
+    "security": {
+      "auth": "string",
+      "secrets": "string",
+      "threats": [
+        "string"
+      ]
+    },
+    "deployment": {
+      "target": "string",
+      "environments": [
+        "string"
+      ]
+    },
+    "acceptance_tests": [
+      {
+        "id": "string",
+        "desc": "string",
+        "criteria": [
+          "string"
+        ]
+      }
+    ],
+    "risks": [
+      {
+        "id": "string",
+        "desc": "string",
+        "mitigation": "string"
+      }
+    ]
+  },
+  "BacklogItem": {
+    "id": "string",
+    "title": "string",
+    "type": "feature|chore|doc|security",
+    "files_touched": [
+      "string"
+    ],
+    "acceptance_criteria": [
+      "string"
+    ],
+    "dependencies": [
+      "string"
+    ],
+    "estimate_hours": "number"
+  },
+  "PolicyFacts": {
+    "facts": [
+      {
+        "id": "string",
+        "text": "string",
+        "source_id": "string"
+      }
+    ],
+    "evidence": [
+      {
+        "id": "string",
+        "source": "string",
+        "url": "string",
+        "retrieved_at": "string",
+        "hash": "string"
+      }
+    ]
+  },
+  "PatchPlan": {
+    "diffs": [
+      {
+        "path": "string",
+        "op": "create|replace|delete",
+        "language": "string",
+        "content?": "string",
+        "patch?": "string"
+      }
+    ],
+    "tests": [
+      {
+        "path": "string",
+        "language": "string",
+        "content": "string"
+      }
+    ],
+    "adr": {
+      "path": "string",
+      "content": "string"
+    }
+  },
+  "PRDraft": {
+    "title": "string",
+    "body": "string",
+    "links": {
+      "issues": [
+        "string"
+      ],
+      "evidence": [
+        "string"
+      ]
+    },
+    "labels": [
+      "string"
+    ]
+  }
+}

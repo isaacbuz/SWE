@@ -1,0 +1,547 @@
+# Model Registry Configuration
+# Defines all available AI models with their capabilities and costs
+
+models:
+  # Anthropic Models
+  - id: claude-sonnet-4
+    provider: anthropic
+    capabilities:
+      - reasoning
+      - code
+      - tools
+      - vision
+      - long_context
+      - function_calling
+      - streaming
+    cost_per_1k_input: 0.003
+    cost_per_1k_output: 0.015
+    context_window: 200000
+    max_output_tokens: 8192
+    quality_score: 0.95
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 4000
+    rate_limit_tpm: 400000
+    latency_p50_ms: 800
+    latency_p95_ms: 2000
+    enabled: true
+    fallback_models:
+      - claude-opus-4
+      - gpt-5
+    tags:
+      - premium
+      - reasoning
+      - multimodal
+
+  - id: claude-opus-4
+    provider: anthropic
+    capabilities:
+      - reasoning
+      - code
+      - tools
+      - vision
+      - long_context
+      - function_calling
+      - streaming
+    cost_per_1k_input: 0.015
+    cost_per_1k_output: 0.075
+    context_window: 200000
+    max_output_tokens: 8192
+    quality_score: 0.98
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 2000
+    rate_limit_tpm: 200000
+    latency_p50_ms: 1200
+    latency_p95_ms: 3000
+    enabled: true
+    fallback_models:
+      - claude-sonnet-4
+      - gpt-5
+    tags:
+      - premium
+      - highest_quality
+      - multimodal
+
+  - id: claude-haiku-4
+    provider: anthropic
+    capabilities:
+      - code
+      - tools
+      - vision
+      - function_calling
+      - streaming
+    cost_per_1k_input: 0.00025
+    cost_per_1k_output: 0.00125
+    context_window: 200000
+    max_output_tokens: 8192
+    quality_score: 0.80
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 5000
+    rate_limit_tpm: 500000
+    latency_p50_ms: 300
+    latency_p95_ms: 800
+    enabled: true
+    fallback_models:
+      - claude-sonnet-4
+      - gpt-4o-mini
+    tags:
+      - budget
+      - fast
+      - multimodal
+
+  # OpenAI Models
+  - id: gpt-5
+    provider: openai
+    capabilities:
+      - reasoning
+      - code
+      - tools
+      - vision
+      - function_calling
+      - json_mode
+      - streaming
+    cost_per_1k_input: 0.005
+    cost_per_1k_output: 0.020
+    context_window: 128000
+    max_output_tokens: 16384
+    quality_score: 0.94
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 5000
+    rate_limit_tpm: 800000
+    latency_p50_ms: 700
+    latency_p95_ms: 1800
+    enabled: true
+    fallback_models:
+      - claude-sonnet-4
+      - gpt-4o
+    tags:
+      - premium
+      - reasoning
+      - multimodal
+
+  - id: gpt-4o
+    provider: openai
+    capabilities:
+      - reasoning
+      - code
+      - tools
+      - vision
+      - function_calling
+      - json_mode
+      - streaming
+    cost_per_1k_input: 0.0025
+    cost_per_1k_output: 0.010
+    context_window: 128000
+    max_output_tokens: 16384
+    quality_score: 0.92
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 5000
+    rate_limit_tpm: 800000
+    latency_p50_ms: 600
+    latency_p95_ms: 1500
+    enabled: true
+    fallback_models:
+      - gpt-5
+      - claude-sonnet-4
+    tags:
+      - premium
+      - multimodal
+      - fast
+
+  - id: gpt-4o-mini
+    provider: openai
+    capabilities:
+      - code
+      - tools
+      - vision
+      - function_calling
+      - json_mode
+      - streaming
+    cost_per_1k_input: 0.00015
+    cost_per_1k_output: 0.00060
+    context_window: 128000
+    max_output_tokens: 16384
+    quality_score: 0.82
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 10000
+    rate_limit_tpm: 2000000
+    latency_p50_ms: 400
+    latency_p95_ms: 1000
+    enabled: true
+    fallback_models:
+      - claude-haiku-4
+      - gpt-4o
+    tags:
+      - budget
+      - fast
+      - multimodal
+
+  - id: o1
+    provider: openai
+    capabilities:
+      - reasoning
+      - code
+    cost_per_1k_input: 0.015
+    cost_per_1k_output: 0.060
+    context_window: 200000
+    max_output_tokens: 100000
+    quality_score: 0.97
+    supports_system_prompt: false
+    supports_streaming: false
+    rate_limit_rpm: 500
+    rate_limit_tpm: 100000
+    latency_p50_ms: 15000
+    latency_p95_ms: 60000
+    enabled: true
+    fallback_models:
+      - claude-opus-4
+      - gpt-5
+    tags:
+      - premium
+      - reasoning
+      - slow
+
+  - id: o1-mini
+    provider: openai
+    capabilities:
+      - reasoning
+      - code
+    cost_per_1k_input: 0.003
+    cost_per_1k_output: 0.012
+    context_window: 128000
+    max_output_tokens: 65536
+    quality_score: 0.90
+    supports_system_prompt: false
+    supports_streaming: false
+    rate_limit_rpm: 1000
+    rate_limit_tpm: 200000
+    latency_p50_ms: 8000
+    latency_p95_ms: 30000
+    enabled: true
+    fallback_models:
+      - claude-sonnet-4
+      - gpt-4o
+    tags:
+      - premium
+      - reasoning
+
+  # Google Models
+  - id: gemini-2.0-flash-thinking
+    provider: google
+    capabilities:
+      - reasoning
+      - code
+      - tools
+      - vision
+      - long_context
+      - function_calling
+      - streaming
+    cost_per_1k_input: 0.00
+    cost_per_1k_output: 0.00
+    context_window: 1000000
+    max_output_tokens: 8192
+    quality_score: 0.88
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 2000
+    rate_limit_tpm: 4000000
+    latency_p50_ms: 1000
+    latency_p95_ms: 3000
+    enabled: true
+    fallback_models:
+      - gemini-pro-1.5
+      - claude-sonnet-4
+    tags:
+      - free
+      - long_context
+      - multimodal
+      - experimental
+
+  - id: gemini-pro-1.5
+    provider: google
+    capabilities:
+      - reasoning
+      - code
+      - tools
+      - vision
+      - long_context
+      - function_calling
+      - json_mode
+      - streaming
+    cost_per_1k_input: 0.00125
+    cost_per_1k_output: 0.00500
+    context_window: 2000000
+    max_output_tokens: 8192
+    quality_score: 0.89
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 2000
+    rate_limit_tpm: 4000000
+    latency_p50_ms: 900
+    latency_p95_ms: 2500
+    enabled: true
+    fallback_models:
+      - claude-sonnet-4
+      - gpt-4o
+    tags:
+      - premium
+      - long_context
+      - multimodal
+
+  - id: gemini-flash-1.5
+    provider: google
+    capabilities:
+      - code
+      - tools
+      - vision
+      - long_context
+      - function_calling
+      - streaming
+    cost_per_1k_input: 0.000075
+    cost_per_1k_output: 0.000300
+    context_window: 1000000
+    max_output_tokens: 8192
+    quality_score: 0.81
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 4000
+    rate_limit_tpm: 4000000
+    latency_p50_ms: 500
+    latency_p95_ms: 1200
+    enabled: true
+    fallback_models:
+      - claude-haiku-4
+      - gpt-4o-mini
+    tags:
+      - budget
+      - fast
+      - long_context
+      - multimodal
+
+  # Mistral Models
+  - id: mistral-large-2
+    provider: mistral
+    capabilities:
+      - reasoning
+      - code
+      - tools
+      - function_calling
+      - json_mode
+      - streaming
+    cost_per_1k_input: 0.002
+    cost_per_1k_output: 0.006
+    context_window: 128000
+    max_output_tokens: 8192
+    quality_score: 0.87
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 1000
+    rate_limit_tpm: 100000
+    latency_p50_ms: 800
+    latency_p95_ms: 2000
+    enabled: true
+    fallback_models:
+      - claude-sonnet-4
+      - gpt-4o
+    tags:
+      - premium
+      - european
+
+  - id: mistral-small-2
+    provider: mistral
+    capabilities:
+      - code
+      - tools
+      - function_calling
+      - streaming
+    cost_per_1k_input: 0.0002
+    cost_per_1k_output: 0.0006
+    context_window: 128000
+    max_output_tokens: 8192
+    quality_score: 0.78
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 2000
+    rate_limit_tpm: 200000
+    latency_p50_ms: 500
+    latency_p95_ms: 1200
+    enabled: true
+    fallback_models:
+      - mistral-large-2
+      - gpt-4o-mini
+    tags:
+      - budget
+      - fast
+      - european
+
+  # Cohere Models
+  - id: command-r-plus
+    provider: cohere
+    capabilities:
+      - reasoning
+      - code
+      - tools
+      - function_calling
+      - streaming
+    cost_per_1k_input: 0.0025
+    cost_per_1k_output: 0.0100
+    context_window: 128000
+    max_output_tokens: 4096
+    quality_score: 0.86
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 1000
+    rate_limit_tpm: 100000
+    latency_p50_ms: 900
+    latency_p95_ms: 2200
+    enabled: true
+    fallback_models:
+      - claude-sonnet-4
+      - mistral-large-2
+    tags:
+      - premium
+      - rag
+
+  - id: command-r
+    provider: cohere
+    capabilities:
+      - code
+      - tools
+      - function_calling
+      - streaming
+    cost_per_1k_input: 0.0005
+    cost_per_1k_output: 0.0015
+    context_window: 128000
+    max_output_tokens: 4096
+    quality_score: 0.79
+    supports_system_prompt: true
+    supports_streaming: true
+    rate_limit_rpm: 2000
+    rate_limit_tpm: 200000
+    latency_p50_ms: 600
+    latency_p95_ms: 1500
+    enabled: true
+    fallback_models:
+      - command-r-plus
+      - mistral-small-2
+    tags:
+      - budget
+      - rag
+
+# Task Type to Model Preferences
+# Maps task types to preferred models and fallbacks
+task_preferences:
+  reasoning:
+    preferred:
+      - claude-opus-4
+      - o1
+      - claude-sonnet-4
+    budget:
+      - o1-mini
+      - claude-sonnet-4
+      - mistral-large-2
+
+  code_generation:
+    preferred:
+      - claude-sonnet-4
+      - gpt-4o
+      - gemini-pro-1.5
+    budget:
+      - claude-haiku-4
+      - gpt-4o-mini
+      - mistral-small-2
+
+  code_review:
+    preferred:
+      - claude-sonnet-4
+      - gpt-5
+      - claude-opus-4
+    budget:
+      - gpt-4o-mini
+      - claude-haiku-4
+
+  planning:
+    preferred:
+      - gpt-5
+      - claude-sonnet-4
+      - o1-mini
+    budget:
+      - gpt-4o
+      - mistral-large-2
+
+  analysis:
+    preferred:
+      - claude-sonnet-4
+      - gemini-pro-1.5
+      - gpt-5
+    budget:
+      - gemini-flash-1.5
+      - gpt-4o-mini
+
+  documentation:
+    preferred:
+      - claude-haiku-4
+      - gpt-4o-mini
+      - mistral-small-2
+    budget:
+      - gemini-flash-1.5
+      - command-r
+
+  testing:
+    preferred:
+      - claude-sonnet-4
+      - gpt-4o
+    budget:
+      - claude-haiku-4
+      - gpt-4o-mini
+
+  refactoring:
+    preferred:
+      - claude-sonnet-4
+      - gpt-4o
+      - o1-mini
+    budget:
+      - gpt-4o-mini
+      - claude-haiku-4
+
+  security_audit:
+    preferred:
+      - claude-opus-4
+      - o1
+      - claude-sonnet-4
+    budget:
+      - claude-sonnet-4
+      - gpt-5
+
+  tool_use:
+    preferred:
+      - claude-sonnet-4
+      - gpt-4o
+      - gemini-pro-1.5
+    budget:
+      - claude-haiku-4
+      - gpt-4o-mini
+
+  multimodal:
+    preferred:
+      - claude-sonnet-4
+      - gpt-4o
+      - gemini-pro-1.5
+    budget:
+      - claude-haiku-4
+      - gpt-4o-mini
+      - gemini-flash-1.5
+
+  long_context:
+    preferred:
+      - gemini-pro-1.5
+      - claude-sonnet-4
+      - gemini-2.0-flash-thinking
+    budget:
+      - gemini-flash-1.5
+      - claude-haiku-4

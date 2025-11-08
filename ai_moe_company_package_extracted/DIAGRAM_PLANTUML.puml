@@ -1,0 +1,28 @@
+@startuml
+actor User
+rectangle Router as R
+cloud "Gov APIs" as G
+cloud "Google APIs" as GG
+cloud "Curated GitHub (RAG)" as RG
+database "Evidence Fabric" as E
+component "OpenAI Planner" as P
+component "Claude Impl Agent" as I
+component "Security/Compliance" as S
+component "QA Agent" as Q
+node "GitHub Delivery" as D
+
+User --> R : Brief
+R --> G : gov lanes
+R --> GG : sheets/drive lanes
+R --> RG : RAG allowlist
+G --> E
+GG --> E
+RG --> E
+E --> P : SystemSpec/Backlog(JSON)
+P --> I : Plan
+I --> S : PatchPlan + Tests + CI + ADR
+S --> Q : pass
+S --> I : fail
+Q --> I : revise
+Q --> D : ready
+@enduml

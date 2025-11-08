@@ -1,0 +1,46 @@
+version: 2
+static:
+  # Static snapshots configuration
+  include: '**/*.html'
+  exclude: 'node_modules/**'
+
+snapshots:
+  # Responsive breakpoints
+  widths:
+    - 375   # Mobile
+    - 768   # Tablet
+    - 1280  # Desktop
+    - 1920  # Large Desktop
+
+  # Minimum height of screenshots
+  min-height: 1024
+
+  # Enable Percy CSS for hiding dynamic content
+  percy-css: |
+    [data-testid="timestamp"],
+    [data-testid="random-id"],
+    .recharts-wrapper {
+      visibility: hidden !important;
+    }
+
+  # Enable JavaScript
+  enable-javascript: true
+
+discovery:
+  # Network idle timeout
+  network-idle-timeout: 750
+
+  # Disable cache
+  disable-cache: true
+
+# Agent configuration
+agent:
+  # Asset discovery configuration
+  asset-discovery:
+    # Network idle timeout
+    network-idle-timeout: 250
+
+    # Allowed hostnames for assets
+    allowed-hostnames:
+      - localhost
+      - 127.0.0.1

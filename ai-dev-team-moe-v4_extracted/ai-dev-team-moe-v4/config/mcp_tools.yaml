@@ -1,0 +1,18 @@
+
+# MCP server/tool declarations (logical). Wire to your MCP host runner.
+tools:
+  - name: repo_manager
+    server: mcp-git
+    capabilities: [clone, branch, commit, push, pr, issues, projects]
+  - name: quality_gates
+    server: mcp-quality
+    capabilities: [lint, test, security_scan, coverage, complexity]
+  - name: project_pm
+    server: mcp-github
+    capabilities: [issues, projects, discussions, actions, releases]
+  - name: web_search
+    server: mcp-search
+    capabilities: [bing, ddg, serpapi, github_search]
+  - name: file_ops
+    server: mcp-fs
+    capabilities: [read, write, move, zip]

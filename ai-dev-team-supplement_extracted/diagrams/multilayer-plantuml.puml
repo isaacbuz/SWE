@@ -1,0 +1,69 @@
+@startuml
+skinparam componentStyle rectangle
+
+package Presentation {
+  [Streamlit UI] as UI
+  [REST/CLI] as API
+}
+
+package "Orchestration & MoE" {
+  [Task Decomposer] as DEC
+  [MoE Router] as RTR
+  [Consensus Engine] as CNS
+  [Quality Gates] as QG
+}
+
+package "Experts & Tools" {
+  [CEO (GPT-5)] as CEO
+  [Chief Architect (Claude)] as ARCH
+  [VP Eng (Gemini 2.5 Pro)] as VPE
+  [CTO (Grok 4)] as CTO
+  [CFO (DeepSeek R1)] as CFO
+  [UX (Gemini Flash)] as UX
+  [Solutions Architect (Claude Sonnet)] as SA
+  [OSS Coders (Qwen/Llama/Granite)] as CODER
+  [MCP Tool Chest] as MCP
+}
+
+package "Providers & Data" {
+  [Model Mesh] as MODELS
+  [DB & Vector] as DB
+  [Artifact Store] as ART
+}
+
+package Ops {
+  [Observability] as OBS
+  [Secrets/Policy] as SEC
+  [Cost/Budgets] as COST
+}
+
+UI --> DEC
+API --> DEC
+DEC --> RTR
+RTR --> CEO
+RTR --> ARCH
+RTR --> VPE
+RTR --> CTO
+RTR --> CFO
+RTR --> UX
+RTR --> SA
+RTR --> CODER
+CEO --> CNS
+ARCH --> CNS
+VPE --> CNS
+CTO --> CNS
+CFO --> CNS
+UX --> CNS
+SA --> CNS
+CODER --> CNS
+CNS --> QG
+QG --> MCP
+MCP --> MODELS
+MCP --> DB
+MCP --> ART
+
+OBS ..> DEC
+OBS ..> RTR
+SEC ..> MCP
+COST ..> RTR
+@enduml
