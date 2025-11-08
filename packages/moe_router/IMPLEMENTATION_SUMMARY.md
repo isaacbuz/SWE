@@ -16,7 +16,7 @@ Complete implementation of a Mixture-of-Experts (MoE) Router with enhanced intel
 ## Project Structure
 
 ```
-packages/moe-router/
+packages/moe_router/
 ├── __init__.py                      # Package exports (46 lines)
 ├── models.py                        # Data models (181 lines)
 ├── router.py                        # Main router class (634 lines)
