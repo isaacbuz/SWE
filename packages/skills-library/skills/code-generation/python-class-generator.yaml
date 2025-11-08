@@ -1,0 +1,122 @@
+name: Python Class Generator
+slug: python-class-generator
+version: 1.0.0
+description: Generate Python classes with docstrings, type hints, and best practices
+detailed_description: |
+  Generates Python classes following PEP 8 and modern Python best practices:
+  - Type hints (PEP 484)
+  - Comprehensive docstrings (Google style)
+  - Property decorators
+  - Magic methods (__str__, __repr__, __eq__)
+  - Error handling
+  - Unit tests with pytest
+category: CODE_GENERATION
+tags:
+  - python
+  - class
+  - oop
+  - backend
+author_name: AgentOS Team
+prompt_template: |
+  Generate a Python class with the following specifications:
+  
+  **Class Details:**
+  - Name: {{ class_name }}
+  - Description: {{ description }}
+  - Base Classes: {{ base_classes }}
+  
+  **Attributes:**
+  {{ attributes_schema }}
+  
+  **Methods:**
+  {{ methods_schema }}
+  
+  **Requirements:**
+  1. Use Python 3.11+ with type hints
+  2. Include Google-style docstrings
+  3. Add property decorators where appropriate
+  4. Implement __str__, __repr__, __eq__ methods
+  5. Include proper error handling
+  6. Add unit tests with pytest
+  7. Follow PEP 8 style guide
+  8. Use dataclasses if appropriate
+  
+  Generate:
+  - Complete class code
+  - Type definitions
+  - Unit tests
+input_schema:
+  type: object
+  required:
+    - class_name
+    - description
+    - attributes_schema
+  properties:
+    class_name:
+      type: string
+      description: Class name (PascalCase)
+      example: User
+    description:
+      type: string
+      description: Class description
+      example: Represents a user in the system
+    base_classes:
+      type: array
+      items:
+        type: string
+      description: Base classes to inherit from
+      default: []
+    attributes_schema:
+      type: object
+      description: JSON Schema for class attributes
+      example:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          email:
+            type: string
+            format: email
+    methods_schema:
+      type: object
+      description: JSON Schema for methods
+      default: {}
+output_schema:
+  type: object
+  required:
+    - class_code
+    - tests_code
+  properties:
+    class_code:
+      type: string
+      description: Complete Python class code
+    tests_code:
+      type: string
+      description: Pytest unit tests
+examples:
+  - name: User Class
+    inputs:
+      class_name: User
+      description: Represents a user
+      attributes_schema:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          email:
+            type: string
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+    - gpt-4o
+  min_quality: 0.85
+  temperature: 0.3
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

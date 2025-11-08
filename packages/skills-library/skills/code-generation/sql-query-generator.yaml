@@ -1,0 +1,102 @@
+name: SQL Query Generator
+slug: sql-query-generator
+version: 1.0.0
+description: Generate optimized SQL queries from natural language descriptions
+detailed_description: |
+  Converts natural language requirements into optimized SQL queries:
+  - SELECT queries with JOINs
+  - Aggregations and GROUP BY
+  - WHERE clause optimization
+  - Index recommendations
+  - Query explanation
+category: CODE_GENERATION
+tags:
+  - sql
+  - database
+  - query
+  - postgresql
+author_name: AgentOS Team
+prompt_template: |
+  Generate an optimized SQL query based on the following requirements:
+  
+  **Requirements:**
+  {{ requirements }}
+  
+  **Database Schema:**
+  {{ schema_description }}
+  
+  **Query Type:** {{ query_type }}
+  
+  **Database:** {{ database_type }}
+  
+  Generate:
+  1. Optimized SQL query
+  2. Query explanation
+  3. Index recommendations
+  4. Performance notes
+input_schema:
+  type: object
+  required:
+    - requirements
+    - schema_description
+    - query_type
+  properties:
+    requirements:
+      type: string
+      description: Natural language description of what the query should do
+      example: Get all users who signed up in the last 30 days and their total order count
+    schema_description:
+      type: string
+      description: Database schema description or table definitions
+      example: |
+        users table: id, email, name, created_at
+        orders table: id, user_id, amount, created_at
+    query_type:
+      type: string
+      enum: [SELECT, INSERT, UPDATE, DELETE]
+      description: Type of query
+      example: SELECT
+    database_type:
+      type: string
+      enum: [postgresql, mysql, sqlite]
+      description: Target database
+      default: postgresql
+output_schema:
+  type: object
+  required:
+    - query
+    - explanation
+  properties:
+    query:
+      type: string
+      description: Generated SQL query
+    explanation:
+      type: string
+      description: Explanation of the query
+    index_recommendations:
+      type: array
+      items:
+        type: string
+      description: Recommended indexes
+    performance_notes:
+      type: string
+      description: Performance considerations
+examples:
+  - name: User Orders Query
+    inputs:
+      requirements: Get users with their total order count and average order value
+      schema_description: |
+        users: id, email, name
+        orders: id, user_id, amount
+      query_type: SELECT
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+    - gpt-4o
+  min_quality: 0.80
+  temperature: 0.2
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

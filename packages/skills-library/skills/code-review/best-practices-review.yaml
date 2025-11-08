@@ -1,0 +1,88 @@
+name: Best Practices Code Review
+slug: best-practices-review
+version: 1.0.0
+description: Code review focusing on best practices, maintainability, and code quality
+detailed_description: |
+  Reviews code for:
+  - Code style and conventions
+  - Design patterns
+  - SOLID principles
+  - DRY (Don't Repeat Yourself)
+  - Maintainability
+  - Documentation
+  - Error handling
+category: CODE_REVIEW
+tags:
+  - code-review
+  - best-practices
+  - quality
+  - maintainability
+author_name: AgentOS Team
+prompt_template: |
+  Perform a best practices code review:
+  
+  **Code:**
+  ```{{ language }}
+  {{ code }}
+  ```
+  
+  **Language Standards:** {{ language_standards }}
+  
+  **Review Focus:**
+  - Code style and conventions
+  - Design patterns usage
+  - SOLID principles compliance
+  - DRY violations
+  - Maintainability
+  - Documentation quality
+  - Error handling
+  
+  Provide:
+  1. Style violations
+  2. Best practice recommendations
+  3. Refactoring suggestions
+  4. Quality score
+input_schema:
+  type: object
+  required:
+    - code
+    - language
+  properties:
+    code:
+      type: string
+      format: textarea
+    language:
+      type: string
+    language_standards:
+      type: string
+      description: Language-specific standards (e.g., PEP 8, ESLint)
+      default: "Standard conventions"
+output_schema:
+  type: object
+  required:
+    - issues
+    - recommendations
+    - quality_score
+  properties:
+    issues:
+      type: array
+      items:
+        type: object
+    recommendations:
+      type: array
+      items:
+        type: string
+    quality_score:
+      type: number
+      minimum: 0
+      maximum: 100
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+  min_quality: 0.85
+  temperature: 0.3
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

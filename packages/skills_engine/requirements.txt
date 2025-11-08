@@ -1,0 +1,21 @@
+# Skills Execution Engine Dependencies
+
+# Core dependencies
+jinja2>=3.1.2
+jsonschema>=4.17.3
+pydantic>=2.0.0
+
+# Database
+asyncpg>=0.29.0
+
+# Optional: For YAML parsing in output validator
+pyyaml>=6.0
+
+# Redis (already in db package, but listed for clarity)
+redis>=5.0.0
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.11.0
+

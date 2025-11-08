@@ -1,0 +1,90 @@
+name: Database Schema Designer
+slug: database-schema-designer
+version: 1.0.0
+description: Design optimized database schemas with relationships, indexes, and constraints
+detailed_description: |
+  Designs database schemas with:
+  - Table definitions
+  - Relationships (foreign keys)
+  - Indexes
+  - Constraints
+  - Normalization
+  - Migration scripts
+category: ARCHITECTURE
+tags:
+  - database
+  - schema
+  - sql
+  - design
+author_name: AgentOS Team
+prompt_template: |
+  Design a database schema:
+  
+  **Requirements:**
+  {{ requirements }}
+  
+  **Entities:**
+  {{ entities_description }}
+  
+  **Relationships:**
+  {{ relationships_description }}
+  
+  **Database:** {{ database_type }}
+  
+  Generate:
+  1. Complete schema (CREATE TABLE statements)
+  2. Indexes
+  3. Foreign keys
+  4. Constraints
+  5. Migration script
+input_schema:
+  type: object
+  required:
+    - requirements
+    - entities_description
+    - database_type
+  properties:
+    requirements:
+      type: string
+      format: textarea
+      description: Requirements and use cases
+    entities_description:
+      type: string
+      format: textarea
+      description: Description of entities and their attributes
+    relationships_description:
+      type: string
+      format: textarea
+      description: Relationships between entities
+      default: ""
+    database_type:
+      type: string
+      enum: [postgresql, mysql, sqlite]
+      default: postgresql
+output_schema:
+  type: object
+  required:
+    - schema_sql
+    - migration_script
+  properties:
+    schema_sql:
+      type: string
+      description: Complete CREATE TABLE statements
+    migration_script:
+      type: string
+      description: Migration script
+    indexes:
+      type: array
+      items:
+        type: string
+      description: Recommended indexes
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+  min_quality: 0.85
+  temperature: 0.2
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

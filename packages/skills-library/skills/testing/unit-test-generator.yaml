@@ -1,0 +1,113 @@
+name: Unit Test Generator
+slug: unit-test-generator
+version: 1.0.0
+description: Generate comprehensive unit tests with edge cases and mocks
+detailed_description: |
+  Generates unit tests that include:
+  - Happy path tests
+  - Edge cases
+  - Error scenarios
+  - Mock setup
+  - Assertions
+  - Test coverage analysis
+category: TESTING
+tags:
+  - testing
+  - unit-tests
+  - jest
+  - pytest
+author_name: AgentOS Team
+prompt_template: |
+  Generate comprehensive unit tests for the following code:
+  
+  **Code to Test:**
+  ```{{ language }}
+  {{ code }}
+  ```
+  
+  **Test Framework:** {{ test_framework }}
+  **Coverage Target:** {{ coverage_target }}%
+  
+  **Requirements:**
+  1. Test all public methods/functions
+  2. Include edge cases (null, empty, boundary values)
+  3. Test error scenarios
+  4. Use proper mocking for dependencies
+  5. Include descriptive test names
+  6. Add setup/teardown if needed
+  7. Aim for {{ coverage_target }}% coverage
+  
+  Generate complete test suite with:
+  - Test cases
+  - Mocks/stubs
+  - Assertions
+  - Coverage report
+input_schema:
+  type: object
+  required:
+    - code
+    - language
+    - test_framework
+  properties:
+    code:
+      type: string
+      description: Code to test
+      format: textarea
+    language:
+      type: string
+      enum: [typescript, javascript, python, java]
+      description: Programming language
+      example: typescript
+    test_framework:
+      type: string
+      enum: [jest, vitest, pytest, unittest, junit]
+      description: Test framework
+      example: jest
+    coverage_target:
+      type: number
+      description: Target test coverage percentage
+      default: 80
+      minimum: 0
+      maximum: 100
+output_schema:
+  type: object
+  required:
+    - test_code
+    - coverage_estimate
+    - test_cases_count
+  properties:
+    test_code:
+      type: string
+      description: Complete test suite code
+    coverage_estimate:
+      type: number
+      description: Estimated coverage percentage
+    test_cases_count:
+      type: number
+      description: Number of test cases generated
+    edge_cases:
+      type: array
+      items:
+        type: string
+      description: Edge cases covered
+examples:
+  - name: Function Tests
+    inputs:
+      code: |
+        function add(a: number, b: number): number {
+          return a + b;
+        }
+      language: typescript
+      test_framework: jest
+      coverage_target: 100
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+    - gpt-4o
+  min_quality: 0.85
+  temperature: 0.3
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

@@ -1,0 +1,103 @@
+name: Security Code Review
+slug: security-code-review
+version: 1.0.0
+description: Security-focused code review identifying vulnerabilities and security best practices
+detailed_description: |
+  Performs comprehensive security code review:
+  - SQL injection vulnerabilities
+  - XSS vulnerabilities
+  - Authentication/authorization issues
+  - Secret management
+  - Input validation
+  - OWASP Top 10 compliance
+category: CODE_REVIEW
+tags:
+  - security
+  - code-review
+  - owasp
+  - vulnerabilities
+author_name: AgentOS Team
+prompt_template: |
+  Perform a security-focused code review on the following code:
+  
+  **Code:**
+  ```{{ language }}
+  {{ code }}
+  ```
+  
+  **Context:**
+  {{ context }}
+  
+  **Review Focus:**
+  - SQL injection vulnerabilities
+  - XSS vulnerabilities
+  - Authentication/authorization flaws
+  - Secret management issues
+  - Input validation problems
+  - OWASP Top 10 compliance
+  - Security best practices
+  
+  Provide:
+  1. Security vulnerabilities found (with severity)
+  2. Recommendations for fixes
+  3. Security best practices suggestions
+  4. OWASP compliance assessment
+input_schema:
+  type: object
+  required:
+    - code
+    - language
+  properties:
+    code:
+      type: string
+      format: textarea
+    language:
+      type: string
+      enum: [typescript, javascript, python, java, go]
+    context:
+      type: string
+      description: Additional context about the code
+      default: ""
+output_schema:
+  type: object
+  required:
+    - vulnerabilities
+    - recommendations
+    - security_score
+  properties:
+    vulnerabilities:
+      type: array
+      items:
+        type: object
+        properties:
+          severity:
+            type: string
+            enum: [critical, high, medium, low]
+          type:
+            type: string
+          description:
+            type: string
+          line_number:
+            type: number
+          recommendation:
+            type: string
+    recommendations:
+      type: array
+      items:
+        type: string
+    security_score:
+      type: number
+      description: Security score out of 100
+      minimum: 0
+      maximum: 100
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+    - gpt-4o
+  min_quality: 0.90
+  temperature: 0.2
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

@@ -1,0 +1,80 @@
+name: System Design Diagram Generator
+slug: system-design-diagram
+version: 1.0.0
+description: Generate Mermaid/PlantUML diagrams from system descriptions
+detailed_description: |
+  Generates architecture diagrams:
+  - Component diagrams
+  - Sequence diagrams
+  - Deployment diagrams
+  - ER diagrams
+  - In Mermaid or PlantUML format
+category: ARCHITECTURE
+tags:
+  - architecture
+  - diagram
+  - mermaid
+  - plantuml
+author_name: AgentOS Team
+prompt_template: |
+  Generate a system architecture diagram:
+  
+  **System Description:**
+  {{ system_description }}
+  
+  **Diagram Type:** {{ diagram_type }}
+  **Format:** {{ format }}
+  
+  **Components:**
+  {{ components_description }}
+  
+  Generate:
+  1. Diagram code ({{ format }})
+  2. Diagram description
+  3. Component explanations
+input_schema:
+  type: object
+  required:
+    - system_description
+    - diagram_type
+    - format
+  properties:
+    system_description:
+      type: string
+      format: textarea
+      description: Description of the system to diagram
+    diagram_type:
+      type: string
+      enum: [component, sequence, deployment, erd, flowchart]
+      description: Type of diagram
+    format:
+      type: string
+      enum: [mermaid, plantuml]
+      default: mermaid
+    components_description:
+      type: string
+      format: textarea
+      description: Description of components and their relationships
+      default: ""
+output_schema:
+  type: object
+  required:
+    - diagram_code
+    - description
+  properties:
+    diagram_code:
+      type: string
+      description: Diagram code in specified format
+    description:
+      type: string
+      description: Description of the diagram
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+  min_quality: 0.85
+  temperature: 0.3
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

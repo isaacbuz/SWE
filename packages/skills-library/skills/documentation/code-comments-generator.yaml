@@ -1,0 +1,70 @@
+name: Code Comments Generator
+slug: code-comments-generator
+version: 1.0.0
+description: Add inline documentation and comments to code
+detailed_description: |
+  Adds comprehensive comments to code:
+  - Function/method docstrings
+  - Inline comments for complex logic
+  - Parameter descriptions
+  - Return value documentation
+  - Example usage
+category: DOCUMENTATION
+tags:
+  - documentation
+  - comments
+  - docstrings
+author_name: AgentOS Team
+prompt_template: |
+  Add comprehensive comments and documentation to the following code:
+  
+  **Code:**
+  ```{{ language }}
+  {{ code }}
+  ```
+  
+  **Comment Style:** {{ comment_style }}
+  
+  **Requirements:**
+  1. Add function/method docstrings
+  2. Add inline comments for complex logic
+  3. Document parameters and return values
+  4. Include usage examples in docstrings
+  5. Follow {{ comment_style }} style guide
+  
+  Generate code with comprehensive comments.
+input_schema:
+  type: object
+  required:
+    - code
+    - language
+  properties:
+    code:
+      type: string
+      format: textarea
+    language:
+      type: string
+      enum: [typescript, javascript, python, java, go]
+    comment_style:
+      type: string
+      enum: [jsdoc, google, sphinx, javadoc]
+      description: Documentation style
+      default: jsdoc
+output_schema:
+  type: object
+  required:
+    - documented_code
+  properties:
+    documented_code:
+      type: string
+      description: Code with comprehensive comments
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+  min_quality: 0.85
+  temperature: 0.3
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

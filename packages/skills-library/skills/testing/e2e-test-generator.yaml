@@ -1,0 +1,84 @@
+name: E2E Test Generator
+slug: e2e-test-generator
+version: 1.0.0
+description: Generate end-to-end tests with Playwright or Cypress
+detailed_description: |
+  Generates E2E tests for web applications:
+  - User flows
+  - UI interactions
+  - Form submissions
+  - Navigation
+  - Visual regression (optional)
+category: TESTING
+tags:
+  - testing
+  - e2e
+  - playwright
+  - cypress
+author_name: AgentOS Team
+prompt_template: |
+  Generate E2E tests for the following user flow:
+  
+  **Flow Description:**
+  {{ flow_description }}
+  
+  **Pages/Components:**
+  {{ pages_description }}
+  
+  **Test Framework:** {{ test_framework }}
+  
+  **Requirements:**
+  1. Test complete user journey
+  2. Include page object model
+  3. Test form interactions
+  4. Test navigation
+  5. Include assertions
+  6. Add wait strategies
+  {% if include_visual_regression %}
+  7. Include visual regression tests
+  {% endif %}
+  
+  Generate complete E2E test suite.
+input_schema:
+  type: object
+  required:
+    - flow_description
+    - pages_description
+    - test_framework
+  properties:
+    flow_description:
+      type: string
+      description: Description of user flow to test
+      format: textarea
+    pages_description:
+      type: string
+      description: Description of pages/components involved
+      format: textarea
+    test_framework:
+      type: string
+      enum: [playwright, cypress, selenium]
+      default: playwright
+    include_visual_regression:
+      type: boolean
+      default: false
+output_schema:
+  type: object
+  required:
+    - test_code
+    - page_objects
+  properties:
+    test_code:
+      type: string
+    page_objects:
+      type: string
+      description: Page object model code
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+  min_quality: 0.85
+  temperature: 0.3
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

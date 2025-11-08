@@ -1,0 +1,83 @@
+name: API Documentation Generator
+slug: api-documentation-generator
+version: 1.0.0
+description: Generate OpenAPI/Swagger documentation from code or specifications
+detailed_description: |
+  Generates comprehensive API documentation:
+  - OpenAPI 3.1 specification
+  - Markdown documentation
+  - Request/response examples
+  - Authentication details
+  - Error responses
+category: DOCUMENTATION
+tags:
+  - documentation
+  - api
+  - openapi
+  - swagger
+author_name: AgentOS Team
+prompt_template: |
+  Generate OpenAPI 3.1 documentation for the following API:
+  
+  **API Information:**
+  - Title: {{ api_title }}
+  - Version: {{ api_version }}
+  - Description: {{ api_description }}
+  
+  **Endpoints:**
+  {{ endpoints_description }}
+  
+  **Authentication:**
+  {{ authentication_type }}
+  
+  Generate:
+  1. Complete OpenAPI 3.1 specification (YAML)
+  2. Markdown documentation
+  3. Request/response examples
+input_schema:
+  type: object
+  required:
+    - api_title
+    - api_version
+    - api_description
+    - endpoints_description
+  properties:
+    api_title:
+      type: string
+      example: User Management API
+    api_version:
+      type: string
+      example: 1.0.0
+    api_description:
+      type: string
+      format: textarea
+    endpoints_description:
+      type: string
+      format: textarea
+      description: Description of API endpoints
+    authentication_type:
+      type: string
+      enum: [none, bearer, api_key, oauth2]
+      default: bearer
+output_schema:
+  type: object
+  required:
+    - openapi_spec
+    - markdown_docs
+  properties:
+    openapi_spec:
+      type: string
+      description: OpenAPI 3.1 YAML specification
+    markdown_docs:
+      type: string
+      description: Markdown documentation
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+  min_quality: 0.85
+  temperature: 0.3
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

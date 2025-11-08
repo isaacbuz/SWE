@@ -1,0 +1,169 @@
+name: TypeScript API Endpoint Generator
+slug: typescript-api-endpoint
+version: 1.0.0
+description: Generate a complete Express.js API endpoint with TypeScript, validation, error handling, and tests
+detailed_description: |
+  This Skill generates production-ready Express.js API endpoints written in TypeScript.
+  
+  Features:
+  - Input validation with Zod schemas
+  - Error handling middleware
+  - Type-safe request/response types
+  - Unit tests with Jest
+  - OpenAPI documentation comments
+  
+  The generated code follows best practices and includes proper error handling, logging, and type safety.
+category: CODE_GENERATION
+tags:
+  - typescript
+  - express
+  - api
+  - rest
+  - backend
+author_name: AgentOS Team
+author_email: team@agentos.com
+organization: AgentOS
+prompt_template: |
+  Generate a complete Express.js API endpoint in TypeScript with the following specifications:
+  
+  **Endpoint Details:**
+  - Path: {{ endpoint_path }}
+  - Method: {{ http_method }}
+  - Description: {{ description }}
+  
+  **Request Schema:**
+  {{ request_schema }}
+  
+  **Response Schema:**
+  {{ response_schema }}
+  
+  **Requirements:**
+  1. Use Express.js with TypeScript
+  2. Implement Zod validation for request body
+  3. Include proper error handling (try-catch, error middleware)
+  4. Add JSDoc comments for OpenAPI generation
+  5. Include unit tests using Jest
+  6. Follow RESTful conventions
+  7. Use async/await for async operations
+  8. Include proper TypeScript types
+  
+  **Additional Context:**
+  {{ additional_context }}
+  
+  Generate the complete endpoint code, including:
+  - Route handler function
+  - Validation schema
+  - Error handling
+  - Unit tests
+  - Type definitions
+input_schema:
+  type: object
+  required:
+    - endpoint_path
+    - http_method
+    - description
+    - request_schema
+    - response_schema
+  properties:
+    endpoint_path:
+      type: string
+      description: API endpoint path (e.g., /api/users/:id)
+      example: /api/users/:id
+    http_method:
+      type: string
+      enum: [GET, POST, PUT, PATCH, DELETE]
+      description: HTTP method
+      example: GET
+    description:
+      type: string
+      description: Endpoint description
+      example: Get user by ID
+    request_schema:
+      type: object
+      description: JSON Schema for request body/query/params
+      example:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+    response_schema:
+      type: object
+      description: JSON Schema for response body
+      example:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+    additional_context:
+      type: string
+      description: Additional context or requirements
+      default: ""
+output_schema:
+  type: object
+  required:
+    - code
+    - validation_schema
+    - types
+    - tests
+  properties:
+    code:
+      type: string
+      description: Complete endpoint implementation code
+    validation_schema:
+      type: string
+      description: Zod validation schema code
+    types:
+      type: string
+      description: TypeScript type definitions
+    tests:
+      type: string
+      description: Jest unit test code
+examples:
+  - name: Get User Endpoint
+    inputs:
+      endpoint_path: /api/users/:id
+      http_method: GET
+      description: Retrieve a user by ID
+      request_schema:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+      response_schema:
+        type: object
+        properties:
+          id:
+            type: string
+          email:
+            type: string
+          name:
+            type: string
+      additional_context: Include authentication check
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+    - gpt-4o
+  min_quality: 0.85
+  max_cost: 0.10
+  temperature: 0.3
+validation_rules:
+  - type: required_fields
+    params:
+      fields:
+        - code
+        - validation_schema
+        - types
+        - tests
+  - type: regex
+    params:
+      field: code
+      pattern: "export.*function|export.*const"
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

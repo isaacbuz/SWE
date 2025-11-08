@@ -1,0 +1,92 @@
+name: README Generator
+slug: readme-generator
+version: 1.0.0
+description: Generate comprehensive README files with installation, usage, and examples
+detailed_description: |
+  Generates professional README files including:
+  - Project description
+  - Installation instructions
+  - Usage examples
+  - API documentation
+  - Contributing guidelines
+  - License information
+category: DOCUMENTATION
+tags:
+  - documentation
+  - readme
+  - markdown
+author_name: AgentOS Team
+prompt_template: |
+  Generate a comprehensive README.md file:
+  
+  **Project Information:**
+  - Name: {{ project_name }}
+  - Description: {{ project_description }}
+  - Language: {{ language }}
+  - License: {{ license }}
+  
+  **Features:**
+  {{ features }}
+  
+  **Installation Steps:**
+  {{ installation_steps }}
+  
+  **Usage Examples:**
+  {{ usage_examples }}
+  
+  Generate a complete README with:
+  - Project title and description
+  - Features list
+  - Installation instructions
+  - Usage examples
+  - API documentation (if applicable)
+  - Contributing guidelines
+  - License
+input_schema:
+  type: object
+  required:
+    - project_name
+    - project_description
+    - language
+  properties:
+    project_name:
+      type: string
+    project_description:
+      type: string
+      format: textarea
+    language:
+      type: string
+    license:
+      type: string
+      default: MIT
+    features:
+      type: array
+      items:
+        type: string
+      description: List of features
+    installation_steps:
+      type: array
+      items:
+        type: string
+      description: Installation steps
+    usage_examples:
+      type: string
+      format: textarea
+output_schema:
+  type: object
+  required:
+    - readme_content
+  properties:
+    readme_content:
+      type: string
+      description: Complete README.md content
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+  min_quality: 0.85
+  temperature: 0.4
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

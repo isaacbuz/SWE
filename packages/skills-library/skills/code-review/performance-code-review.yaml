@@ -1,0 +1,96 @@
+name: Performance Code Review
+slug: performance-code-review
+version: 1.0.0
+description: Performance optimization review identifying bottlenecks and optimization opportunities
+detailed_description: |
+  Analyzes code for performance issues:
+  - N+1 query problems
+  - Inefficient algorithms
+  - Memory leaks
+  - Unnecessary re-renders
+  - Database query optimization
+  - Caching opportunities
+category: CODE_REVIEW
+tags:
+  - performance
+  - optimization
+  - code-review
+  - profiling
+author_name: AgentOS Team
+prompt_template: |
+  Perform a performance-focused code review:
+  
+  **Code:**
+  ```{{ language }}
+  {{ code }}
+  ```
+  
+  **Context:**
+  {{ context }}
+  
+  **Review Focus:**
+  - Algorithm efficiency (Big O)
+  - Database query optimization
+  - Memory usage
+  - Caching opportunities
+  - Unnecessary computations
+  - Bottlenecks
+  
+  Provide:
+  1. Performance issues found
+  2. Optimization recommendations
+  3. Performance metrics estimates
+  4. Caching strategies
+input_schema:
+  type: object
+  required:
+    - code
+    - language
+  properties:
+    code:
+      type: string
+      format: textarea
+    language:
+      type: string
+    context:
+      type: string
+      default: ""
+output_schema:
+  type: object
+  required:
+    - issues
+    - recommendations
+    - performance_score
+  properties:
+    issues:
+      type: array
+      items:
+        type: object
+        properties:
+          severity:
+            type: string
+            enum: [critical, high, medium, low]
+          type:
+            type: string
+          description:
+            type: string
+          impact:
+            type: string
+    recommendations:
+      type: array
+      items:
+        type: string
+    performance_score:
+      type: number
+      minimum: 0
+      maximum: 100
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+  min_quality: 0.85
+  temperature: 0.2
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

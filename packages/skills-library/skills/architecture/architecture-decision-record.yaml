@@ -1,0 +1,92 @@
+name: Architecture Decision Record Generator
+slug: architecture-decision-record
+version: 1.0.0
+description: Generate Architecture Decision Records (ADRs) following best practices
+detailed_description: |
+  Generates ADRs in Markdown format following the standard template:
+  - Context
+  - Decision
+  - Consequences
+  - Status
+  - Date
+category: ARCHITECTURE
+tags:
+  - architecture
+  - adr
+  - documentation
+  - decision-making
+author_name: AgentOS Team
+prompt_template: |
+  Generate an Architecture Decision Record (ADR):
+  
+  **Decision Title:** {{ decision_title }}
+  **ADR Number:** {{ adr_number }}
+  **Status:** {{ status }}
+  
+  **Context:**
+  {{ context }}
+  
+  **Decision:**
+  {{ decision }}
+  
+  **Options Considered:**
+  {{ options_considered }}
+  
+  **Consequences:**
+  {{ consequences }}
+  
+  Generate a complete ADR in Markdown format following standard ADR template.
+input_schema:
+  type: object
+  required:
+    - decision_title
+    - context
+    - decision
+  properties:
+    decision_title:
+      type: string
+      example: Use PostgreSQL as primary database
+    adr_number:
+      type: number
+      description: ADR number
+      default: 1
+    status:
+      type: string
+      enum: [proposed, accepted, rejected, deprecated, superseded]
+      default: accepted
+    context:
+      type: string
+      format: textarea
+      description: Context and problem statement
+    decision:
+      type: string
+      format: textarea
+      description: Decision made
+    options_considered:
+      type: array
+      items:
+        type: string
+      description: Options that were considered
+    consequences:
+      type: array
+      items:
+        type: string
+      description: Consequences of the decision
+output_schema:
+  type: object
+  required:
+    - adr_markdown
+  properties:
+    adr_markdown:
+      type: string
+      description: Complete ADR in Markdown format
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+  min_quality: 0.85
+  temperature: 0.3
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

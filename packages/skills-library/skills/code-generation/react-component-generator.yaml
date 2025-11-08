@@ -1,0 +1,139 @@
+name: React Component Generator
+slug: react-component-generator
+version: 1.0.0
+description: Generate React components with TypeScript, hooks, and proper styling
+detailed_description: |
+  Generates production-ready React components with:
+  - TypeScript types
+  - Custom hooks
+  - Props validation
+  - Styling with Tailwind CSS
+  - Accessibility (ARIA) support
+  - Storybook stories (optional)
+category: CODE_GENERATION
+tags:
+  - react
+  - typescript
+  - frontend
+  - component
+  - ui
+author_name: AgentOS Team
+prompt_template: |
+  Generate a React component in TypeScript with the following specifications:
+  
+  **Component Details:**
+  - Name: {{ component_name }}
+  - Description: {{ description }}
+  - Type: {{ component_type }}
+  
+  **Props:**
+  {{ props_schema }}
+  
+  **Requirements:**
+  1. Use React 18+ with TypeScript
+  2. Include proper TypeScript types for props
+  3. Use functional components with hooks
+  4. Add Tailwind CSS classes for styling
+  5. Include accessibility attributes (ARIA)
+  6. Add JSDoc comments
+  7. Export component and types
+  {% if include_storybook %}
+  8. Include Storybook story
+  {% endif %}
+  
+  **Styling Preferences:**
+  {{ styling_preferences }}
+  
+  Generate:
+  - Component code
+  - Type definitions
+  - Export statements
+  {% if include_storybook %}
+  - Storybook story
+  {% endif %}
+input_schema:
+  type: object
+  required:
+    - component_name
+    - description
+    - component_type
+    - props_schema
+  properties:
+    component_name:
+      type: string
+      description: Component name (PascalCase)
+      example: UserCard
+    description:
+      type: string
+      description: Component description
+      example: Displays user information in a card format
+    component_type:
+      type: string
+      enum: [presentational, container, form, layout]
+      description: Component type
+      example: presentational
+    props_schema:
+      type: object
+      description: JSON Schema for component props
+      example:
+        type: object
+        properties:
+          user:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              email:
+                type: string
+    styling_preferences:
+      type: string
+      description: Styling preferences or theme
+      default: "Modern, clean design with subtle shadows"
+    include_storybook:
+      type: boolean
+      description: Include Storybook story
+      default: false
+output_schema:
+  type: object
+  required:
+    - component_code
+    - types_code
+  properties:
+    component_code:
+      type: string
+      description: Complete React component code
+    types_code:
+      type: string
+      description: TypeScript type definitions
+    storybook_story:
+      type: string
+      description: Storybook story code (if requested)
+examples:
+  - name: Button Component
+    inputs:
+      component_name: Button
+      description: A reusable button component
+      component_type: presentational
+      props_schema:
+        type: object
+        properties:
+          label:
+            type: string
+          onClick:
+            type: function
+          variant:
+            type: string
+            enum: [primary, secondary, danger]
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+    - gpt-4o
+  min_quality: 0.85
+  temperature: 0.3
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+

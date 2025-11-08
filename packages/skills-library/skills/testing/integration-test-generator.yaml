@@ -1,0 +1,90 @@
+name: Integration Test Generator
+slug: integration-test-generator
+version: 1.0.0
+description: Generate integration tests for API endpoints and services
+detailed_description: |
+  Generates integration tests that:
+  - Test API endpoints end-to-end
+  - Set up test database
+  - Test database interactions
+  - Verify response formats
+  - Test error handling
+category: TESTING
+tags:
+  - testing
+  - integration
+  - api
+  - e2e
+author_name: AgentOS Team
+prompt_template: |
+  Generate integration tests for the following API endpoint:
+  
+  **Endpoint:**
+  - Method: {{ http_method }}
+  - Path: {{ endpoint_path }}
+  - Description: {{ description }}
+  
+  **Request Schema:**
+  {{ request_schema }}
+  
+  **Response Schema:**
+  {{ response_schema }}
+  
+  **Test Framework:** {{ test_framework }}
+  
+  **Requirements:**
+  1. Test successful requests
+  2. Test validation errors
+  3. Test authentication/authorization
+  4. Test database interactions
+  5. Test error responses
+  6. Include setup/teardown for test database
+  7. Use realistic test data
+  
+  Generate complete integration test suite.
+input_schema:
+  type: object
+  required:
+    - http_method
+    - endpoint_path
+    - description
+    - request_schema
+    - response_schema
+    - test_framework
+  properties:
+    http_method:
+      type: string
+      enum: [GET, POST, PUT, PATCH, DELETE]
+    endpoint_path:
+      type: string
+      example: /api/users/:id
+    description:
+      type: string
+    request_schema:
+      type: object
+    response_schema:
+      type: object
+    test_framework:
+      type: string
+      enum: [jest, pytest, mocha]
+      default: jest
+output_schema:
+  type: object
+  required:
+    - test_code
+    - test_cases_count
+  properties:
+    test_code:
+      type: string
+    test_cases_count:
+      type: number
+model_preferences:
+  preferred_models:
+    - claude-sonnet-4
+  min_quality: 0.85
+  temperature: 0.3
+visibility: public
+license: MIT
+pricing_model: free
+status: active
+
