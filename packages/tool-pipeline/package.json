@@ -1,0 +1,29 @@
+{
+  "name": "@ai-company/tool-pipeline",
+  "version": "0.1.0",
+  "description": "End-to-end tool calling pipeline for LLM providers",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-company/llm-providers": "workspace:*",
+    "@ai-company/openapi-tools": "workspace:*",
+    "@ai-company/tool-executor": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.0"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  }
+}
+

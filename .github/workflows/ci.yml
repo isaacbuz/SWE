@@ -197,6 +197,29 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
           NODE_ENV: test
 
+      - name: Run MoE Router tests
+        run: |
+          cd packages/moe_router
+          pip install -r requirements.txt
+          pytest tests/ --cov=moe_router --cov-report=xml --cov-report=html -v
+        continue-on-error: false
+
+      - name: Run Agent System tests
+        run: |
+          cd packages/agents
+          pip install -r ../moe_router/requirements.txt || true
+          pip install pytest pytest-asyncio pytest-mock pytest-cov
+          pytest tests/ --cov=packages.agents --cov-report=xml --cov-report=html -v
+        continue-on-error: false
+
+      - name: Run Workflow tests
+        run: |
+          cd packages/workflows
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio pytest-mock pytest-cov temporalio[dev]
+          pytest tests/ --cov=packages.workflows --cov-report=xml --cov-report=html -v
+        continue-on-error: false
+
       - name: Check coverage threshold
         run: |
           echo "Coverage check: Minimum 80% required"
@@ -211,7 +234,12 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: ./coverage/lcov.info,./apps/api/coverage.xml
+          files: |
+            ./coverage/lcov.info
+            ./apps/api/coverage.xml
+            ./packages/moe_router/htmlcov/coverage.xml
+            ./packages/agents/htmlcov/coverage.xml
+            ./packages/workflows/htmlcov/coverage.xml
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false

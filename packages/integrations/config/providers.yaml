@@ -190,6 +190,93 @@ providers:
       api_key: "IBM_API_KEY"
       project_id: "IBM_PROJECT_ID"
 
+  mistral:
+    name: "Mistral AI"
+    base_url: "https://api.mistral.ai/v1"
+    enabled: true
+    timeout: 300
+    max_retries: 3
+
+    models:
+      - id: "mistral-large-latest"
+        name: "Mistral Large"
+        context_window: 32000
+        max_output_tokens: 8192
+        default: true
+        cost_per_1k_prompt: 0.002
+        cost_per_1k_completion: 0.006
+
+      - id: "mistral-medium-latest"
+        name: "Mistral Medium"
+        context_window: 32000
+        max_output_tokens: 8192
+        cost_per_1k_prompt: 0.001
+        cost_per_1k_completion: 0.003
+
+      - id: "mistral-small-latest"
+        name: "Mistral Small"
+        context_window: 32000
+        max_output_tokens: 8192
+        cost_per_1k_prompt: 0.0002
+        cost_per_1k_completion: 0.0006
+
+    rate_limits:
+      requests_per_minute: 50
+      requests_per_hour: 1000
+      tokens_per_minute: 40000
+      max_concurrent: 5
+
+    features:
+      - streaming
+      - function_calling
+      - json_mode
+
+    environment_variables:
+      api_key: "MISTRAL_API_KEY"
+
+  cohere:
+    name: "Cohere"
+    base_url: "https://api.cohere.ai/v1"
+    enabled: true
+    timeout: 300
+    max_retries: 3
+
+    models:
+      - id: "command-r-plus"
+        name: "Command R+"
+        context_window: 128000
+        max_output_tokens: 4096
+        default: true
+        cost_per_1k_prompt: 0.003
+        cost_per_1k_completion: 0.015
+
+      - id: "command-r"
+        name: "Command R"
+        context_window: 128000
+        max_output_tokens: 4096
+        cost_per_1k_prompt: 0.0005
+        cost_per_1k_completion: 0.0015
+
+      - id: "command"
+        name: "Command"
+        context_window: 4096
+        max_output_tokens: 4096
+        cost_per_1k_prompt: 0.0015
+        cost_per_1k_completion: 0.002
+
+    rate_limits:
+      requests_per_minute: 50
+      requests_per_hour: 1000
+      tokens_per_minute: 40000
+      max_concurrent: 5
+
+    features:
+      - streaming
+      - function_calling
+
+    environment_variables:
+      api_key: "COHERE_API_KEY"
+
   local:
     name: "Local Models"
     enabled: true
