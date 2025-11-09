@@ -1,0 +1,74 @@
+# Prometheus Configuration
+# Scrapes metrics from all services in the platform
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'swe-platform'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - '/etc/prometheus/alerts/*.yml'
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # FastAPI API Service
+  - job_name: 'api'
+    static_configs:
+      - targets: ['api:9000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # MoE Router Metrics
+  - job_name: 'moe-router'
+    static_configs:
+      - targets: ['api:9000']
+    metrics_path: '/metrics/moe-router'
+    scrape_interval: 15s
+
+  # Agent System Metrics
+  - job_name: 'agents'
+    static_configs:
+      - targets: ['api:9000']
+    metrics_path: '/metrics/agents'
+    scrape_interval: 15s
+
+  # Workflow Metrics
+  - job_name: 'workflows'
+    static_configs:
+      - targets: ['api:9000']
+    metrics_path: '/metrics/workflows'
+    scrape_interval: 15s
+
+  # PostgreSQL Exporter (if installed)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 30s
+
+  # Redis Exporter (if installed)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 30s
+
+  # Node Exporter (system metrics)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+

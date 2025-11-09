@@ -1,0 +1,85 @@
+{
+  "dashboard": {
+    "title": "SWE Platform Overview",
+    "tags": ["platform", "overview"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Request Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(http_server_request_total[5m])",
+            "legendFormat": "{{http_method}} {{http_route}}"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Error Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(http_server_request_errors[5m])",
+            "legendFormat": "Errors"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "P95 Latency",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_server_request_duration_bucket[5m]))",
+            "legendFormat": "P95 Latency (ms)"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "LLM Cost Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(llm_cost_total[5m])",
+            "legendFormat": "{{llm_provider}}/{{llm_model}}"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Agent Execution Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "rate(agent_execution_total[5m])",
+            "legendFormat": "{{agent_name}}"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Cache Hit Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "rate(cache_hits[5m]) / (rate(cache_hits[5m]) + rate(cache_misses[5m]))",
+            "legendFormat": "Hit Rate"
+          }
+        ]
+      }
+    ]
+  }
+}
+

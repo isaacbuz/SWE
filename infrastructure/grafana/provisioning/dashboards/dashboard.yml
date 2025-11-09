@@ -1,0 +1,17 @@
+# Grafana Dashboard Provisioning
+# Automatically loads dashboards from this directory
+
+apiVersion: 1
+
+providers:
+  - name: 'SWE Platform Dashboards'
+    orgId: 1
+    folder: 'SWE Platform'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: true
+

@@ -1,0 +1,155 @@
+# Prometheus Alerting Rules
+# Defines alert conditions for the SWE Platform
+
+groups:
+  - name: platform_alerts
+    interval: 30s
+    rules:
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: rate(http_server_request_errors[5m]) / rate(http_server_request_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 10%)"
+
+      # High Latency
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_server_request_duration_bucket[5m])) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API latency detected"
+          description: "P95 latency is {{ $value }}ms (threshold: 1000ms)"
+
+      # High LLM Cost
+      - alert: HighLLMCost
+        expr: rate(llm_cost_total[1h]) > 10
+        for: 15m
+        labels:
+          severity: warning
+          component: llm
+        annotations:
+          summary: "High LLM costs detected"
+          description: "LLM cost rate is ${{ $value }}/hour (threshold: $10/hour)"
+
+      # Agent Execution Failures
+      - alert: AgentExecutionFailures
+        expr: rate(agent_execution_errors[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          component: agents
+        annotations:
+          summary: "High agent execution failure rate"
+          description: "Agent failure rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+
+      # Database Connection Issues
+      - alert: DatabaseConnectionIssues
+        expr: rate(db_query_total{status="error"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Database connection issues detected"
+          description: "Database error rate is {{ $value | humanizePercentage }}"
+
+      # Low Cache Hit Rate
+      - alert: LowCacheHitRate
+        expr: rate(cache_hits[5m]) / (rate(cache_hits[5m]) + rate(cache_misses[5m])) < 0.5
+        for: 10m
+        labels:
+          severity: warning
+          component: cache
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate is {{ $value | humanizePercentage }} (threshold: 50%)"
+
+      # Service Down
+      - alert: ServiceDown
+        expr: up{job=~"api|moe-router|agents|workflows"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} has been down for more than 2 minutes"
+
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value | humanizePercentage }} (threshold: 90%)"
+
+      # High CPU Usage
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}% (threshold: 80%)"
+
+  - name: quality_alerts
+    interval: 30s
+    rules:
+      # Quality Gate Failures
+      - alert: QualityGateFailures
+        expr: rate(quality_gate_failed[5m]) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          component: quality
+        annotations:
+          summary: "High quality gate failure rate"
+          description: "Quality gate failure rate is {{ $value | humanizePercentage }}"
+
+      # Test Coverage Below Threshold
+      - alert: LowTestCoverage
+        expr: test_coverage_percentage < 80
+        for: 1h
+        labels:
+          severity: warning
+          component: testing
+        annotations:
+          summary: "Test coverage below threshold"
+          description: "Test coverage is {{ $value }}% (threshold: 80%)"
+
+  - name: cost_alerts
+    interval: 1m
+    rules:
+      # Daily Cost Budget Exceeded
+      - alert: DailyCostBudgetExceeded
+        expr: sum(increase(llm_cost_total[24h])) > 100
+        for: 1m
+        labels:
+          severity: critical
+          component: cost
+        annotations:
+          summary: "Daily cost budget exceeded"
+          description: "Daily LLM cost is ${{ $value }} (budget: $100)"
+
+      # Cost Spike Detected
+      - alert: CostSpike
+        expr: rate(llm_cost_total[5m]) > rate(llm_cost_total[1h] offset 1h) * 2
+        for: 10m
+        labels:
+          severity: warning
+          component: cost
+        annotations:
+          summary: "Cost spike detected"
+          description: "Current cost rate is {{ $value }}x higher than 1 hour ago"
+

@@ -27,6 +27,8 @@ from .anthropic_client import AnthropicClient
 from .openai_client import OpenAIClient
 from .google_client import GoogleClient
 from .ibm_client import IBMClient
+from .mistral_client import MistralClient
+from .cohere_client import CohereClient
 from .local_client import LocalClient
 
 __version__ = "1.0.0"
@@ -54,5 +56,7 @@ __all__ = [
     "OpenAIClient",
     "GoogleClient",
     "IBMClient",
+    "MistralClient",
+    "CohereClient",
     "LocalClient",
 ]
