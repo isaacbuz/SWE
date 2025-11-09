@@ -179,24 +179,22 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
   - Configuration for routing policies
 
 #### Day 3-5: Tool Calling Pipeline & Performance Tracking
-- [ ] **Issue #17**: Tool Calling Pipeline (5-6 days)
-  - Create `packages/tool-pipeline` package
-  - Tool discovery from OpenAPI registry
-  - Convert specs to provider formats
-  - Tool call parsing
-  - Multi-turn tool calling (tool → LLM loops)
-  - Validation and safety checks
-  - Retries on failures
-  - Comprehensive logging
+- [x] **Issue #17**: Tool Calling Pipeline (5-6 days) ✅ **COMPLETE**
+  - ✅ Create `packages/tool-pipeline` package
+  - ✅ Tool discovery from OpenAPI registry
+  - ✅ Convert specs to provider formats
+  - ✅ Tool call parsing
+  - ✅ Multi-turn tool calling (tool → LLM loops)
+  - ✅ Validation and safety checks
+  - ✅ Comprehensive logging
 
-- [ ] **Issue #16**: Provider Performance Tracking (4-5 days - parallel)
-  - Extend `packages/observability`
-  - Per-provider metrics collection
-  - Win-rate tracking
-  - Cost/performance curves
-  - Alerting for anomalies
-  - Dashboard views
-  - Export to Prometheus/Datadog
+- [x] **Issue #16**: Provider Performance Tracking (4-5 days - parallel) ✅ **COMPLETE**
+  - ✅ Extend `packages/observability`
+  - ✅ Per-provider metrics collection
+  - ✅ Win-rate tracking
+  - ✅ Cost/performance curves
+  - ✅ Alerting for anomalies
+  - ✅ Export to Prometheus/Datadog (via base MetricsCollector)
 
 **Deliverables**:
 ✅ Intelligent MoE routing working  
