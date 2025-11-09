@@ -33,7 +33,7 @@ structlog==24.1.0
 slowapi==0.1.9
 
 # CORS and middleware
-python-cors==1.0.0
+# FastAPI has built-in CORS middleware, no need for external package
 
 # WebSocket
 python-socketio==5.10.0
