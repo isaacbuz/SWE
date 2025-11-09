@@ -241,12 +241,12 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
   - Token usage and cost
   - Re-run with different provider
 
-- [ ] **Issue #18**: Sample Pipeline - Spec to GitHub Issues (3-4 days)
-  - Create CLI tool or extend existing
-  - `spec-to-github` command
-  - Full pipeline demonstration
-  - Example spec files
-  - Documentation and tutorial
+- [x] **Issue #18**: Sample Pipeline - Spec to GitHub Issues (3-4 days) ✅ **COMPLETE**
+  - ✅ Create CLI tool package
+  - ✅ `spec-to-github` command
+  - ✅ Full pipeline demonstration
+  - ✅ Example spec files
+  - ✅ Documentation and tutorial
 
 **Deliverables**:
 ✅ Security controls in place  
