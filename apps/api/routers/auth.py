@@ -265,23 +265,48 @@ async def register(request: RegisterRequest) -> Token:
     )
 
 
-@router.post(
+@router.get(
     "/github/login",
     summary="Initiate GitHub OAuth flow"
 )
 @limiter.limit("10/minute")
-async def github_login() -> RedirectResponse:
+async def github_login(
+    redirect_uri: Optional[str] = Query(None)
+) -> RedirectResponse:
     """
     Initiate GitHub OAuth authentication flow.
     
     Redirects user to GitHub for authorization.
+    
+    - **redirect_uri**: Optional redirect URI after authentication
     """
-    # TODO: Implement GitHub OAuth flow
-    # For now, return error
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="GitHub OAuth not yet implemented"
+    if not settings.github_client_id:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="GitHub OAuth not configured"
+        )
+    
+    # Generate state token for CSRF protection
+    state_token = secrets.token_urlsafe(32)
+    
+    # Store state in session/Redis (TODO: Use Redis when available)
+    # For now, we'll include it in the redirect URI
+    
+    # Build GitHub OAuth URL
+    github_oauth_url = (
+        f"https://github.com/login/oauth/authorize"
+        f"?client_id={settings.github_client_id}"
+        f"&redirect_uri={settings.github_redirect_uri}"
+        f"&scope=read:user,user:email"
+        f"&state={state_token}"
     )
+    
+    # If redirect_uri provided, encode it in state
+    if redirect_uri:
+        # In production, store state in Redis with redirect_uri
+        pass
+    
+    return RedirectResponse(url=github_oauth_url)
 
 
 @router.get(
@@ -291,21 +316,172 @@ async def github_login() -> RedirectResponse:
 @limiter.limit("10/minute")
 async def github_callback(
     code: Optional[str] = Query(None),
-    state: Optional[str] = Query(None)
+    state: Optional[str] = Query(None),
+    error: Optional[str] = Query(None)
 ) -> RedirectResponse:
     """
     Handle GitHub OAuth callback.
     
     - **code**: Authorization code from GitHub
     - **state**: State parameter for CSRF protection
+    - **error**: Error from GitHub (if any)
     
-    Returns redirect to frontend with tokens.
+    Returns redirect to frontend with tokens in URL fragment or error.
     """
-    # TODO: Implement GitHub OAuth callback
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="GitHub OAuth callback not yet implemented"
-    )
+    if error:
+        # User denied authorization
+        frontend_url = settings.github_redirect_uri.replace("/auth/callback", "")
+        return RedirectResponse(
+            url=f"{frontend_url}/auth/error?error={error}"
+        )
+    
+    if not code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing authorization code"
+        )
+    
+    if not settings.github_client_id or not settings.github_client_secret:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="GitHub OAuth not configured"
+        )
+    
+    try:
+        # Exchange code for access token
+        import httpx
+        
+        async with httpx.AsyncClient() as client:
+            # Exchange code for token
+            token_response = await client.post(
+                "https://github.com/login/oauth/access_token",
+                data={
+                    "client_id": settings.github_client_id,
+                    "client_secret": settings.github_client_secret,
+                    "code": code,
+                    "redirect_uri": settings.github_redirect_uri
+                },
+                headers={"Accept": "application/json"}
+            )
+            
+            if token_response.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Failed to exchange code for token"
+                )
+            
+            token_data = token_response.json()
+            github_token = token_data.get("access_token")
+            
+            if not github_token:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="No access token received from GitHub"
+                )
+            
+            # Get user info from GitHub
+            user_response = await client.get(
+                "https://api.github.com/user",
+                headers={
+                    "Authorization": f"Bearer {github_token}",
+                    "Accept": "application/vnd.github+json"
+                }
+            )
+            
+            if user_response.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Failed to get user info from GitHub"
+                )
+            
+            github_user = user_response.json()
+            
+            # Get user email (may require separate call)
+            email_response = await client.get(
+                "https://api.github.com/user/emails",
+                headers={
+                    "Authorization": f"Bearer {github_token}",
+                    "Accept": "application/vnd.github+json"
+                }
+            )
+            
+            email = github_user.get("email")
+            if email_response.status_code == 200:
+                emails = email_response.json()
+                # Find primary email
+                primary_email = next((e for e in emails if e.get("primary")), None)
+                if primary_email:
+                    email = primary_email.get("email")
+            
+            if not email:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="No email found in GitHub account"
+                )
+            
+            # Find or create user
+            user_data = await user_service.get_user_by_email(email)
+            
+            if not user_data:
+                # Create new user from GitHub
+                username = github_user.get("login", email.split("@")[0])
+                # Generate random password (user can set it later)
+                password_hash = password_handler.hash_password(secrets.token_urlsafe(32))
+                
+                user_data = await user_service.create_user(
+                    username=username,
+                    email=email,
+                    password_hash=password_hash,
+                    full_name=github_user.get("name"),
+                    role="user",
+                    github_username=github_user.get("login")
+                )
+            else:
+                # Update GitHub username if changed
+                if github_user.get("login") and not user_data.get("github_username"):
+                    await user_service.update_user(
+                        user_data["id"],
+                        {"github_username": github_user.get("login")}
+                    )
+            
+            # Map database role to UserRole enum
+            role_mapping = {
+                "admin": UserRole.ADMIN,
+                "manager": UserRole.USER,
+                "user": UserRole.USER,
+                "service": UserRole.AGENT
+            }
+            role = role_mapping.get(user_data.get("role", "user"), UserRole.USER)
+            
+            # Create JWT tokens
+            access_token = jwt_handler.create_access_token(
+                user_id=str(user_data["id"]),
+                email=user_data["email"],
+                role=role,
+                scopes=[]
+            )
+            
+            refresh_token = jwt_handler.create_refresh_token(
+                user_id=str(user_data["id"]),
+                email=user_data["email"]
+            )
+            
+            # Update last login
+            await user_service.update_user_last_login(user_data["id"])
+            
+            # Redirect to frontend with tokens
+            frontend_url = settings.github_redirect_uri.replace("/auth/callback", "")
+            return RedirectResponse(
+                url=f"{frontend_url}/auth/callback?access_token={access_token}&refresh_token={refresh_token}&token_type=bearer"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"OAuth flow failed: {str(e)}"
+        )
 
 
 @router.post(

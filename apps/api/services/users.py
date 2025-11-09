@@ -129,7 +129,8 @@ class UserService:
         email: str,
         password_hash: str,
         full_name: Optional[str] = None,
-        role: str = "user"
+        role: str = "user",
+        github_username: Optional[str] = None
     ) -> Dict[str, Any]:
         """Create a new user"""
         conn = await self._get_connection()
@@ -149,12 +150,12 @@ class UserService:
             row = await conn.fetchrow(
                 """
                 INSERT INTO users (
-                    username, email, password_hash, full_name, role,
+                    username, email, password_hash, full_name, role, github_username,
                     is_active, created_at, updated_at
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                RETURNING id, username, email, full_name, role, is_active, created_at, updated_at
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                RETURNING id, username, email, full_name, role, github_username, is_active, created_at, updated_at
                 """,
-                username.lower(), email.lower(), password_hash, full_name, role,
+                username.lower(), email.lower(), password_hash, full_name, role, github_username,
                 True, datetime.utcnow(), datetime.utcnow()
             )
             
@@ -164,10 +165,51 @@ class UserService:
                 "email": row["email"],
                 "full_name": row.get("full_name"),
                 "role": row.get("role", "user"),
+                "github_username": row.get("github_username"),
                 "is_active": row.get("is_active", True),
                 "created_at": row["created_at"].isoformat() if row.get("created_at") else None,
                 "updated_at": row["updated_at"].isoformat() if row.get("updated_at") else None,
             }
+        finally:
+            await self._release_connection(conn)
+
+    async def update_user(self, user_id: int, updates: Dict[str, Any]) -> Dict[str, Any]:
+        """Update user fields"""
+        conn = await self._get_connection()
+        try:
+            update_fields = []
+            update_params = []
+            param_idx = 1
+            
+            if "github_username" in updates:
+                update_fields.append(f"github_username = ${param_idx}")
+                update_params.append(updates["github_username"])
+                param_idx += 1
+            
+            if "full_name" in updates:
+                update_fields.append(f"full_name = ${param_idx}")
+                update_params.append(updates["full_name"])
+                param_idx += 1
+            
+            if not update_fields:
+                # No updates, return current user
+                return await self.get_user_by_id(user_id)
+            
+            update_fields.append(f"updated_at = ${param_idx}")
+            update_params.append(datetime.utcnow())
+            param_idx += 1
+            update_params.append(user_id)
+            
+            await conn.execute(
+                f"""
+                UPDATE users
+                SET {', '.join(update_fields)}
+                WHERE id = ${param_idx}
+                """,
+                *update_params
+            )
+            
+            return await self.get_user_by_id(user_id)
         finally:
             await self._release_connection(conn)
 
