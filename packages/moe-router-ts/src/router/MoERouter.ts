@@ -196,13 +196,13 @@ export class MoERouter {
   private getQualityScore(provider: LLMProvider): number {
     // Simplified - would use actual quality metrics
     // For now, use provider name as heuristic
-    if (provider.name.includes('gpt-4') || provider.name.includes('claude-3-opus') || provider.name.includes('gemini-ultra')) {
+    if (provider.name.includes('gpt-4') || provider.name.includes('claude-3-opus') || provider.name.includes('gemini-ultra') || provider.name.includes('mistral-large')) {
       return 0.95;
     }
-    if (provider.name.includes('gpt-3.5') || provider.name.includes('claude-3-sonnet') || provider.name.includes('gemini-pro')) {
+    if (provider.name.includes('gpt-3.5') || provider.name.includes('claude-3-sonnet') || provider.name.includes('gemini-pro') || provider.name.includes('mistral-medium')) {
       return 0.85;
     }
-    if (provider.name.includes('claude-3-haiku')) {
+    if (provider.name.includes('claude-3-haiku') || provider.name.includes('mistral-small')) {
       return 0.75;
     }
     return 0.7; // Default
