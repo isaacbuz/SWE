@@ -1,0 +1,51 @@
+name: Skills System Tests
+
+on:
+  push:
+    paths:
+      - 'packages/skills_engine/**'
+      - 'apps/api/routers/skills.py'
+      - 'apps/web/**/skills/**'
+      - 'packages/agents/skills_*.py'
+  pull_request:
+    paths:
+      - 'packages/skills_engine/**'
+      - 'apps/api/routers/skills.py'
+      - 'apps/web/**/skills/**'
+      - 'packages/agents/skills_*.py'
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install -r packages/skills_engine/requirements.txt
+          pip install -r packages/skills_engine/requirements-test.txt
+      - name: Run tests
+        run: |
+          pytest packages/skills_engine/tests/ -v --cov=packages.skills_engine --cov-report=xml
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: |
+          cd apps/web
+          npm ci
+      - name: Run tests
+        run: |
+          cd apps/web
+          npm test -- --coverage

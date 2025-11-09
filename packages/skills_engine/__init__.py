@@ -9,6 +9,7 @@ from .models import (
     Skill,
     SkillResult,
     ExecutionContext,
+    ExecutionStatus,
     ValidationResult,
     ValidationRule,
 )
@@ -27,6 +28,7 @@ __all__ = [
     "Skill",
     "SkillResult",
     "ExecutionContext",
+    "ExecutionStatus",
     "ValidationResult",
     "ValidationRule",
     "InputValidator",
