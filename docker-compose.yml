@@ -1,331 +1,101 @@
-version: '3.9'
-
-# Docker Compose for local development environment
-# Includes: API service, PostgreSQL, Redis, and Temporal
+version: '3.8'
 
 services:
-  # ===== PostgreSQL Database =====
+  # PostgreSQL Database
   postgres:
-    image: postgres:16-alpine
-    container_name: ai-company-postgres
-    restart: unless-stopped
-
+    image: postgres:15-alpine
+    container_name: swe-postgres
     environment:
-      # IMPORTANT: Use .env file in production, not hardcoded values
-      POSTGRES_DB: ${DB_NAME:-ai_company_db}
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
-      # Enable logs for debugging
-      POSTGRES_INITDB_ARGS: "-c log_statement=all"
-
+      POSTGRES_DB: swe_db
+      POSTGRES_USER: swe_user
+      POSTGRES_PASSWORD: swe_password
     ports:
-      - "${DB_PORT:-5432}:5432"
-
+      - "5432:5432"
     volumes:
-      # Persist data across container restarts
       - postgres_data:/var/lib/postgresql/data
-      # Initialize database with seed data if present
-      - ./infrastructure/db/init.sql:/docker-entrypoint-initdb.d/init.sql
-
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U swe_user"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
 
-    networks:
-      - ai-company-network
-
-    # Security: read-only filesystem where possible
-    read_only: false
-    security_opt:
-      - no-new-privileges:true
-
-  # ===== Redis Cache =====
+  # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: ai-company-redis
-    restart: unless-stopped
-
-    command: redis-server
-      --appendonly yes
-      --requirepass ${REDIS_PASSWORD:-redis_password}
-      --maxmemory 512mb
-      --maxmemory-policy allkeys-lru
-
+    container_name: swe-redis
     ports:
-      - "${REDIS_PORT:-6379}:6379"
-
+      - "6379:6379"
     volumes:
-      # Persist Redis data
       - redis_data:/data
-
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
 
-    networks:
-      - ai-company-network
-
-    security_opt:
-      - no-new-privileges:true
-
-    # IMPORTANT: In production, use redis-sentinel or redis-cluster
-    # For local development, single instance is fine
-
-  # ===== Temporal (Workflow Orchestration) =====
-  temporal:
-    image: temporalio/auto-setup:latest
-    container_name: ai-company-temporal
-    restart: unless-stopped
-
-    environment:
-      DB: postgresql
-      DB_PORT: 5432
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
-      POSTGRES_DB: temporal
-      POSTGRES_SEEDS: postgres
-      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/docker.yaml
-
-    ports:
-      # Temporal server
-      - "7233:7233"
-      # Temporal UI
-      - "8080:8080"
-      # gRPC metrics
-      - "9090:9090"
-
-    volumes:
-      - temporal_data:/var/lib/postgresql
-      - ./infrastructure/temporal/dynamicconfig:/etc/temporal/config/dynamicconfig
-
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-    networks:
-      - ai-company-network
-
-    security_opt:
-      - no-new-privileges:true
-
-  # ===== FastAPI Service =====
+  # Python FastAPI Backend
   api:
-    # Build from local Dockerfile or use prebuilt image
     build:
-      context: .
+      context: ./apps/api
       dockerfile: Dockerfile
-
-    # Alternative: use prebuilt image
-    # image: ghcr.io/your-org/ai-company/api:latest
-
-    container_name: ai-company-api
-    restart: unless-stopped
-
+    container_name: swe-api
     environment:
-      # Application settings
-      ENVIRONMENT: ${ENVIRONMENT:-development}
-      DEBUG: ${DEBUG:-true}
-      LOG_LEVEL: ${LOG_LEVEL:-INFO}
-
-      # Database configuration
-      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-ai_company_db}
-
-      # Redis configuration
-      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
-
-      # Temporal configuration
-      TEMPORAL_HOST: temporal
-      TEMPORAL_PORT: 7233
-      TEMPORAL_NAMESPACE: default
-      TEMPORAL_TASK_QUEUE: ai-company-tasks
-
-      # API configuration
-      API_TITLE: ${API_TITLE:-"AI-First SWE Company"}
-      API_VERSION: ${API_VERSION:-"0.1.0"}
-      API_DESCRIPTION: ${API_DESCRIPTION:-"AI-native software engineering platform"}
-
-      # Security (IMPORTANT: Use secrets in production, not environment variables)
-      SECRET_KEY: ${SECRET_KEY:-your-secret-key-change-in-production}
-      ALGORITHM: HS256
-      ACCESS_TOKEN_EXPIRE_MINUTES: 30
-
-      # CORS settings
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:8000}
-
-      # Rate limiting
-      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
-      RATE_LIMIT_REQUESTS: ${RATE_LIMIT_REQUESTS:-100}
-      RATE_LIMIT_PERIOD: ${RATE_LIMIT_PERIOD:-60}
-
-      # Feature flags
-      ENABLE_AGENTS: ${ENABLE_AGENTS:-true}
-      ENABLE_WORKFLOWS: ${ENABLE_WORKFLOWS:-true}
-      ENABLE_METRICS: ${ENABLE_METRICS:-true}
-
+      DATABASE_URL: postgresql+asyncpg://swe_user:swe_password@postgres:5432/swe_db
+      REDIS_URL: redis://redis:6379
+      TOOL_SERVICE_URL: http://tool-service:3001
+      ENVIRONMENT: development
+      API_PREFIX: /api/v1
+      CORS_ORIGINS: http://localhost:3000,http://localhost:3001
     ports:
-      # API server
-      - "${API_PORT:-8000}:8000"
-      # Metrics endpoint (optional)
-      - "${METRICS_PORT:-9000}:9000"
-
-    volumes:
-      # Hot reload for development
-      - ./apps/api:/app
-      # Logs
-      - ./logs/api:/app/logs
-      # Cache/data
-      - api_data:/app/data
-
+      - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-      temporal:
-        condition: service_healthy
+      tool-service:
+        condition: service_started
+    volumes:
+      - ./apps/api:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+  # Node.js Tool Service
+  tool-service:
+    build:
+      context: .
+      dockerfile: apps/tool-service/Dockerfile
+    container_name: swe-tool-service
+    environment:
+      PORT: 3001
+      NODE_ENV: development
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./packages:/app/packages
+      - ./tools:/app/tools
+      - ./apps/tool-service:/app/apps/tool-service
+      - /app/node_modules
+    command: pnpm --filter @ai-company/tool-service dev
 
-    networks:
-      - ai-company-network
+  # Next.js Frontend
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: swe-web
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    command: pnpm dev
 
-    security_opt:
-      - no-new-privileges:true
-
-    # Resource limits for local development
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 512M
-        reservations:
-          cpus: '0.5'
-          memory: 256M
-
-  # ===== Temporal UI (optional, already included in temporal service) =====
-  # If you want a separate Temporal UI service, uncomment below
-  # temporal-ui:
-  #   image: temporalio/ui:latest
-  #   container_name: ai-company-temporal-ui
-  #   ports:
-  #     - "8080:8080"
-  #   environment:
-  #     TEMPORAL_ADDRESS: temporal:7233
-  #   depends_on:
-  #     - temporal
-  #   networks:
-  #     - ai-company-network
-
-  # ===== Prometheus (optional, for metrics collection) =====
-  # prometheus:
-  #   image: prom/prometheus:latest
-  #   container_name: ai-company-prometheus
-  #   volumes:
-  #     - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-  #     - prometheus_data:/prometheus
-  #   ports:
-  #     - "9090:9090"
-  #   command:
-  #     - '--config.file=/etc/prometheus/prometheus.yml'
-  #     - '--storage.tsdb.path=/prometheus'
-  #   networks:
-  #     - ai-company-network
-
-  # ===== Grafana (optional, for visualization) =====
-  # grafana:
-  #   image: grafana/grafana:latest
-  #   container_name: ai-company-grafana
-  #   ports:
-  #     - "3001:3000"
-  #   environment:
-  #     GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
-  #   volumes:
-  #     - grafana_data:/var/lib/grafana
-  #     - ./infrastructure/grafana/provisioning:/etc/grafana/provisioning
-  #   depends_on:
-  #     - prometheus
-  #   networks:
-  #     - ai-company-network
-
-# ===== Volumes =====
 volumes:
   postgres_data:
-    driver: local
   redis_data:
-    driver: local
-  temporal_data:
-    driver: local
-  api_data:
-    driver: local
-  prometheus_data:
-    driver: local
-  grafana_data:
-    driver: local
-
-# ===== Networks =====
-networks:
-  ai-company-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.28.0.0/16
-
-# ===== Usage Notes =====
-#
-# Start all services:
-#   docker-compose up -d
-#
-# View logs:
-#   docker-compose logs -f [service-name]
-#
-# Access services:
-#   - API: http://localhost:8000
-#   - API Docs: http://localhost:8000/docs
-#   - Temporal UI: http://localhost:8080
-#   - PostgreSQL: localhost:5432 (psql -h localhost -U postgres -d ai_company_db)
-#   - Redis: localhost:6379 (redis-cli -p 6379 -a redis_password)
-#
-# Stop services:
-#   docker-compose down
-#
-# Remove volumes (WARNING: deletes data):
-#   docker-compose down -v
-#
-# Rebuild images:
-#   docker-compose build --no-cache
-#
-# Scale services:
-#   docker-compose up -d --scale api=3
-#
-# ===== Environment Variables =====
-#
-# Copy .env.example to .env and customize:
-#   cp .env.example .env
-#
-# Key environment variables:
-# - ENVIRONMENT: development|staging|production
-# - DEBUG: true|false
-# - DB_PASSWORD: PostgreSQL password (change for non-local)
-# - REDIS_PASSWORD: Redis password (change for non-local)
-# - SECRET_KEY: JWT secret (change for production)
-# - ALLOWED_ORIGINS: CORS allowed origins
-#
-# IMPORTANT: Never commit .env files with secrets to version control!

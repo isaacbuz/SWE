@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: swe-postgres-prod
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-swe_db}
+      POSTGRES_USER: ${POSTGRES_USER:-swe_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-swe_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - swe-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: swe-redis-prod
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - swe-network
+
+  # Python FastAPI Backend
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: swe-api-prod
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: redis://redis:6379
+      TOOL_SERVICE_URL: http://tool-service:3001
+      ENVIRONMENT: production
+      API_PREFIX: /api/v1
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      SECRET_KEY: ${SECRET_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      tool-service:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - swe-network
+
+  # Node.js Tool Service
+  tool-service:
+    build:
+      context: .
+      dockerfile: apps/tool-service/Dockerfile
+    container_name: swe-tool-service-prod
+    environment:
+      PORT: 3001
+      NODE_ENV: production
+    volumes:
+      - ./tools:/app/tools:ro
+    restart: unless-stopped
+    networks:
+      - swe-network
+
+  # Next.js Frontend
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: swe-web-prod
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NODE_ENV: production
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - swe-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: swe-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - web
+      - api
+    restart: unless-stopped
+    networks:
+      - swe-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  swe-network:
+    driver: bridge
+
