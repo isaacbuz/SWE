@@ -46,7 +46,15 @@ async def lifespan(app: FastAPI):
     await get_db_pool()
     logger.info("database_connection_pool_initialized")
 
-    # TODO: Initialize Redis connection pool
+    # Initialize Redis connection pool
+    try:
+        from db.redis_connection import get_redis_pool
+        await get_redis_pool()
+        logger.info("redis_connection_pool_initialized")
+    except Exception as e:
+        logger.warning(f"Redis initialization failed (non-critical): {e}")
+        logger.info("continuing_without_redis")
+
     # TODO: Run database migrations
     # TODO: Initialize background task queues
     # TODO: Load configuration from external sources
@@ -63,7 +71,14 @@ async def lifespan(app: FastAPI):
     await close_db_pool()
     logger.info("database_connection_pool_closed")
 
-    # TODO: Close Redis connections
+    # Close Redis connections
+    try:
+        from db.redis_connection import close_redis_pool
+        await close_redis_pool()
+        logger.info("redis_connection_pool_closed")
+    except Exception as e:
+        logger.warning(f"Error closing Redis pool: {e}")
+
     # TODO: Gracefully shutdown background tasks
     # TODO: Flush logs and metrics
 
@@ -233,17 +248,25 @@ async def health_check() -> Dict[str, Any]:
 
     Returns application status and basic metrics.
     """
-    # TODO: Check database connectivity
-    # TODO: Check Redis connectivity
-    # TODO: Check external service dependencies
-
+    from db.connection import db_health_check
+    from db.redis_connection import redis_health_check
+    
+    # Check database connectivity
+    db_status = await db_health_check()
+    
+    # Check Redis connectivity
+    redis_status = await redis_health_check()
+    
+    # Determine overall status
+    overall_status = "healthy" if db_status and redis_status else "degraded"
+    
     return {
-        "status": "healthy",
+        "status": overall_status,
         "version": settings.app_version,
         "environment": settings.environment,
         "checks": {
-            "database": "ok",  # TODO: Actual check
-            "redis": "ok",  # TODO: Actual check
+            "database": "ok" if db_status else "unavailable",
+            "redis": "ok" if redis_status else "unavailable",
         }
     }
 
