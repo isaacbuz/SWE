@@ -9,10 +9,10 @@
 
 - [x] Issue #1: Set up CI/CD pipelines with GitHub Actions ✅ **COMPLETE**
 - [x] Issue #2: Configure Docker and docker-compose for local development ✅ **COMPLETE**
-- [ ] Issue #3: Set up Kubernetes manifests for production deployment
-- [ ] Issue #4: Provision infrastructure with Terraform (GCP)
-- [ ] Issue #5: Set up PostgreSQL database with all schemas
-- [ ] Issue #6: Configure Redis for caching and rate limiting
+- [x] Issue #3: Set up Kubernetes manifests for production deployment ✅ **COMPLETE** (31 files created, all acceptance criteria met)
+- [x] Issue #4: Provision infrastructure with Terraform (GCP) ✅ **COMPLETE** (enhanced with DNS, Armor, monitoring, cost optimization)
+- [x] Issue #5: Set up PostgreSQL database with all schemas ✅ **COMPLETE** (Alembic migrations, async init, backup/restore)
+- [x] Issue #6: Configure Redis for caching and rate limiting ✅ **COMPLETE** (client, cache, rate limiting, sessions, locks, pub/sub)
 - [ ] Issue #7: Implement secret management and rotation
 - [ ] Issue #8: Set up monitoring and alerting infrastructure
 
