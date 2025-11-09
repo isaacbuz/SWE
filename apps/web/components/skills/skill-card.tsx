@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Star, Download, Code, Zap, Clock } from 'lucide-react'
-import { Skill } from '@/lib/api/skills'
+import { Skill } from '@/lib/api/types'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils/cn'

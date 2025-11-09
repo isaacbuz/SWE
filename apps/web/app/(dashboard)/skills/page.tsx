@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Search, Filter, Plus, Grid, List as ListIcon } from 'lucide-react'
 import { useSkills, useInstallSkill, useUninstallSkill, useInstalledSkills } from '@/lib/hooks/use-skills'
+import { Skill } from '@/lib/api/types'
 import { SkillCard } from '@/components/skills/skill-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
