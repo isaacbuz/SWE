@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: piehr-staging
+spec:
+  replicas: 2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: piehr-staging
+spec:
+  replicas: 2
+

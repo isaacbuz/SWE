@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: temporal-config
+  namespace: piehr
+data:
+  host: "temporal-server:7233"
+  namespace: "default"
+  task-queue: "autonomous-coding-task-queue"
+

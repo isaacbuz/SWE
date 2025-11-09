@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: temporal-worker
+  namespace: piehr
+  labels:
+    app: temporal-worker
+    component: workflow
+spec:
+  type: ClusterIP
+  selector:
+    app: temporal-worker
+  ports:
+  - name: metrics
+    port: 9090
+    targetPort: metrics
+    protocol: TCP
+
