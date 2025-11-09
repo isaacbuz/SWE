@@ -1,140 +1,9 @@
-# Environment variables and secrets
-.env
-.env.local
-.env.*.local
-.env.backup
-.env.*.backup
-.secret-backups/
-
-# Credentials and keys
-credentials/
-*.key
-*.pem
-*.p12
-*.pfx
-**/credentials.json
-**/service-account.json
-~/.ssh/
-
-# IDE and Editor
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-.AppleDouble
-.LSOverride
-*.iml
-.workspace
-.ionide/
-.vim/
-.emacs.d/
-*.sublime-workspace
-*.sublime-project
-
-# Build and Distribution
-dist/
-build/
-.next/
-out/
-.nuxt/
-.cache/
-.parcel-cache/
-.vuepress/dist
-
-# Dependencies
-node_modules/
-pnpm-lock.yaml
-package-lock.json
-yarn.lock
-.pnp
-.pnp.js
-
-# Testing
-coverage/
-.nyc_output/
-.pytest_cache/
-__pycache__/
-*.egg-info/
-.coverage
-htmlcov/
-.tox/
-
-# Logging
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-setup.log
-secret-rotation.log
-
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-*.postgres
-data/
-postgres_data/
-redis_data/
-mongodb_data/
-
-# Docker
-.dockerignore
-docker-compose.override.yml
-.docker/
-
-# Kubernetes
-kubeconfig
-*.kubeconfig
-.kube/
-
-# Terraform
-*.tfstate
-*.tfstate.*
-.terraform/
-.terraform.lock.hcl
-crash.log
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-
-# OS and System files
-Thumbs.db
-.vagrant/
-.cache/
-dist-ssr/
-
-# Application specific
-.next
-.vercel
-.turbo
-turbo.json.log
-
-# Development temp files
-temp/
-tmp/
-*.tmp
-*.temp
-
-# Backup files
-*.bak
-*.backup
-*.swp
-.~*
-
 # Python
-*.pyc
-*.pyo
-*.pyd
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
 .Python
-env/
-venv/
-ENV/
 build/
 develop-eggs/
 dist/
@@ -147,107 +16,68 @@ parts/
 sdist/
 var/
 wheels/
+*.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# Ruby
-*.gem
-*.rbc
-/.config
-/InstalledFiles
-/pkg/
-/spec/reports/
-/spec/tmp
-**/.ruby-version
-**/.ruby-gemset
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
 
-# Java
-*.class
-*.jar
-*.war
-*.ear
-target/
-.gradle/
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# Go
-*.out
-vendor/
-go.sum
-
-# Rust
-target/
-Cargo.lock
-
-# Package managers
-.pnp
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
-
-# CI/CD
-.github/workflows/secrets.yml
-
-# Temporary API documentation
-swagger.json
-openapi.yaml
-
-# Generated files
-generated/
-dist/
-
-# Local configuration overrides
-local.config.json
-.env.local.json
-
-# Prisma
-prisma/.env
+# Environment variables
+.env
+.env.local
+.env.*.local
 
 # Node
-.node_modules/
-npm-shrinkwrap.json
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Security and Compliance
-audit/
-compliance/
+# Next.js
+.next/
+out/
+build/
+dist/
 
-# Performance profiling
-*.cpuprofile
-perf/
-*.flamegraph
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+coverage/
+*.cover
+.hypothesis/
 
-# IDE plugins
-.eslintcache
-.stylelintcache
-tsconfig.tsbuildinfo
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
-# Project specific
-.project-local/
-uploads/
-temp-uploads/
+# Logs
+*.log
+logs/
 
-# System files to never commit
-.AppleDouble
-.LSOverride
-*.DS_Store
+# OS
+.DS_Store
 Thumbs.db
-desktop.ini
-$RECYCLE.BIN/
 
-# Any files with sensitive naming patterns
-*secret*
-*private*
-*credential*
-*password*
-*token*
-*key*
+# Temporary files
+*.tmp
+*.temp
+.cache/
 
-# Except whitelisted examples
-!.env.example
-!credentials.example.json
-!.github/workflows/
-
-# Architecture specific files
-.aws-sam/
-.chalice/
-sam-tests/
+# Skills specific
+.skills-complete
