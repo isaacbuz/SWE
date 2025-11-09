@@ -1,0 +1,876 @@
+openapi: 3.1.0
+info:
+  title: AI Dev Team Tools
+  version: 1.0.0
+  description: |
+    Internal tools for AI agents to interact with GitHub, code operations, and CI/CD systems.
+    These tools enable agents to perform software development tasks autonomously.
+  contact:
+    name: AI Engineering Team
+    email: dev@agentOS.com
+
+servers:
+  - url: https://api.agentOS.com/v1
+    description: Production API
+  - url: http://localhost:8000/v1
+    description: Local development
+
+tags:
+  - name: github
+    description: GitHub operations (issues, PRs, branches, projects)
+  - name: code
+    description: Code generation, analysis, and refactoring operations
+  - name: cicd
+    description: CI/CD operations (testing, linting, security scanning)
+
+paths:
+  # ============================================
+  # GitHub Operations (6 tools)
+  # ============================================
+  
+  /github/issues/create:
+    post:
+      operationId: createIssues
+      summary: Create multiple GitHub issues from specification
+      description: |
+        Creates one or more GitHub issues from a structured specification.
+        Supports batch creation with labels, assignees, and milestones.
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                  description: Repository in format owner/repo
+                  example: "isaacbuz/SWE"
+                issues:
+                  type: array
+                  description: List of issues to create
+                  items:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        minLength: 1
+                        maxLength: 200
+                      body:
+                        type: string
+                        description: Issue description in markdown
+                      labels:
+                        type: array
+                        items:
+                          type: string
+                        description: Labels to apply
+                      assignees:
+                        type: array
+                        items:
+                          type: string
+                        description: GitHub usernames to assign
+                      milestone:
+                        type: string
+                        description: Milestone name or number
+                    required:
+                      - title
+                      - body
+              required:
+                - repository
+                - issues
+            examples:
+              single_issue:
+                value:
+                  repository: "isaacbuz/SWE"
+                  issues:
+                    - title: "Implement user authentication"
+                      body: "Add JWT-based authentication system"
+                      labels: ["enhancement", "backend"]
+      responses:
+        '201':
+          description: Issues created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        issue_number:
+                          type: integer
+                        issue_url:
+                          type: string
+                        title:
+                          type: string
+
+  /github/prs/create:
+    post:
+      operationId: createPR
+      summary: Create a pull request
+      description: |
+        Creates a pull request from a branch to a target branch.
+        Supports draft PRs, auto-merge, and review requests.
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                  example: "isaacbuz/SWE"
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                body:
+                  type: string
+                  description: PR description in markdown
+                head:
+                  type: string
+                  description: Source branch name
+                base:
+                  type: string
+                  description: Target branch name
+                  default: "main"
+                draft:
+                  type: boolean
+                  default: false
+                auto_merge:
+                  type: boolean
+                  default: false
+                reviewers:
+                  type: array
+                  items:
+                    type: string
+                  description: GitHub usernames for review requests
+                labels:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - repository
+                - title
+                - head
+      responses:
+        '201':
+          description: PR created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pr_number:
+                    type: integer
+                  pr_url:
+                    type: string
+                  branch:
+                    type: string
+
+  /github/prs/review:
+    post:
+      operationId: reviewPR
+      summary: Analyze and review a pull request
+      description: |
+        Analyzes a pull request for code quality, security, and best practices.
+        Returns detailed review comments and suggestions.
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                pr_number:
+                  type: integer
+                review_type:
+                  type: string
+                  enum: [full, security, performance, style]
+                  default: full
+                  description: Type of review to perform
+                auto_comment:
+                  type: boolean
+                  default: true
+                  description: Automatically post review comments
+              required:
+                - repository
+                - pr_number
+      responses:
+        '200':
+          description: Review completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  approved:
+                    type: boolean
+                  score:
+                    type: number
+                    minimum: 0
+                    maximum: 100
+                  comments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                        line:
+                          type: integer
+                        comment:
+                          type: string
+                        severity:
+                          type: string
+                          enum: [error, warning, info]
+                  suggestions:
+                    type: array
+                    items:
+                      type: string
+
+  /github/issues/update:
+    patch:
+      operationId: updateIssue
+      summary: Update issue status and labels
+      description: |
+        Updates an issue's status, labels, assignees, or other metadata.
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                issue_number:
+                  type: integer
+                state:
+                  type: string
+                  enum: [open, closed]
+                labels:
+                  type: array
+                  items:
+                    type: string
+                assignees:
+                  type: array
+                  items:
+                    type: string
+                milestone:
+                  type: string
+              required:
+                - repository
+                - issue_number
+      responses:
+        '200':
+          description: Issue updated successfully
+
+  /github/projects/add:
+    post:
+      operationId: addToProject
+      summary: Add issue or PR to project board
+      description: |
+        Adds an issue or pull request to a GitHub project board column.
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                project_id:
+                  type: integer
+                  description: GitHub project ID
+                content_id:
+                  type: integer
+                  description: Issue or PR number
+                content_type:
+                  type: string
+                  enum: [Issue, PullRequest]
+                column_id:
+                  type: string
+                  description: Target column ID
+              required:
+                - project_id
+                - content_id
+                - content_type
+                - column_id
+      responses:
+        '201':
+          description: Added to project successfully
+
+  /github/actions/trigger:
+    post:
+      operationId: triggerWorkflow
+      summary: Trigger a GitHub Actions workflow
+      description: |
+        Manually triggers a GitHub Actions workflow by dispatch event.
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                workflow_id:
+                  type: string
+                  description: Workflow file name or ID
+                ref:
+                  type: string
+                  default: "main"
+                  description: Branch or tag to run workflow on
+                inputs:
+                  type: object
+                  description: Workflow input parameters
+              required:
+                - repository
+                - workflow_id
+      responses:
+        '204':
+          description: Workflow triggered successfully
+
+  # ============================================
+  # Code Operations (5 tools)
+  # ============================================
+
+  /code/analyze:
+    post:
+      operationId: analyzeCode
+      summary: Run static code analysis
+      description: |
+        Analyzes code for complexity, quality metrics, and potential issues.
+        Supports multiple languages and analysis tools.
+      tags:
+        - code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                path:
+                  type: string
+                  description: File or directory path to analyze
+                language:
+                  type: string
+                  enum: [python, typescript, javascript, go, rust, java]
+                analysis_type:
+                  type: array
+                  items:
+                    type: string
+                    enum: [complexity, quality, security, performance, dependencies]
+                  default: [complexity, quality]
+              required:
+                - repository
+                - path
+      responses:
+        '200':
+          description: Analysis completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  complexity_score:
+                    type: number
+                  quality_score:
+                    type: number
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        severity:
+                          type: string
+                          enum: [critical, high, medium, low]
+                        message:
+                          type: string
+                        line:
+                          type: integer
+
+  /code/tests/generate:
+    post:
+      operationId: generateTests
+      summary: Generate test cases for code
+      description: |
+        Generates comprehensive test cases including unit, integration, and edge cases.
+      tags:
+        - code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                file_path:
+                  type: string
+                test_framework:
+                  type: string
+                  enum: [pytest, jest, vitest, unittest]
+                  default: pytest
+                test_types:
+                  type: array
+                  items:
+                    type: string
+                    enum: [unit, integration, e2e, edge_cases]
+                  default: [unit, edge_cases]
+                coverage_target:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+                  default: 80
+              required:
+                - repository
+                - file_path
+      responses:
+        '200':
+          description: Tests generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  test_files:
+                    type: array
+                    items:
+                      type: string
+                  test_count:
+                    type: integer
+                  estimated_coverage:
+                    type: number
+
+  /code/refactor:
+    post:
+      operationId: refactorCode
+      summary: Apply code refactoring
+      description: |
+        Refactors code to improve quality, readability, and maintainability.
+        Supports various refactoring patterns.
+      tags:
+        - code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                file_path:
+                  type: string
+                refactoring_type:
+                  type: string
+                  enum: [extract_method, extract_class, rename, simplify, optimize]
+                target_metrics:
+                  type: object
+                  properties:
+                    max_complexity:
+                      type: integer
+                    min_coverage:
+                      type: number
+              required:
+                - repository
+                - file_path
+                - refactoring_type
+      responses:
+        '200':
+          description: Refactoring completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  changes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                        diff:
+                          type: string
+                  metrics_before:
+                      type: object
+                  metrics_after:
+                      type: object
+
+  /code/documentation/generate:
+    post:
+      operationId: generateDocumentation
+      summary: Generate code documentation
+      description: |
+        Generates comprehensive documentation including docstrings, README, and API docs.
+      tags:
+        - code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                target:
+                  type: string
+                  description: File, directory, or module to document
+                doc_types:
+                  type: array
+                  items:
+                    type: string
+                    enum: [docstrings, readme, api_docs, examples]
+                  default: [docstrings]
+                format:
+                  type: string
+                  enum: [markdown, rst, html]
+                  default: markdown
+              required:
+                - repository
+                - target
+      responses:
+        '200':
+          description: Documentation generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  files:
+                    type: array
+                    items:
+                      type: string
+                  coverage:
+                      type: number
+
+  /code/migration/plan:
+    post:
+      operationId: planMigration
+      summary: Create migration plan for code changes
+      description: |
+        Analyzes codebase and creates a step-by-step migration plan for major changes.
+      tags:
+        - code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                migration_type:
+                  type: string
+                  enum: [framework_upgrade, api_version, architecture, dependency]
+                source:
+                  type: string
+                  description: Current version or state
+                target:
+                  type: string
+                  description: Target version or state
+                scope:
+                  type: string
+                  enum: [full, incremental, pilot]
+                  default: incremental
+              required:
+                - repository
+                - migration_type
+                - source
+                - target
+      responses:
+        '200':
+          description: Migration plan created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  steps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        step_number:
+                          type: integer
+                        description:
+                          type: string
+                        estimated_hours:
+                          type: number
+                        dependencies:
+                          type: array
+                          items:
+                            type: integer
+                  total_estimated_hours:
+                    type: number
+
+  # ============================================
+  # CI/CD Operations (4 tools)
+  # ============================================
+
+  /cicd/tests/run:
+    post:
+      operationId: runTests
+      summary: Execute test suite
+      description: |
+        Runs tests and returns results with coverage metrics.
+      tags:
+        - cicd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                test_type:
+                  type: string
+                  enum: [unit, integration, e2e, all]
+                  default: all
+                test_files:
+                  type: array
+                  items:
+                    type: string
+                  description: Specific test files to run (optional)
+                coverage_threshold:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+                  default: 80
+              required:
+                - repository
+      responses:
+        '200':
+          description: Tests completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passed:
+                    type: boolean
+                  test_count:
+                    type: integer
+                  passed_count:
+                    type: integer
+                  failed_count:
+                    type: integer
+                  coverage:
+                    type: number
+                  duration_ms:
+                    type: integer
+                  failures:
+                    type: array
+                    items:
+                      type: object
+
+  /cicd/lint/run:
+    post:
+      operationId: runLinters
+      summary: Run code linters
+      description: |
+        Executes linting tools and returns issues found.
+      tags:
+        - cicd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                linters:
+                  type: array
+                  items:
+                    type: string
+                    enum: [eslint, pylint, black, ruff, prettier]
+                  default: [eslint, pylint]
+                auto_fix:
+                  type: boolean
+                  default: false
+                strict:
+                  type: boolean
+                  default: false
+              required:
+                - repository
+      responses:
+        '200':
+          description: Linting completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passed:
+                    type: boolean
+                  errors:
+                    type: integer
+                  warnings:
+                    type: integer
+                  fixed:
+                    type: integer
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                        line:
+                          type: integer
+                        severity:
+                          type: string
+                          enum: [error, warning]
+                        message:
+                          type: string
+
+  /cicd/security/scan:
+    post:
+      operationId: runSecurityScan
+      summary: Run security vulnerability scan
+      description: |
+        Scans codebase for security vulnerabilities and compliance issues.
+      tags:
+        - cicd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                scan_type:
+                  type: array
+                  items:
+                    type: string
+                    enum: [dependencies, secrets, sast, docker, iac]
+                  default: [dependencies, secrets]
+                severity_threshold:
+                  type: string
+                  enum: [critical, high, medium, low]
+                  default: high
+              required:
+                - repository
+      responses:
+        '200':
+          description: Security scan completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passed:
+                    type: boolean
+                  vulnerabilities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        severity:
+                          type: string
+                          enum: [critical, high, medium, low]
+                        type:
+                          type: string
+                        description:
+                          type: string
+                        file:
+                          type: string
+                        cve:
+                          type: string
+                  score:
+                    type: number
+                    minimum: 0
+                    maximum: 10
+
+  /cicd/deploy/preview:
+    post:
+      operationId: deployPreview
+      summary: Create preview deployment
+      description: |
+        Creates a preview deployment for testing before production.
+      tags:
+        - cicd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository:
+                  type: string
+                branch:
+                  type: string
+                environment:
+                  type: string
+                  enum: [staging, preview, dev]
+                  default: preview
+                config:
+                  type: object
+                  description: Environment-specific configuration
+              required:
+                - repository
+                - branch
+      responses:
+        '200':
+          description: Preview deployment created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deployment_id:
+                    type: string
+                  url:
+                    type: string
+                  status:
+                    type: string
+                    enum: [pending, building, ready, failed]
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - ApiKeyAuth: []
+  - BearerAuth: []
+
