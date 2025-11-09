@@ -1,0 +1,815 @@
+openapi: 3.1.0
+info:
+  title: AI Dev Team Tools
+  version: 1.0.0
+  description: |
+    Tools available to AI agents for software development tasks.
+    These tools enable agents to interact with GitHub, analyze code,
+    generate tests, and manage CI/CD workflows.
+  contact:
+    name: AI Dev Team
+    email: dev@ai-company.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.ai-company.com/v1
+    description: Production API
+  - url: http://localhost:8000/v1
+    description: Local development
+
+tags:
+  - name: github
+    description: GitHub operations (issues, PRs, repositories)
+  - name: code
+    description: Code analysis and generation operations
+  - name: cicd
+    description: CI/CD and deployment operations
+  - name: testing
+    description: Testing and quality assurance operations
+
+paths:
+  # GitHub Operations
+  /github/create-issues:
+    post:
+      operationId: createIssues
+      tags:
+        - github
+      summary: Create multiple GitHub issues from a specification
+      description: |
+        Creates one or more GitHub issues in a repository from a structured specification.
+        Supports assigning labels, assignees, and linking related issues.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - owner
+                - repo
+                - tasks
+              properties:
+                owner:
+                  type: string
+                  description: GitHub repository owner (username or organization)
+                  example: "isaacbuz"
+                repo:
+                  type: string
+                  description: Repository name
+                  example: "SWE"
+                tasks:
+                  type: array
+                  description: Array of issue specifications
+                  minItems: 1
+                  items:
+                    type: object
+                    required:
+                      - title
+                      - body
+                    properties:
+                      title:
+                        type: string
+                        description: Issue title
+                        minLength: 1
+                        maxLength: 200
+                        example: "Implement OpenAPI tool registry"
+                      body:
+                        type: string
+                        description: Issue body (markdown supported)
+                        minLength: 1
+                        example: "Create a tool registry that loads OpenAPI specs..."
+                      labels:
+                        type: array
+                        description: Labels to apply to the issue
+                        items:
+                          type: string
+                        example: ["enhancement", "openapi", "priority:high"]
+                      assignees:
+                        type: array
+                        description: GitHub usernames to assign
+                        items:
+                          type: string
+                        example: ["agent-1", "agent-2"]
+                      milestone:
+                        type: integer
+                        description: Milestone number
+                        example: 1
+                      related_issues:
+                        type: array
+                        description: Related issue numbers
+                        items:
+                          type: integer
+                        example: [1, 2, 3]
+      responses:
+        '200':
+          description: Issues created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  created:
+                    type: integer
+                    description: Number of issues created
+                    example: 3
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        number:
+                          type: integer
+                          example: 42
+                        url:
+                          type: string
+                          format: uri
+                          example: "https://github.com/isaacbuz/SWE/issues/42"
+                        title:
+                          type: string
+                          example: "Implement OpenAPI tool registry"
+        '400':
+          description: Invalid request
+        '401':
+          description: Authentication failed
+        '403':
+          description: Insufficient permissions
+        '404':
+          description: Repository not found
+
+  /github/create-pr:
+    post:
+      operationId: createPR
+      tags:
+        - github
+      summary: Create a pull request
+      description: |
+        Creates a pull request from a branch to a target branch.
+        Supports draft PRs, auto-merge, and review requests.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - owner
+                - repo
+                - title
+                - head
+                - base
+              properties:
+                owner:
+                  type: string
+                  example: "isaacbuz"
+                repo:
+                  type: string
+                  example: "SWE"
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                  example: "feat: Add OpenAPI tool registry"
+                body:
+                  type: string
+                  description: PR description (markdown supported)
+                  example: "This PR implements the OpenAPI tool registry..."
+                head:
+                  type: string
+                  description: Source branch name
+                  example: "feature/openapi-tools"
+                base:
+                  type: string
+                  description: Target branch name
+                  example: "main"
+                draft:
+                  type: boolean
+                  description: Create as draft PR
+                  default: false
+                auto_merge:
+                  type: boolean
+                  description: Enable auto-merge when ready
+                  default: false
+                reviewers:
+                  type: array
+                  description: GitHub usernames to request reviews from
+                  items:
+                    type: string
+                labels:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: PR created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  pr_number:
+                    type: integer
+                    example: 123
+                  url:
+                    type: string
+                    format: uri
+                    example: "https://github.com/isaacbuz/SWE/pull/123"
+
+  /github/review-pr:
+    post:
+      operationId: reviewPR
+      tags:
+        - github
+      summary: Analyze and review a pull request
+      description: |
+        Performs automated code review on a pull request.
+        Analyzes code quality, security, performance, and best practices.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - owner
+                - repo
+                - pr_number
+              properties:
+                owner:
+                  type: string
+                repo:
+                  type: string
+                pr_number:
+                  type: integer
+                  description: Pull request number
+                  example: 123
+                review_type:
+                  type: string
+                  enum:
+                    - security
+                    - performance
+                    - best_practices
+                    - comprehensive
+                  default: comprehensive
+                  description: Type of review to perform
+                include_suggestions:
+                  type: boolean
+                  description: Include code suggestions in review
+                  default: true
+      responses:
+        '200':
+          description: Review completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  review:
+                    type: object
+                    properties:
+                      summary:
+                        type: string
+                      issues:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            severity:
+                              type: string
+                              enum: [critical, high, medium, low]
+                            file:
+                              type: string
+                            line:
+                              type: integer
+                            message:
+                              type: string
+                            suggestion:
+                              type: string
+                      score:
+                        type: number
+                        minimum: 0
+                        maximum: 100
+
+  /github/update-issue:
+    patch:
+      operationId: updateIssue
+      tags:
+        - github
+      summary: Update issue status, labels, or assignees
+      description: Updates an existing GitHub issue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - owner
+                - repo
+                - issue_number
+              properties:
+                owner:
+                  type: string
+                repo:
+                  type: string
+                issue_number:
+                  type: integer
+                state:
+                  type: string
+                  enum: [open, closed]
+                labels:
+                  type: array
+                  items:
+                    type: string
+                assignees:
+                  type: array
+                  items:
+                    type: string
+                milestone:
+                  type: integer
+                body:
+                  type: string
+      responses:
+        '200':
+          description: Issue updated successfully
+
+  /github/list-issues:
+    get:
+      operationId: listIssues
+      tags:
+        - github
+      summary: List repository issues
+      description: Retrieves a list of issues from a repository with filtering
+      parameters:
+        - name: owner
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum: [open, closed, all]
+            default: open
+        - name: labels
+          in: query
+          schema:
+            type: string
+            description: Comma-separated list of labels
+        - name: assignee
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 30
+      responses:
+        '200':
+          description: List of issues
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        number:
+                          type: integer
+                        title:
+                          type: string
+                        state:
+                          type: string
+                        labels:
+                          type: array
+                          items:
+                            type: string
+
+  # Code Operations
+  /code/analyze:
+    post:
+      operationId: analyzeCode
+      tags:
+        - code
+      summary: Run static code analysis
+      description: |
+        Performs static analysis on code files or directories.
+        Detects bugs, security vulnerabilities, code smells, and performance issues.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - paths
+              properties:
+                paths:
+                  type: array
+                  description: File or directory paths to analyze
+                  items:
+                    type: string
+                  example: ["packages/openapi-tools/src"]
+                analysis_types:
+                  type: array
+                  description: Types of analysis to perform
+                  items:
+                    type: string
+                    enum: [security, performance, quality, complexity]
+                  default: [security, quality]
+                language:
+                  type: string
+                  description: Programming language
+                  enum: [typescript, python, javascript, go, rust]
+      responses:
+        '200':
+          description: Analysis results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                        line:
+                          type: integer
+                        severity:
+                          type: string
+                          enum: [error, warning, info]
+                        message:
+                          type: string
+                        rule:
+                          type: string
+
+  /code/generate-tests:
+    post:
+      operationId: generateTests
+      tags:
+        - code
+        - testing
+      summary: Generate test cases for code
+      description: |
+        Generates comprehensive test cases for functions, classes, or modules.
+        Supports unit tests, integration tests, and edge cases.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - language
+              properties:
+                code:
+                  type: string
+                  description: Source code to generate tests for
+                language:
+                  type: string
+                  enum: [typescript, python, javascript]
+                test_framework:
+                  type: string
+                  description: Test framework to use
+                  enum: [vitest, jest, pytest, unittest]
+                  default: vitest
+                test_type:
+                  type: string
+                  enum: [unit, integration, e2e]
+                  default: unit
+                include_edge_cases:
+                  type: boolean
+                  default: true
+                coverage_target:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+                  default: 80
+      responses:
+        '200':
+          description: Generated test code
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  test_code:
+                    type: string
+                    description: Generated test code
+                  test_count:
+                    type: integer
+                  coverage_estimate:
+                    type: number
+
+  /code/refactor:
+    post:
+      operationId: refactorCode
+      tags:
+        - code
+      summary: Apply refactoring to code
+      description: |
+        Applies refactoring patterns to improve code quality.
+        Supports common refactorings like extract method, rename variable, etc.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - refactoring_type
+              properties:
+                code:
+                  type: string
+                refactoring_type:
+                  type: string
+                  enum:
+                    - extract_method
+                    - extract_class
+                    - rename
+                    - simplify_conditional
+                    - remove_duplication
+                    - improve_naming
+                language:
+                  type: string
+                  enum: [typescript, python, javascript]
+      responses:
+        '200':
+          description: Refactored code
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  refactored_code:
+                    type: string
+                  changes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        description:
+                          type: string
+
+  # CI/CD Operations
+  /cicd/run-tests:
+    post:
+      operationId: runTests
+      tags:
+        - cicd
+        - testing
+      summary: Execute test suite
+      description: |
+        Runs the test suite for a project or specific test files.
+        Supports parallel execution and coverage reporting.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - project_path
+              properties:
+                project_path:
+                  type: string
+                  description: Path to project root
+                  example: "packages/openapi-tools"
+                test_files:
+                  type: array
+                  description: Specific test files to run (optional)
+                  items:
+                    type: string
+                test_type:
+                  type: string
+                  enum: [unit, integration, e2e, all]
+                  default: all
+                parallel:
+                  type: boolean
+                  default: true
+                coverage:
+                  type: boolean
+                  description: Generate coverage report
+                  default: true
+                verbose:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: Test execution results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  passed:
+                    type: integer
+                  failed:
+                    type: integer
+                  skipped:
+                    type: integer
+                  duration_ms:
+                    type: number
+                  coverage:
+                    type: object
+                    properties:
+                      lines:
+                        type: number
+                      functions:
+                        type: number
+                      branches:
+                        type: number
+                  failures:
+                    type: array
+                    items:
+                      type: object
+
+  /cicd/deploy-preview:
+    post:
+      operationId: deployPreview
+      tags:
+        - cicd
+      summary: Create preview deployment
+      description: |
+        Creates a preview deployment for a branch or PR.
+        Useful for testing changes before merging.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - branch
+              properties:
+                branch:
+                  type: string
+                  description: Branch name or PR number
+                  example: "feature/openapi-tools"
+                environment:
+                  type: string
+                  enum: [preview, staging]
+                  default: preview
+                auto_destroy:
+                  type: boolean
+                  description: Automatically destroy after merge
+                  default: true
+                variables:
+                  type: object
+                  description: Environment variables
+                  additionalProperties:
+                    type: string
+      responses:
+        '200':
+          description: Deployment created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  deployment_url:
+                    type: string
+                    format: uri
+                  deployment_id:
+                    type: string
+
+  /cicd/create-workflow:
+    post:
+      operationId: createWorkflow
+      tags:
+        - cicd
+      summary: Generate GitHub Actions workflow
+      description: |
+        Generates a GitHub Actions workflow file from a specification.
+        Supports common CI/CD patterns and custom configurations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - triggers
+                - jobs
+              properties:
+                name:
+                  type: string
+                  description: Workflow name
+                  example: "CI Pipeline"
+                triggers:
+                  type: object
+                  properties:
+                    push:
+                      type: object
+                      properties:
+                        branches:
+                          type: array
+                          items:
+                            type: string
+                    pull_request:
+                      type: object
+                      properties:
+                        branches:
+                          type: array
+                          items:
+                            type: string
+                jobs:
+                  type: object
+                  description: Job definitions
+                  additionalProperties:
+                    type: object
+                    properties:
+                      runs_on:
+                        type: string
+                        example: ubuntu-latest
+                      steps:
+                        type: array
+                        items:
+                          type: object
+                output_path:
+                  type: string
+                  description: Where to save the workflow file
+                  default: ".github/workflows/ci.yml"
+      responses:
+        '200':
+          description: Workflow file generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  workflow_content:
+                    type: string
+                    description: Generated YAML workflow content
+                  file_path:
+                    type: string
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - ApiKeyAuth: []
+  - BearerAuth: []
+

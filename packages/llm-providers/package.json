@@ -1,0 +1,29 @@
+{
+  "name": "@ai-company/llm-providers",
+  "version": "0.1.0",
+  "description": "Provider-agnostic LLM interface for TypeScript/Node.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "openai": "^4.20.0",
+    "@anthropic-ai/sdk": "^0.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.0"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./domain": "./dist/domain/index.js"
+  }
+}
+
