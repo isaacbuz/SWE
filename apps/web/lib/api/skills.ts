@@ -1,7 +1,7 @@
 /**
  * Skills API Client
  */
-import { Skill, SkillDetail, SkillExecutionResult, SkillInstallation, SkillAnalytics } from './types'
+import { Skill, SkillDetail, SkillExecutionResult, SkillInstallation, SkillAnalytics, SkillReview, SkillReviewCreate } from './types'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
@@ -120,5 +120,26 @@ export const skillsApi = {
     if (params?.end_date) queryParams.append('end_date', params.end_date)
 
     return apiRequest<SkillAnalytics>(`/skills/${skillId}/analytics?${queryParams}`)
+  },
+
+  async getSkillReviews(
+    skillId: string,
+    params?: { limit?: number; offset?: number }
+  ): Promise<SkillReview[]> {
+    const queryParams = new URLSearchParams()
+    if (params?.limit) queryParams.append('limit', params.limit.toString())
+    if (params?.offset) queryParams.append('offset', params.offset.toString())
+
+    return apiRequest<SkillReview[]>(`/skills/${skillId}/reviews?${queryParams}`)
+  },
+
+  async createSkillReview(
+    skillId: string,
+    review: SkillReviewCreate
+  ): Promise<SkillReview> {
+    return apiRequest<SkillReview>(`/skills/${skillId}/reviews`, {
+      method: 'POST',
+      body: JSON.stringify(review),
+    })
   },
 }

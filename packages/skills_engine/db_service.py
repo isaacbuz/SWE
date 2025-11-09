@@ -377,6 +377,97 @@ class SkillsDatabaseService:
             )
             return [dict(row) for row in rows]
     
+    async def list_skill_reviews(
+        self,
+        skill_id: UUID,
+        limit: int = 20,
+        offset: int = 0
+    ) -> List[Dict[str, Any]]:
+        """List reviews for a skill"""
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch(
+                """
+                SELECT id, skill_id, user_id, rating, title, review_text, created_at
+                FROM skill_reviews
+                WHERE skill_id = $1
+                ORDER BY created_at DESC
+                LIMIT $2 OFFSET $3
+                """,
+                skill_id, limit, offset
+            )
+            return [dict(row) for row in rows]
+    
+    async def create_skill_review(
+        self,
+        skill_id: UUID,
+        user_id: UUID,
+        rating: int,
+        title: Optional[str] = None,
+        review_text: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Create a review for a skill"""
+        async with self.pool.acquire() as conn:
+            # Check if skill exists
+            skill = await conn.fetchrow(
+                "SELECT id FROM skills WHERE id = $1",
+                skill_id
+            )
+            
+            if not skill:
+                raise ValueError(f"Skill {skill_id} not found")
+            
+            # Check if user already reviewed
+            existing = await conn.fetchrow(
+                "SELECT id FROM skill_reviews WHERE skill_id = $1 AND user_id = $2",
+                skill_id, user_id
+            )
+            
+            if existing:
+                # Update existing review
+                review_id = existing["id"]
+                row = await conn.fetchrow(
+                    """
+                    UPDATE skill_reviews
+                    SET rating = $1, title = $2, review_text = $3, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = $4
+                    RETURNING *
+                    """,
+                    rating, title, review_text, review_id
+                )
+            else:
+                # Create new review
+                review_id = uuid4()
+                row = await conn.fetchrow(
+                    """
+                    INSERT INTO skill_reviews (
+                        id, skill_id, user_id, rating, title, review_text, created_at, updated_at
+                    ) VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                    RETURNING *
+                    """,
+                    review_id, skill_id, user_id, rating, title, review_text
+                )
+            
+            # Update skill's avg_rating and review_count
+            await conn.execute(
+                """
+                UPDATE skills
+                SET avg_rating = (
+                    SELECT AVG(rating)::NUMERIC(3,2)
+                    FROM skill_reviews
+                    WHERE skill_id = $1
+                ),
+                review_count = (
+                    SELECT COUNT(*)
+                    FROM skill_reviews
+                    WHERE skill_id = $1
+                )
+                WHERE id = $1
+                """,
+                skill_id
+            )
+            
+            return dict(row)
+    
     async def get_skill_analytics(
         self,
         skill_id: UUID,

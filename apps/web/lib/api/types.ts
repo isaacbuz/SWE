@@ -82,3 +82,19 @@ export interface SkillAnalytics {
   unique_users?: number
   updated_at: string
 }
+
+export interface SkillReview {
+  id: string
+  skill_id: string
+  user_id: string
+  rating: number
+  title?: string
+  review_text?: string
+  created_at: string
+}
+
+export interface SkillReviewCreate {
+  rating: number
+  title?: string
+  review_text?: string
+}
