@@ -233,13 +233,13 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
   - ✅ Execute tools from palette
   - ✅ Show progress and results
 
-- [ ] **Issue #20**: AI Dock with Provider Visibility (5-6 days)
-  - Create AI Dock component
-  - Display current/last provider
-  - Provider selection UI
-  - Tool call trace viewer
-  - Token usage and cost
-  - Re-run with different provider
+- [x] **Issue #20**: AI Dock with Provider Visibility (5-6 days) ✅ **COMPLETE**
+  - ✅ Enhanced AI Dock component
+  - ✅ Display current/last provider
+  - ✅ Provider selection UI
+  - ✅ Tool call trace viewer
+  - ✅ Token usage and cost
+  - ✅ Re-run with different provider
 
 - [x] **Issue #18**: Sample Pipeline - Spec to GitHub Issues (3-4 days) ✅ **COMPLETE**
   - ✅ Create CLI tool package
