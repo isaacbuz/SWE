@@ -41,7 +41,8 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "recharts": "^2.10.3",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
     "@types/node": "^22",

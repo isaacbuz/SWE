@@ -55,6 +55,7 @@ dist/
 # Keep lib directory (contains API clients and hooks)
 !apps/web/lib/api/
 !apps/web/lib/hooks/
+!apps/web/lib/websocket/
 
 # Testing
 .coverage
