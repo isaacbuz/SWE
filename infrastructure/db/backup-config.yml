@@ -1,0 +1,73 @@
+# Database Backup Configuration
+# This file defines backup policies and schedules
+
+backup:
+  # Backup schedule (cron format)
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  
+  # Backup retention
+  retention:
+    days: 30
+    weeks: 4
+    months: 12
+  
+  # Backup storage
+  storage:
+    # Local storage
+    local:
+      enabled: true
+      directory: "/var/backups/postgresql"
+      max_size_gb: 100
+    
+    # S3 storage
+    s3:
+      enabled: false
+      bucket: "swe-platform-backups"
+      prefix: "postgresql-backups/"
+      region: "us-east-1"
+      remove_local_after_upload: false
+    
+    # Google Cloud Storage
+    gcs:
+      enabled: false
+      bucket: "swe-platform-backups"
+      prefix: "postgresql-backups/"
+  
+  # Compression
+  compression:
+    enabled: true
+    method: "gzip"  # gzip, bzip2, xz
+  
+  # Backup types
+  types:
+    # Full backup
+    full:
+      enabled: true
+      schedule: "0 2 * * 0"  # Weekly on Sunday
+    
+    # Incremental backup (WAL archiving)
+    incremental:
+      enabled: true
+      wal_archive: true
+      archive_command: "test ! -f /var/backups/postgresql/wal/%f && cp %p /var/backups/postgresql/wal/%f"
+  
+  # Monitoring
+  monitoring:
+    enabled: true
+    alert_on_failure: true
+    alert_email: "admin@example.com"
+    check_backup_size: true
+    min_backup_size_mb: 1
+
+# Restore configuration
+restore:
+  # Point-in-time recovery
+  pitr:
+    enabled: true
+    recovery_target_time: null  # Set to specific timestamp for PITR
+  
+  # Verification
+  verification:
+    enabled: true
+    verify_after_restore: true
+
