@@ -1,0 +1,28 @@
+{
+  "name": "@ai-company/cli-tools",
+  "version": "0.1.0",
+  "description": "CLI tools for AI agent workflows",
+  "type": "module",
+  "bin": {
+    "spec-to-github": "./dist/commands/specToGithub.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-company/tool-pipeline": "workspace:*",
+    "@ai-company/openapi-tools": "workspace:*",
+    "@ai-company/tool-executor": "workspace:*",
+    "@ai-company/llm-providers": "workspace:*",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/fs-extra": "^11.0.4",
+    "typescript": "^5.3.3"
+  }
+}
+

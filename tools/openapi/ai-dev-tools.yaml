@@ -1,0 +1,786 @@
+openapi: 3.1.0
+info:
+  title: AI Dev Team Tools
+  version: 1.0.0
+  description: |
+    Tools available to AI agents for software development tasks.
+    These tools enable agents to interact with GitHub, analyze code,
+    generate tests, and manage CI/CD workflows.
+  contact:
+    name: AI Dev Team
+    email: dev@ai-company.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.ai-company.com/v1
+    description: Production API
+  - url: http://localhost:8000/api/v1
+    description: Local development
+
+tags:
+  - name: github
+    description: GitHub operations (issues, PRs, repositories)
+  - name: code
+    description: Code analysis and generation
+  - name: cicd
+    description: CI/CD and deployment operations
+  - name: testing
+    description: Test generation and execution
+
+paths:
+  # GitHub Operations
+  /github/create-issues:
+    post:
+      operationId: createIssues
+      summary: Create multiple GitHub issues
+      description: |
+        Creates one or more GitHub issues from a specification.
+        Supports batch creation with labels, assignees, and milestones.
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [owner, repo, tasks]
+              properties:
+                owner:
+                  type: string
+                  description: GitHub repository owner (username or organization)
+                  example: "isaacbuz"
+                repo:
+                  type: string
+                  description: Repository name
+                  example: "SWE"
+                tasks:
+                  type: array
+                  description: Array of issues to create
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [title, body]
+                    properties:
+                      title:
+                        type: string
+                        description: Issue title
+                        minLength: 1
+                        maxLength: 200
+                        example: "Implement feature X"
+                      body:
+                        type: string
+                        description: Issue body (supports Markdown)
+                        example: "## Description\n\nThis issue implements feature X..."
+                      labels:
+                        type: array
+                        description: Labels to apply
+                        items:
+                          type: string
+                        example: ["enhancement", "priority:high"]
+                      assignees:
+                        type: array
+                        description: GitHub usernames to assign
+                        items:
+                          type: string
+                        example: ["@isaacbuz"]
+                      milestone:
+                        type: string
+                        description: Milestone name or number
+                        example: "v1.0.0"
+      responses:
+        '200':
+          description: Successfully created issues
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        number:
+                          type: integer
+                          description: Issue number
+                        url:
+                          type: string
+                          format: uri
+                        title:
+                          type: string
+        '400':
+          description: Invalid request
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+        '404':
+          description: Repository not found
+
+  /github/create-pr:
+    post:
+      operationId: createPR
+      summary: Create a pull request
+      description: |
+        Creates a pull request from a branch to a base branch.
+        Supports draft PRs, labels, reviewers, and auto-merge configuration.
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [owner, repo, title, head, base]
+              properties:
+                owner:
+                  type: string
+                  example: "isaacbuz"
+                repo:
+                  type: string
+                  example: "SWE"
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                  example: "Add feature X"
+                body:
+                  type: string
+                  description: PR description (supports Markdown)
+                  example: "## Changes\n\n- Added feature X\n- Updated tests"
+                head:
+                  type: string
+                  description: Branch name to merge from
+                  example: "feature/add-x"
+                base:
+                  type: string
+                  description: Branch name to merge into
+                  example: "main"
+                draft:
+                  type: boolean
+                  description: Create as draft PR
+                  default: false
+                labels:
+                  type: array
+                  items:
+                    type: string
+                  example: ["enhancement"]
+                reviewers:
+                  type: array
+                  description: GitHub usernames to request review from
+                  items:
+                    type: string
+                  example: ["@isaacbuz"]
+      responses:
+        '200':
+          description: Successfully created PR
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  number:
+                    type: integer
+                  url:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+
+  /github/review-pr:
+    post:
+      operationId: reviewPR
+      summary: Review a pull request
+      description: |
+        Analyzes and reviews a pull request, providing feedback on code quality,
+        security, performance, and best practices.
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [owner, repo, prNumber]
+              properties:
+                owner:
+                  type: string
+                  example: "isaacbuz"
+                repo:
+                  type: string
+                  example: "SWE"
+                prNumber:
+                  type: integer
+                  description: Pull request number
+                  example: 42
+                reviewType:
+                  type: string
+                  enum: [security, performance, best-practices, comprehensive]
+                  description: Type of review to perform
+                  default: comprehensive
+      responses:
+        '200':
+          description: Review completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  review:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        enum: [approved, changes_requested, comment]
+                      comments:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            path:
+                              type: string
+                            line:
+                              type: integer
+                            body:
+                              type: string
+
+  /github/update-issue:
+    patch:
+      operationId: updateIssue
+      summary: Update an issue
+      description: |
+        Updates an existing GitHub issue (status, labels, assignees, etc.)
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [owner, repo, issueNumber]
+              properties:
+                owner:
+                  type: string
+                  example: "isaacbuz"
+                repo:
+                  type: string
+                  example: "SWE"
+                issueNumber:
+                  type: integer
+                  example: 42
+                state:
+                  type: string
+                  enum: [open, closed]
+                  description: Issue state
+                labels:
+                  type: array
+                  items:
+                    type: string
+                assignees:
+                  type: array
+                  items:
+                    type: string
+                milestone:
+                  type: string
+      responses:
+        '200':
+          description: Issue updated successfully
+
+  /github/merge-pr:
+    post:
+      operationId: mergePR
+      summary: Merge a pull request
+      description: |
+        Merges a pull request using specified merge method.
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [owner, repo, prNumber]
+              properties:
+                owner:
+                  type: string
+                  example: "isaacbuz"
+                repo:
+                  type: string
+                  example: "SWE"
+                prNumber:
+                  type: integer
+                  example: 42
+                mergeMethod:
+                  type: string
+                  enum: [merge, squash, rebase]
+                  default: merge
+                  description: Merge method to use
+                commitMessage:
+                  type: string
+                  description: Custom commit message (for squash/rebase)
+      responses:
+        '200':
+          description: PR merged successfully
+
+  /github/comment-on-issue:
+    post:
+      operationId: commentOnIssue
+      summary: Add comment to issue or PR
+      description: |
+        Adds a comment to an issue or pull request.
+      tags:
+        - github
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [owner, repo, issueNumber, body]
+              properties:
+                owner:
+                  type: string
+                  example: "isaacbuz"
+                repo:
+                  type: string
+                  example: "SWE"
+                issueNumber:
+                  type: integer
+                  example: 42
+                body:
+                  type: string
+                  description: Comment body (supports Markdown)
+                  minLength: 1
+      responses:
+        '200':
+          description: Comment added successfully
+
+  # Code Operations
+  /code/analyze:
+    post:
+      operationId: analyzeCode
+      summary: Run static code analysis
+      description: |
+        Analyzes code for issues, security vulnerabilities, and code quality metrics.
+      tags:
+        - code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, language]
+              properties:
+                code:
+                  type: string
+                  description: Source code to analyze
+                  example: "function add(a, b) { return a + b; }"
+                language:
+                  type: string
+                  enum: [typescript, javascript, python, java, go, rust]
+                  description: Programming language
+                analysisType:
+                  type: array
+                  items:
+                    type: string
+                    enum: [security, performance, quality, complexity]
+                  description: Types of analysis to perform
+                  default: [quality]
+      responses:
+        '200':
+          description: Analysis completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        severity:
+                          type: string
+                          enum: [error, warning, info]
+                        message:
+                          type: string
+                        line:
+                          type: integer
+                        column:
+                          type: integer
+
+  /code/generate-tests:
+    post:
+      operationId: generateTests
+      summary: Generate test cases
+      description: |
+        Generates unit tests for given code with edge cases and error scenarios.
+      tags:
+        - code
+        - testing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, language, testFramework]
+              properties:
+                code:
+                  type: string
+                  description: Source code to test
+                language:
+                  type: string
+                  enum: [typescript, javascript, python, java, go, rust]
+                testFramework:
+                  type: string
+                  description: Test framework to use
+                  example: "vitest"
+                includeEdgeCases:
+                  type: boolean
+                  default: true
+                  description: Include edge case tests
+                includeErrorCases:
+                  type: boolean
+                  default: true
+                  description: Include error scenario tests
+      responses:
+        '200':
+          description: Tests generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tests:
+                    type: string
+                    description: Generated test code
+
+  /code/refactor:
+    post:
+      operationId: refactorCode
+      summary: Refactor code
+      description: |
+        Applies refactoring to improve code quality, readability, and maintainability.
+      tags:
+        - code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, language, refactoringType]
+              properties:
+                code:
+                  type: string
+                  description: Code to refactor
+                language:
+                  type: string
+                  enum: [typescript, javascript, python, java, go, rust]
+                refactoringType:
+                  type: string
+                  enum: [extract-method, extract-variable, simplify-condition, improve-naming, reduce-complexity]
+                  description: Type of refactoring to apply
+      responses:
+        '200':
+          description: Code refactored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refactoredCode:
+                    type: string
+                  changes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        description:
+                          type: string
+
+  /code/format:
+    post:
+      operationId: formatCode
+      summary: Format code
+      description: |
+        Formats code according to language-specific style guidelines.
+      tags:
+        - code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, language]
+              properties:
+                code:
+                  type: string
+                  description: Code to format
+                language:
+                  type: string
+                  enum: [typescript, javascript, python, java, go, rust]
+                style:
+                  type: string
+                  description: Style guide to use
+                  example: "prettier"
+      responses:
+        '200':
+          description: Code formatted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  formattedCode:
+                    type: string
+
+  /code/lint:
+    post:
+      operationId: lintCode
+      summary: Run linter
+      description: |
+        Runs linter on code and returns linting errors and warnings.
+      tags:
+        - code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, language]
+              properties:
+                code:
+                  type: string
+                  description: Code to lint
+                language:
+                  type: string
+                  enum: [typescript, javascript, python, java, go, rust]
+                linter:
+                  type: string
+                  description: Linter to use
+                  example: "eslint"
+      responses:
+        '200':
+          description: Linting completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        severity:
+                          type: string
+                          enum: [error, warning]
+                        message:
+                          type: string
+                        line:
+                          type: integer
+
+  # CI/CD Operations
+  /cicd/run-tests:
+    post:
+      operationId: runTests
+      summary: Execute test suite
+      description: |
+        Runs the test suite for a project and returns results.
+      tags:
+        - cicd
+        - testing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [projectPath]
+              properties:
+                projectPath:
+                  type: string
+                  description: Path to project root
+                  example: "./apps/api"
+                testCommand:
+                  type: string
+                  description: Custom test command
+                  example: "npm test"
+                testFiles:
+                  type: array
+                  description: Specific test files to run
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Tests executed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passed:
+                    type: integer
+                  failed:
+                    type: integer
+                  duration:
+                    type: number
+                    description: Duration in seconds
+                  results:
+                    type: array
+                    items:
+                      type: object
+
+  /cicd/deploy-preview:
+    post:
+      operationId: deployPreview
+      summary: Create preview deployment
+      description: |
+        Creates a preview deployment for testing before production.
+      tags:
+        - cicd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [branch, environment]
+              properties:
+                branch:
+                  type: string
+                  description: Branch to deploy
+                  example: "feature/add-x"
+                environment:
+                  type: string
+                  enum: [staging, preview, development]
+                  description: Deployment environment
+                variables:
+                  type: object
+                  description: Environment variables
+                  additionalProperties:
+                    type: string
+      responses:
+        '200':
+          description: Preview deployment created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deploymentId:
+                    type: string
+                  url:
+                    type: string
+                    format: uri
+
+  /cicd/create-workflow:
+    post:
+      operationId: createWorkflow
+      summary: Generate GitHub Actions workflow
+      description: |
+        Generates a GitHub Actions workflow file for CI/CD.
+      tags:
+        - cicd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, steps]
+              properties:
+                name:
+                  type: string
+                  description: Workflow name
+                  example: "CI Pipeline"
+                on:
+                  type: object
+                  description: Workflow triggers
+                  properties:
+                    push:
+                      type: object
+                    pull_request:
+                      type: object
+                steps:
+                  type: array
+                  description: Workflow steps
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      uses:
+                        type: string
+                      run:
+                        type: string
+      responses:
+        '200':
+          description: Workflow created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow:
+                    type: string
+                    description: Generated workflow YAML
+
+  /cicd/run-build:
+    post:
+      operationId: runBuild
+      summary: Execute build process
+      description: |
+        Runs the build process for a project.
+      tags:
+        - cicd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [projectPath]
+              properties:
+                projectPath:
+                  type: string
+                  description: Path to project root
+                  example: "./apps/api"
+                buildCommand:
+                  type: string
+                  description: Custom build command
+                  example: "npm run build"
+                environment:
+                  type: string
+                  enum: [development, production]
+                  default: production
+      responses:
+        '200':
+          description: Build executed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  output:
+                    type: string
+                  duration:
+                    type: number
+                    description: Duration in seconds
+

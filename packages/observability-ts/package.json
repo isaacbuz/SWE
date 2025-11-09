@@ -1,0 +1,28 @@
+{
+  "name": "@ai-company/observability",
+  "version": "0.1.0",
+  "description": "Provider performance tracking and metrics",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-company/moe-router": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.0"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./providers": "./dist/providers/index.js"
+  }
+}
+

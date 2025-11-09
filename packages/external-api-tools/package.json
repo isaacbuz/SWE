@@ -1,0 +1,31 @@
+{
+  "name": "@ai-company/external-api-tools",
+  "version": "0.1.0",
+  "description": "Secure wrappers around external APIs (GitHub, GSA, etc.)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.0.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/node-fetch": "^2.6.11",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.0"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./github": "./dist/github/index.js",
+    "./gsa": "./dist/gsa/index.js"
+  }
+}
+

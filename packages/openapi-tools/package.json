@@ -1,0 +1,31 @@
+{
+  "name": "@ai-company/openapi-tools",
+  "version": "0.1.0",
+  "description": "OpenAPI tool registry and schema management for LLM tool calling",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "openapi-types": "^12.1.0",
+    "swagger-parser": "^10.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/swagger-parser": "^10.0.3",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.0"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./types": "./dist/types/index.js",
+    "./registry": "./dist/registry/index.js"
+  }
+}
+
