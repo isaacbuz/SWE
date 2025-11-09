@@ -69,11 +69,12 @@ async def get_current_user_from_token(
         return None
 
     return CurrentUser(
-        id=int(token_data.sub),
+        id=user_data["id"],
         email=token_data.email,
         username=user_data.get("username", ""),
         role=token_data.role,
-        is_active=user_data.get("is_active", True)
+        is_active=user_data.get("is_active", True),
+        scopes=token_data.scopes
     )
 
 

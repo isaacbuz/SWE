@@ -1,6 +1,7 @@
 """
 API routers module.
 """
+from routers.auth import router as auth_router
 from routers.projects import router as projects_router
 from routers.agents import router as agents_router
 from routers.issues import router as issues_router

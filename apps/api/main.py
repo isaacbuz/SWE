@@ -12,6 +12,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from config import settings
 from middleware import setup_cors, setup_logging, setup_rate_limiting, logger
 from routers import (
+    auth_router,
     projects_router,
     agents_router,
     issues_router,
@@ -276,7 +277,8 @@ async def root() -> Dict[str, Any]:
     }
 
 
-# Register routers with API prefix
+# Register routers
+app.include_router(auth_router, prefix=settings.api_prefix)  # Auth endpoints don't need /api/v1 prefix
 app.include_router(projects_router, prefix=settings.api_prefix)
 app.include_router(agents_router, prefix=settings.api_prefix)
 app.include_router(issues_router, prefix=settings.api_prefix)

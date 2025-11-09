@@ -189,6 +189,8 @@ class UserService:
     @staticmethod
     def to_current_user(user_data: Dict[str, Any]) -> CurrentUser:
         """Convert user data to CurrentUser model"""
+        from auth.models import UserRole
+        
         # Map database role to UserRole enum
         role_mapping = {
             "admin": UserRole.ADMIN,
@@ -203,7 +205,8 @@ class UserService:
             email=user_data["email"],
             username=user_data.get("username", ""),
             role=role,
-            is_active=user_data.get("is_active", True)
+            is_active=user_data.get("is_active", True),
+            scopes=[]  # TODO: Load scopes from user permissions
         )
 
 

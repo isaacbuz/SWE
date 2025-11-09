@@ -64,8 +64,7 @@ class JWTHandler:
     def create_refresh_token(
         self,
         user_id: str,
-        email: str,
-        role: UserRole
+        email: str
     ) -> str:
         """
         Create JWT refresh token.
@@ -84,7 +83,6 @@ class JWTHandler:
         payload = {
             "sub": user_id,
             "email": email,
-            "role": role.value,
             "token_type": TokenType.REFRESH.value,
             "exp": expires_at,
             "iat": now,
