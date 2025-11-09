@@ -10,6 +10,10 @@ from pydantic import BaseModel, Field
 
 from auth import get_current_active_user, require_user, CurrentUser
 from middleware import limiter
+from db.connection import get_db_pool
+from db.agents import AgentsService
+from db.users import UsersService
+from db.projects import ProjectsService
 
 
 router = APIRouter(prefix="/agents", tags=["agents"])
@@ -90,6 +94,60 @@ class AgentLogs(BaseModel):
     logs: List[AgentLog]
 
 
+# Dependencies
+async def get_agents_service() -> AgentsService:
+    """Get agents database service"""
+    pool = await get_db_pool()
+    return AgentsService(pool)
+
+
+async def get_projects_service() -> ProjectsService:
+    """Get projects database service"""
+    pool = await get_db_pool()
+    from db.projects import ProjectsService
+    return ProjectsService(pool)
+
+
+async def get_users_service() -> UsersService:
+    """Get users database service"""
+    pool = await get_db_pool()
+    from db.users import UsersService
+    return UsersService(pool)
+
+
+# Helper function to convert agent data to response model
+def agent_data_to_model(agent_data: dict) -> Agent:
+    """Convert database agent data to response model"""
+    # Extract result and error from config or last execution
+    result = agent_data.get("config", {}).get("last_result")
+    error = agent_data.get("config", {}).get("last_error")
+    
+    # Map database status to router status
+    db_status = agent_data.get("status", "pending")
+    status_map = {
+        "idle": "pending",
+        "running": "running",
+        "completed": "completed",
+        "failed": "failed",
+        "cancelled": "cancelled"
+    }
+    router_status = status_map.get(db_status, "pending")
+    
+    return Agent(
+        id=agent_data["agent_id"],
+        project_id=agent_data["project_id"],
+        agent_type=AgentType(agent_data["agent_type"]),
+        status=AgentStatus(router_status),
+        config=agent_data.get("config", {}),
+        result=result,
+        error=error,
+        created_at=agent_data["created_at"].isoformat(),
+        updated_at=agent_data["updated_at"].isoformat(),
+        started_at=agent_data["last_execution_at"].isoformat() if agent_data.get("last_execution_at") else None,
+        completed_at=agent_data["last_execution_at"].isoformat() if agent_data.get("last_execution_at") and router_status in ["completed", "failed", "cancelled"] else None
+    )
+
+
 # Endpoints
 
 @router.post(
@@ -134,18 +192,54 @@ async def list_agents(
     status: Optional[AgentStatus] = Query(None, description="Filter by status"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    agents_service: AgentsService = Depends(get_agents_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> AgentList:
     """
     List agents with optional filtering.
 
     Supports filtering by project, type, and status.
     """
-    # TODO: Query agents from database with filters
-    # TODO: Apply pagination
-    # TODO: Return agent list
-
-    return AgentList(items=[], total=0, page=page, page_size=page_size)
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Map router status to database status
+    db_status = None
+    if status:
+        status_map = {
+            "pending": "idle",
+            "running": "running",
+            "completed": "completed",
+            "failed": "failed",
+            "cancelled": "cancelled"
+        }
+        db_status = status_map.get(status.value)
+    
+    # Query agents from database
+    agents_data, total = await agents_service.list_agents(
+        user_id=user_id,
+        project_id=project_id,
+        agent_type=agent_type.value if agent_type else None,
+        status=db_status,
+        page=page,
+        page_size=page_size
+    )
+    
+    # Convert to response models
+    items = [agent_data_to_model(agent) for agent in agents_data]
+    
+    return AgentList(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size
+    )
 
 
 @router.get(
@@ -156,21 +250,32 @@ async def list_agents(
 @limiter.limit("30/minute")
 async def get_agent(
     agent_id: UUID,
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    agents_service: AgentsService = Depends(get_agents_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> Agent:
     """
     Get a specific agent by ID.
 
     - **agent_id**: Agent UUID
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Return agent details
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
-    )
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Load agent from database
+    agent_data = await agents_service.get_agent(agent_id, user_id)
+    if not agent_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Agent {agent_id} not found"
+        )
+    
+    return agent_data_to_model(agent_data)
 
 
 @router.patch(
