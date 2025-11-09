@@ -2,10 +2,13 @@
 
 import React, { useState, useMemo, useEffect } from 'react'
 import { Command } from 'cmdk'
-import { Search, FileText, Code, Zap, Clock } from 'lucide-react'
+import { Search, FileText, Code, Zap, Clock, Wrench } from 'lucide-react'
 import Fuse from 'fuse.js'
 import { useUIStore } from '@/lib/stores/ui-store'
 import { useCommand, CommandAction } from './command-provider'
+import { useTools, groupToolsByCategory } from '@/lib/hooks/use-tools'
+import { ToolSpec } from '@/lib/api/tools'
+import { ToolExecutionDialog } from './tool-execution-dialog'
 import { cn } from '@/lib/utils/cn'
 
 export function CommandPalette() {
@@ -13,23 +16,46 @@ export function CommandPalette() {
   const { actions, executeAction } = useCommand()
   const { recentCommands, addRecentCommand } = useUIStore()
   const [search, setSearch] = useState('')
+  const [selectedTool, setSelectedTool] = useState<ToolSpec | null>(null)
+  const { data: tools = [], isLoading: toolsLoading } = useTools()
 
-  // Fuzzy search setup
+  // Convert tools to command actions
+  const toolActions = useMemo(() => {
+    return tools.map((tool): CommandAction => ({
+      id: `tool-${tool.name}`,
+      label: tool.name,
+      description: tool.description,
+      icon: <Wrench className="h-4 w-4" />,
+      category: 'actions' as const,
+      keywords: [tool.name, ...(tool.tags || []), tool.description],
+      onExecute: () => {
+        setSelectedTool(tool)
+      },
+    }))
+  }, [tools])
+
+  // Combine regular actions with tool actions
+  const allActions = useMemo(() => {
+    return [...actions, ...toolActions]
+  }, [actions, toolActions])
+
+  // Fuzzy search setup (include tool actions)
   const fuse = useMemo(() => {
-    return new Fuse(actions, {
+    return new Fuse(allActions, {
       keys: ['label', 'description', 'keywords'],
       threshold: 0.3,
       includeScore: true,
     })
-  }, [actions])
+  }, [allActions])
 
   // Search results
   const results = useMemo(() => {
     if (!search) {
-      return actions
+      return allActions
     }
     return fuse.search(search).map(result => result.item)
-  }, [search, fuse, actions])
+  }, [search, fuse, allActions])
+
 
   // Group results by category
   const grouped = useMemo(() => {
@@ -38,10 +64,13 @@ export function CommandPalette() {
       actions: [],
       navigate: [],
       ai: [],
+      tools: [],
     }
 
     results.forEach(action => {
-      if (recentCommands.includes(action.id)) {
+      if (action.id.startsWith('tool-')) {
+        groups.tools.push(action)
+      } else if (recentCommands.includes(action.id)) {
         groups.recent.push(action)
       } else {
         groups[action.category].push(action)
@@ -69,10 +98,11 @@ export function CommandPalette() {
   if (!commandPaletteOpen) return null
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 pt-[20vh]"
-      onClick={closeCommandPalette}
-    >
+    <>
+      <div
+        className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 pt-[20vh]"
+        onClick={closeCommandPalette}
+      >
       <Command
         className="w-full max-w-2xl rounded-xl border border-border-default bg-white shadow-e4"
         onClick={(e) => e.stopPropagation()}
@@ -140,6 +170,24 @@ export function CommandPalette() {
               ))}
             </Command.Group>
           )}
+
+          {grouped.tools.length > 0 && (
+            <Command.Group heading="Tools" className="mb-2">
+              {grouped.tools.map((action) => (
+                <CommandItem
+                  key={action.id}
+                  action={action}
+                  onExecute={() => handleExecute(action.id)}
+                />
+              ))}
+            </Command.Group>
+          )}
+
+          {toolsLoading && (
+            <Command.Group heading="Loading tools..." className="mb-2">
+              <div className="px-3 py-2 text-sm text-ink-tertiary">Loading available tools...</div>
+            </Command.Group>
+          )}
         </Command.List>
 
         <div className="flex items-center justify-between border-t border-border-subtle px-4 py-2 text-xs text-ink-tertiary">
@@ -151,6 +199,17 @@ export function CommandPalette() {
         </div>
       </Command>
     </div>
+
+    {selectedTool && (
+      <ToolExecutionDialog
+        tool={selectedTool}
+        onClose={() => {
+          setSelectedTool(null)
+          closeCommandPalette()
+        }}
+      />
+    )}
+    </>
   )
 }
 

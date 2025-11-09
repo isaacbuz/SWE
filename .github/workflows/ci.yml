@@ -185,6 +185,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r apps/api/requirements.txt
           pip install pytest pytest-cov pytest-asyncio pytest-mock
+          # Install test dependencies for packages
+          pip install -r packages/moe_router/requirements-test.txt || true
+          pip install -r packages/agents/requirements-test.txt || true
+          pip install -r packages/workflows/requirements-test.txt || true
 
       - name: Run Node.js tests with coverage
         run: pnpm test:coverage || echo "No coverage tests configured"
@@ -200,6 +204,24 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
           REDIS_URL: redis://localhost:6379/0
           NODE_ENV: test
+
+      - name: Run MoE Router tests
+        run: |
+          cd packages/moe_router
+          pytest tests/ -v --cov=moe_router --cov-report=xml --cov-report=term
+        continue-on-error: true
+
+      - name: Run Agent System tests
+        run: |
+          cd packages/agents
+          pytest tests/ -v --cov=agents --cov-report=xml --cov-report=term
+        continue-on-error: true
+
+      - name: Run Workflow tests
+        run: |
+          cd packages/workflows
+          pytest tests/ -v --cov=workflows --cov-report=xml --cov-report=term
+        continue-on-error: true
 
       - name: Check coverage threshold
         run: |

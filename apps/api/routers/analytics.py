@@ -11,6 +11,9 @@ from pydantic import BaseModel, Field
 
 from auth import get_current_active_user, require_user, CurrentUser
 from middleware import limiter
+from db.connection import get_db_pool
+from db.analytics import AnalyticsService
+from db.users import UsersService
 
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
@@ -102,6 +105,19 @@ class PerformanceMetrics(BaseModel):
     cache_hit_rate: float
 
 
+# Dependencies
+async def get_analytics_service() -> AnalyticsService:
+    """Get analytics database service"""
+    pool = await get_db_pool()
+    return AnalyticsService(pool)
+
+
+async def get_users_service() -> UsersService:
+    """Get users database service"""
+    pool = await get_db_pool()
+    return UsersService(pool)
+
+
 # Endpoints
 
 @router.get(
@@ -111,25 +127,34 @@ class PerformanceMetrics(BaseModel):
 )
 @limiter.limit("30/minute")
 async def get_dashboard_metrics(
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    analytics_service: AnalyticsService = Depends(get_analytics_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> DashboardMetrics:
     """
     Get overview metrics for dashboard.
 
     Returns aggregated metrics across all user's projects.
     """
-    # TODO: Query aggregated metrics from database
-    # TODO: Fetch recent activity
-    # TODO: Return dashboard metrics
-
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Query aggregated metrics
+    metrics = await analytics_service.get_dashboard_metrics(user_id)
+    
     return DashboardMetrics(
-        total_projects=0,
-        total_issues=0,
-        resolved_issues=0,
-        total_prs=0,
-        reviewed_prs=0,
-        active_agents=0,
-        recent_activity=[]
+        total_projects=metrics.get("total_projects", 0),
+        total_issues=metrics.get("total_issues", 0),
+        resolved_issues=metrics.get("resolved_issues", 0),
+        total_prs=metrics.get("total_prs", 0),
+        reviewed_prs=metrics.get("reviewed_prs", 0),
+        active_agents=metrics.get("active_agents", 0),
+        recent_activity=metrics.get("recent_activity", [])
     )
 
 
@@ -141,22 +166,32 @@ async def get_dashboard_metrics(
 @limiter.limit("30/minute")
 async def get_project_metrics(
     project_id: UUID,
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    analytics_service: AnalyticsService = Depends(get_analytics_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> ProjectMetrics:
     """
     Get detailed metrics for a specific project.
 
     - **project_id**: Project UUID
     """
-    # TODO: Verify user has access to project
-    # TODO: Query project metrics from database
-    # TODO: Calculate averages and scores
-    # TODO: Return project metrics
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Project {project_id} not found"
-    )
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Query project metrics
+    metrics = await analytics_service.get_project_metrics(project_id, user_id)
+    if not metrics:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Project {project_id} not found"
+        )
+    
+    return ProjectMetrics(**metrics)
 
 
 @router.get(
@@ -167,22 +202,32 @@ async def get_project_metrics(
 @limiter.limit("30/minute")
 async def get_agent_metrics(
     agent_id: UUID,
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    analytics_service: AnalyticsService = Depends(get_analytics_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> AgentMetrics:
     """
     Get performance metrics for a specific agent.
 
     - **agent_id**: Agent UUID
     """
-    # TODO: Verify user has access to agent
-    # TODO: Query agent metrics from database
-    # TODO: Calculate success rate and averages
-    # TODO: Return agent metrics
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
-    )
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Query agent metrics
+    metrics = await analytics_service.get_agent_metrics(agent_id, user_id)
+    if not metrics:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Agent {agent_id} not found"
+        )
+    
+    return AgentMetrics(**metrics)
 
 
 @router.get(
@@ -195,7 +240,9 @@ async def get_metric_timeseries(
     metric_type: MetricType,
     time_range: TimeRange = Query(TimeRange.WEEK, description="Time range"),
     project_id: Optional[UUID] = Query(None, description="Filter by project"),
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    analytics_service: AnalyticsService = Depends(get_analytics_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> MetricSeries:
     """
     Get time series data for a specific metric.
@@ -204,19 +251,37 @@ async def get_metric_timeseries(
     - **time_range**: Time range for data
     - **project_id**: Optional project filter
     """
-    # TODO: Query time series data from database
-    # TODO: Apply project filter if provided
-    # TODO: Calculate aggregates
-    # TODO: Return metric series
-
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Query time series data
+    data = await analytics_service.get_metric_series(
+        user_id=user_id,
+        metric_type=metric_type.value,
+        time_range=time_range.value,
+        project_id=project_id
+    )
+    
+    # Calculate aggregates
+    values = [item["value"] for item in data]
+    total = sum(values)
+    average = total / len(values) if values else 0.0
+    min_val = min(values) if values else 0.0
+    max_val = max(values) if values else 0.0
+    
     return MetricSeries(
         metric_type=metric_type,
         time_range=time_range,
-        data=[],
-        total=0.0,
-        average=0.0,
-        min=0.0,
-        max=0.0
+        data=[MetricValue(**item) for item in data],
+        total=total,
+        average=average,
+        min=min_val,
+        max=max_val
     )
 
 

@@ -8,8 +8,9 @@ import { SuggestionChip } from './suggestion-chip'
 import { PromptBar } from './prompt-bar'
 import { ExecSummary } from './exec-summary'
 import { RiskList } from './risk-list'
+import { ProviderVisibility, ProviderInfo, ExecutionMetrics } from './provider-visibility'
 
-type TabType = 'summary' | 'risks' | 'actions'
+type TabType = 'summary' | 'risks' | 'actions' | 'provider'
 
 interface AIDockContentProps {
   context?: {
@@ -84,6 +85,12 @@ export function AIDockContent({ context }: AIDockContentProps) {
         >
           Actions
         </Tab>
+        <Tab
+          active={activeTab === 'provider'}
+          onClick={() => setActiveTab('provider')}
+        >
+          Provider
+        </Tab>
       </div>
 
       {/* Content */}
@@ -91,6 +98,19 @@ export function AIDockContent({ context }: AIDockContentProps) {
         {activeTab === 'summary' && <ExecSummary context={context} />}
         {activeTab === 'risks' && <RiskList context={context} />}
         {activeTab === 'actions' && <ActionsSuggestions context={context} />}
+        {activeTab === 'provider' && (
+          <ProviderTab
+            context={context}
+            onProviderChange={(providerId) => {
+              console.log('Provider changed to:', providerId)
+              // TODO: Implement provider change logic
+            }}
+            onRerun={(providerId) => {
+              console.log('Re-run with provider:', providerId)
+              // TODO: Implement re-run logic
+            }}
+          />
+        )}
       </div>
 
       {/* Footer - Prompt Bar */}
@@ -203,4 +223,81 @@ function getContextualSuggestions(context?: any) {
       onClick: () => console.log('Check health'),
     },
   ]
+}
+
+function ProviderTab({
+  context,
+  onProviderChange,
+  onRerun,
+}: {
+  context?: any
+  onProviderChange: (providerId: string) => void
+  onRerun: (providerId?: string) => void
+}) {
+  // Mock data - in production, this would come from API/hooks
+  const mockMetrics: ExecutionMetrics | undefined = {
+    provider: {
+      id: 'openai',
+      name: 'OpenAI',
+      model: 'GPT-4 Turbo',
+      status: 'active',
+      health: 'healthy',
+    },
+    toolCalls: [
+      {
+        id: '1',
+        toolName: 'analyzeCode',
+        arguments: { code: '...', language: 'typescript' },
+        result: { issues: 3, suggestions: 5 },
+        durationMs: 1200,
+        timestamp: new Date(),
+      },
+      {
+        id: '2',
+        toolName: 'createIssues',
+        arguments: { repository: 'owner/repo', issues: [] },
+        result: { created: 5 },
+        durationMs: 800,
+        timestamp: new Date(),
+      },
+    ],
+    tokensInput: 2450,
+    tokensOutput: 1200,
+    cost: 0.042,
+    totalDurationMs: 2000,
+    success: true,
+  }
+
+  const mockProviders: ProviderInfo[] = [
+    {
+      id: 'openai',
+      name: 'OpenAI',
+      model: 'GPT-4 Turbo',
+      status: 'active',
+      health: 'healthy',
+    },
+    {
+      id: 'anthropic',
+      name: 'Anthropic',
+      model: 'Claude 3 Opus',
+      status: 'idle',
+      health: 'healthy',
+    },
+    {
+      id: 'google',
+      name: 'Google',
+      model: 'Gemini Pro',
+      status: 'idle',
+      health: 'degraded',
+    },
+  ]
+
+  return (
+    <ProviderVisibility
+      metrics={mockMetrics}
+      availableProviders={mockProviders}
+      onProviderChange={onProviderChange}
+      onRerun={onRerun}
+    />
+  )
 }

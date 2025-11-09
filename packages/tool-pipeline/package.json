@@ -1,0 +1,23 @@
+{
+  "name": "@ai-company/tool-pipeline",
+  "version": "1.0.0",
+  "description": "Tool calling pipeline for LLM providers",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@ai-company/openapi-tools": "workspace:*",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  }
+}
+

@@ -41,9 +41,32 @@ async def lifespan(app: FastAPI):
     broadcaster = init_broadcaster()
     logger.info("event_broadcaster_initialized")
 
-    # TODO: Initialize database connection pool
-    # TODO: Initialize Redis connection pool
-    # TODO: Run database migrations
+    # Initialize database connection pool
+    from db.connection import get_db_pool
+    await get_db_pool()
+    logger.info("database_connection_pool_initialized")
+
+    # Initialize Redis connection pool
+    try:
+        from db.redis_connection import get_redis_pool
+        await get_redis_pool()
+        logger.info("redis_connection_pool_initialized")
+    except Exception as e:
+        logger.warning(f"Redis initialization failed (non-critical): {e}")
+        logger.info("continuing_without_redis")
+
+    # Run database migrations
+    try:
+        from db.migrations import run_migrations
+        migration_success = await run_migrations()
+        if migration_success:
+            logger.info("database_migrations_completed")
+        else:
+            logger.warning("database_migrations_failed_or_skipped")
+    except Exception as e:
+        logger.warning(f"Migration runner failed (non-critical): {e}")
+        logger.info("continuing_without_migrations")
+
     # TODO: Initialize background task queues
     # TODO: Load configuration from external sources
 
@@ -54,8 +77,19 @@ async def lifespan(app: FastAPI):
     # Shutdown
     logger.info("application_shutting_down")
 
-    # TODO: Close database connections
-    # TODO: Close Redis connections
+    # Close database connections
+    from db.connection import close_db_pool
+    await close_db_pool()
+    logger.info("database_connection_pool_closed")
+
+    # Close Redis connections
+    try:
+        from db.redis_connection import close_redis_pool
+        await close_redis_pool()
+        logger.info("redis_connection_pool_closed")
+    except Exception as e:
+        logger.warning(f"Error closing Redis pool: {e}")
+
     # TODO: Gracefully shutdown background tasks
     # TODO: Flush logs and metrics
 
@@ -225,17 +259,25 @@ async def health_check() -> Dict[str, Any]:
 
     Returns application status and basic metrics.
     """
-    # TODO: Check database connectivity
-    # TODO: Check Redis connectivity
-    # TODO: Check external service dependencies
-
+    from db.connection import db_health_check
+    from db.redis_connection import redis_health_check
+    
+    # Check database connectivity
+    db_status = await db_health_check()
+    
+    # Check Redis connectivity
+    redis_status = await redis_health_check()
+    
+    # Determine overall status
+    overall_status = "healthy" if db_status and redis_status else "degraded"
+    
     return {
-        "status": "healthy",
+        "status": overall_status,
         "version": settings.app_version,
         "environment": settings.environment,
         "checks": {
-            "database": "ok",  # TODO: Actual check
-            "redis": "ok",  # TODO: Actual check
+            "database": "ok" if db_status else "unavailable",
+            "redis": "ok" if redis_status else "unavailable",
         }
     }
 
