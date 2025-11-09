@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from auth import get_current_active_user, require_user, CurrentUser
 from middleware import limiter
+from services.issues import issue_service
 
 
 router = APIRouter(prefix="/issues", tags=["issues"])
@@ -116,15 +117,16 @@ async def create_issue(
     - **priority**: Issue priority (default: medium)
     - **labels**: Optional list of labels
     """
-    # TODO: Verify project exists and user has access
-    # TODO: If github_issue_url provided, fetch issue details
-    # TODO: Create issue in database
-    # TODO: Optionally trigger agent to analyze issue
-
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Issue creation not yet implemented"
+    issue_data = await issue_service.create_issue(
+        project_id=issue.project_id,
+        title=issue.title,
+        description=issue.description,
+        user_id=current_user.id,
+        github_issue_url=issue.github_issue_url,
+        priority=issue.priority.value,
+        labels=issue.labels
     )
+    return Issue(**issue_data)
 
 
 @router.get(
@@ -147,11 +149,21 @@ async def list_issues(
 
     Supports filtering by project, status, priority, and labels.
     """
-    # TODO: Query issues from database with filters
-    # TODO: Apply pagination
-    # TODO: Return issue list
-
-    return IssueList(items=[], total=0, page=page, page_size=page_size)
+    result = await issue_service.list_issues(
+        user_id=current_user.id,
+        project_id=project_id,
+        status_filter=status.value if status else None,
+        priority_filter=priority.value if priority else None,
+        labels_filter=labels,
+        page=page,
+        page_size=page_size
+    )
+    return IssueList(
+        items=[Issue(**item) for item in result["items"]],
+        total=result["total"],
+        page=result["page"],
+        page_size=result["page_size"]
+    )
 
 
 @router.get(
@@ -169,18 +181,11 @@ async def get_issue_stats(
 
     - **project_id**: Optional project filter
     """
-    # TODO: Query issue statistics from database
-    # TODO: Calculate counts by status and priority
-    # TODO: Return statistics
-
-    return IssueStats(
-        total=0,
-        open=0,
-        in_progress=0,
-        resolved=0,
-        closed=0,
-        by_priority={}
+    stats = await issue_service.get_issue_stats(
+        user_id=current_user.id,
+        project_id=project_id
     )
+    return IssueStats(**stats)
 
 
 @router.get(
@@ -198,14 +203,8 @@ async def get_issue(
 
     - **issue_id**: Issue UUID
     """
-    # TODO: Load issue from database
-    # TODO: Verify user has access to issue's project
-    # TODO: Return issue details
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Issue {issue_id} not found"
-    )
+    issue_data = await issue_service.get_issue(issue_id, current_user.id)
+    return Issue(**issue_data)
 
 
 @router.patch(
@@ -224,16 +223,17 @@ async def update_issue(
 
     Only provided fields will be updated.
     """
-    # TODO: Load issue from database
-    # TODO: Verify user has access to issue's project
-    # TODO: Validate updates
-    # TODO: Update issue in database
-    # TODO: Return updated issue
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Issue {issue_id} not found"
+    updates = update.dict(exclude_unset=True)
+    if "priority" in updates:
+        updates["priority"] = updates["priority"].value if updates["priority"] else None
+    if "status" in updates:
+        updates["status"] = updates["status"].value if updates["status"] else None
+    issue_data = await issue_service.update_issue(
+        issue_id=issue_id,
+        user_id=current_user.id,
+        updates=updates
     )
+    return Issue(**issue_data)
 
 
 @router.post(
@@ -253,17 +253,12 @@ async def assign_agent_to_issue(
     - **issue_id**: Issue UUID
     - **agent_id**: Agent UUID to assign
     """
-    # TODO: Load issue from database
-    # TODO: Verify user has access to issue's project
-    # TODO: Verify agent exists and is available
-    # TODO: Assign agent to issue
-    # TODO: Update issue status to IN_PROGRESS
-    # TODO: Start agent execution
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Issue {issue_id} not found"
+    issue_data = await issue_service.assign_agent(
+        issue_id=issue_id,
+        agent_id=agent_id,
+        user_id=current_user.id
     )
+    return Issue(**issue_data)
 
 
 @router.post(
@@ -283,16 +278,12 @@ async def resolve_issue(
     - **issue_id**: Issue UUID
     - **pr_url**: Optional PR URL that resolved the issue
     """
-    # TODO: Load issue from database
-    # TODO: Verify user has access to issue's project
-    # TODO: Update issue status to RESOLVED
-    # TODO: Record resolution PR URL if provided
-    # TODO: Set resolved_at timestamp
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Issue {issue_id} not found"
+    issue_data = await issue_service.resolve_issue(
+        issue_id=issue_id,
+        user_id=current_user.id,
+        pr_url=pr_url
     )
+    return Issue(**issue_data)
 
 
 @router.delete(
@@ -310,12 +301,4 @@ async def delete_issue(
 
     This will also cancel any assigned agents.
     """
-    # TODO: Load issue from database
-    # TODO: Verify user has access to issue's project
-    # TODO: Cancel any assigned agents
-    # TODO: Delete issue
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Issue {issue_id} not found"
-    )
+    await issue_service.delete_issue(issue_id, current_user.id)

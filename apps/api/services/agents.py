@@ -99,7 +99,7 @@ class AgentService:
             
             return agent
         finally:
-            await conn.close()
+            await self._release_connection(conn)
 
     async def _create_execution(
         self,
@@ -315,7 +315,7 @@ class AgentService:
             
             return await self.get_agent(agent_id, user_id)
         finally:
-            await conn.close()
+            await self._release_connection(conn)
 
     async def cancel_agent(self, agent_id: UUID, user_id: int) -> Dict[str, Any]:
         """Cancel agent execution"""
@@ -345,7 +345,7 @@ class AgentService:
             
             return await self.get_agent(agent_id, user_id)
         finally:
-            await conn.close()
+            await self._release_connection(conn)
 
     async def get_agent_logs(
         self,
@@ -399,7 +399,7 @@ class AgentService:
                     detail=f"Agent {agent_id} not found"
                 )
         finally:
-            await conn.close()
+            await self._release_connection(conn)
 
     def _row_to_dict(self, row) -> Dict[str, Any]:
         """Convert database row to dictionary"""
