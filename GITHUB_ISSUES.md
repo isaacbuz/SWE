@@ -151,7 +151,7 @@
 **Due**: Week 6
 
 - [x] Issue #98: Deploy to staging environment ✅ **COMPLETE**
-- [ ] Issue #99: Set up SSL/TLS certificates
+- [x] Issue #99: Set up SSL/TLS certificates ✅ **COMPLETE**
 - [ ] Issue #100: Configure production database with backups
 - [ ] Issue #101: Set up CDN for frontend assets
 - [ ] Issue #102: Implement disaster recovery plan
