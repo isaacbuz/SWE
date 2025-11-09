@@ -8,6 +8,7 @@ import { ToolSpec } from "../types/index.js";
 import { SchemaValidator } from "./SchemaValidator.js";
 import { RateLimiter } from "./RateLimiter.js";
 import { CircuitBreaker } from "./CircuitBreaker.js";
+import { PermissionChecker, PermissionDeniedError } from "../permissions/PermissionChecker.js";
 
 export interface ToolHandler {
   (args: Record<string, unknown>): Promise<unknown> | unknown;
@@ -31,6 +32,9 @@ export interface ToolExecutorOptions {
   /** Enable circuit breaker */
   circuitBreaker?: boolean;
   
+  /** Enable permission checking */
+  checkPermissions?: boolean;
+  
   /** Custom validator */
   validator?: SchemaValidator;
   
@@ -39,6 +43,9 @@ export interface ToolExecutorOptions {
   
   /** Custom circuit breaker */
   circuitBreakerInstance?: CircuitBreaker;
+  
+  /** Custom permission checker */
+  permissionChecker?: PermissionChecker;
   
   /** Maximum execution time in milliseconds */
   timeout?: number;
@@ -49,10 +56,12 @@ export class ToolExecutor {
   private validator: SchemaValidator;
   private rateLimiter: RateLimiter;
   private circuitBreaker: CircuitBreaker;
-  private options: Required<Omit<ToolExecutorOptions, "validator" | "rateLimiter" | "circuitBreakerInstance">> & {
+  private permissionChecker?: PermissionChecker;
+  private options: Required<Omit<ToolExecutorOptions, "validator" | "rateLimiter" | "circuitBreakerInstance" | "permissionChecker">> & {
     validator?: SchemaValidator;
     rateLimiter?: RateLimiter;
     circuitBreakerInstance?: CircuitBreaker;
+    permissionChecker?: PermissionChecker;
   };
 
   constructor(options: ToolExecutorOptions = {}) {
@@ -60,15 +69,18 @@ export class ToolExecutor {
       validate: options.validate ?? true,
       rateLimit: options.rateLimit ?? true,
       circuitBreaker: options.circuitBreaker ?? true,
+      checkPermissions: options.checkPermissions ?? true,
       timeout: options.timeout ?? 30000,
       validator: options.validator,
       rateLimiter: options.rateLimiter,
       circuitBreakerInstance: options.circuitBreakerInstance,
+      permissionChecker: options.permissionChecker,
     };
 
     this.validator = this.options.validator || new SchemaValidator();
     this.rateLimiter = this.options.rateLimiter || new RateLimiter();
     this.circuitBreaker = this.options.circuitBreakerInstance || new CircuitBreaker();
+    this.permissionChecker = this.options.permissionChecker;
   }
 
   /**
@@ -106,12 +118,32 @@ export class ToolExecutor {
   async execute(
     toolName: string,
     args: unknown,
-    spec?: ToolSpec
+    spec?: ToolSpec,
+    userId?: string
   ): Promise<ToolResult> {
     const startTime = Date.now();
 
     try {
-      // 1. Check if tool exists
+      // 1. Check permissions if enabled
+      if (this.options.checkPermissions && userId && this.permissionChecker) {
+        const hasPermission = await this.permissionChecker.canExecute(
+          userId,
+          toolName,
+          "execute",
+          args as Record<string, unknown>
+        );
+
+        if (!hasPermission) {
+          throw new PermissionDeniedError(
+            `User '${userId}' does not have permission to execute '${toolName}'`,
+            userId,
+            toolName,
+            "execute"
+          );
+        }
+      }
+
+      // 2. Check if tool exists
       const handler = this.handlers.get(toolName);
       if (!handler) {
         return {
@@ -122,7 +154,7 @@ export class ToolExecutor {
         };
       }
 
-      // 2. Validate arguments if enabled
+      // 3. Validate arguments if enabled
       if (this.options.validate && spec) {
         const validationResult = this.validator.validate(
           toolName,
@@ -140,7 +172,7 @@ export class ToolExecutor {
         }
       }
 
-      // 3. Rate limiting check
+      // 4. Rate limiting check
       if (this.options.rateLimit) {
         const rateLimitResult = await this.rateLimiter.checkLimit(toolName);
         if (!rateLimitResult.allowed) {
@@ -153,7 +185,7 @@ export class ToolExecutor {
         }
       }
 
-      // 4. Circuit breaker check
+      // 5. Circuit breaker check
       if (this.options.circuitBreaker) {
         if (!this.circuitBreaker.isOpen(toolName)) {
           return {
@@ -165,10 +197,10 @@ export class ToolExecutor {
         }
       }
 
-      // 5. Sanitize inputs
+      // 6. Sanitize inputs
       const sanitizedArgs = this.sanitizeInputs(args);
 
-      // 6. Execute with timeout
+      // 7. Execute with timeout
       const result = await Promise.race([
         this.executeHandler(handler, sanitizedArgs),
         this.createTimeout(this.options.timeout),
@@ -184,7 +216,7 @@ export class ToolExecutor {
         };
       }
 
-      // 7. Record success
+      // 8. Record success
       if (this.options.circuitBreaker) {
         this.circuitBreaker.recordSuccess(toolName);
       }
