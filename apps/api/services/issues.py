@@ -371,14 +371,37 @@ class IssueService:
         conn = await self._get_connection()
         try:
             # Verify issue exists and user has access
-            issue = await self.get_issue(issue_id, user_id)
+            issue_row = await conn.fetchrow(
+                """
+                SELECT t.* FROM tasks t
+                JOIN projects p ON p.project_id = t.project_id
+                WHERE t.task_id = $1 AND p.owner_id = $2 AND t.github_pr_number IS NULL
+                """,
+                issue_id, user_id
+            )
+            
+            if not issue_row:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Issue {issue_id} not found"
+                )
             
             # Update issue
-            updates = {"status": "resolved", "completed_at": datetime.utcnow()}
+            metadata = dict(issue_row.get("metadata", {}))
             if pr_url:
-                updates["metadata"] = {**(issue.get("metadata", {})), "resolution_pr_url": pr_url}
+                metadata["resolution_pr_url"] = pr_url
             
-            return await self.update_issue(issue_id, user_id, updates)
+            row = await conn.fetchrow(
+                """
+                UPDATE tasks
+                SET status = 'closed', completed_at = $1, metadata = $2, updated_at = $3
+                WHERE task_id = $4
+                RETURNING *
+                """,
+                datetime.utcnow(), metadata, datetime.utcnow(), issue_id
+            )
+            
+            return self._row_to_dict(row)
         finally:
             await self._release_connection(conn)
 
