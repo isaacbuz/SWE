@@ -1,0 +1,107 @@
+---
+# Cloud Storage bucket configuration for CDN
+# This is a Terraform configuration example for GCP Cloud Storage + CDN
+
+# Note: This should be applied via Terraform, not Kubernetes
+# Included here for reference
+
+# terraform/main.tf should include:
+# resource "google_storage_bucket" "cdn_assets" {
+#   name          = "${var.project_id}-cdn-assets"
+#   location      = "US"
+#   force_destroy = false
+#
+#   uniform_bucket_level_access = true
+#
+#   website {
+#     main_page_suffix = "index.html"
+#     not_found_page   = "404.html"
+#   }
+#
+#   cors {
+#     origin          = ["https://piehr.example.com", "https://staging.piehr.example.com"]
+#     method          = ["GET", "HEAD"]
+#     response_header = ["*"]
+#     max_age_seconds = 3600
+#   }
+#
+#   lifecycle_rule {
+#     condition {
+#       age = 365
+#     }
+#     action {
+#       type = "Delete"
+#     }
+#   }
+# }
+#
+# resource "google_storage_bucket_iam_member" "cdn_public" {
+#   bucket = google_storage_bucket.cdn_assets.name
+#   role   = "roles/storage.objectViewer"
+#   member = "allUsers"
+# }
+#
+# resource "google_compute_backend_bucket" "cdn_backend" {
+#   name        = "piehr-cdn-backend"
+#   description = "CDN backend bucket for PieHr assets"
+#   bucket_name = google_storage_bucket.cdn_assets.name
+#   enable_cdn  = true
+# }
+#
+# resource "google_compute_url_map" "cdn_url_map" {
+#   name            = "piehr-cdn-url-map"
+#   default_service = google_compute_backend_bucket.cdn_backend.id
+# }
+#
+# resource "google_compute_target_https_proxy" "cdn_https_proxy" {
+#   name             = "piehr-cdn-https-proxy"
+#   url_map          = google_compute_url_map.cdn_url_map.id
+#   ssl_certificates = [google_compute_managed_ssl_certificate.cdn_cert.id]
+# }
+#
+# resource "google_compute_managed_ssl_certificate" "cdn_cert" {
+#   name = "piehr-cdn-cert"
+#   managed {
+#     domains = ["cdn.piehr.example.com"]
+#   }
+# }
+#
+# resource "google_compute_global_forwarding_rule" "cdn_forwarding_rule" {
+#   name       = "piehr-cdn-forwarding-rule"
+#   target     = google_compute_target_https_proxy.cdn_https_proxy.id
+#   port_range = "443"
+#   ip_address = google_compute_global_address.cdn_ip.id
+# }
+#
+# resource "google_compute_global_address" "cdn_ip" {
+#   name = "piehr-cdn-ip"
+# }
+
+---
+# Next.js static export configuration for CDN
+# This should be added to next.config.js
+
+# next.config.js example:
+# module.exports = {
+#   output: 'export',
+#   images: {
+#     unoptimized: true,
+#   },
+#   assetPrefix: process.env.NODE_ENV === 'production' 
+#     ? 'https://cdn.piehr.example.com' 
+#     : '',
+# }
+
+---
+# Kubernetes ConfigMap for CDN configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cdn-config
+  namespace: piehr
+data:
+  CDN_URL: "https://cdn.piehr.example.com"
+  CDN_ENABLED: "true"
+  CACHE_CONTROL: "public, max-age=31536000, immutable"
+  ASSET_PREFIX: "/assets"
+
