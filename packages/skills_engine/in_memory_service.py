@@ -364,6 +364,28 @@ class InMemorySkillsService:
 
         return review
 
+    async def list_skill_versions(
+        self,
+        skill_id: UUID,
+    ) -> List[Dict[str, Any]]:
+        """List versions for a skill (in-memory implementation returns current version)."""
+        skill_id = _ensure_uuid(skill_id)
+        skill = self._skills.get(skill_id)
+        if not skill:
+            return []
+        
+        # Return current version as a version entry
+        return [{
+            "id": uuid4(),
+            "skill_id": skill_id,
+            "version": skill.get("version", "1.0.0"),
+            "changelog": None,
+            "breaking_changes": False,
+            "migration_guide": None,
+            "status": "active",
+            "created_at": skill.get("created_at", _now()),
+        }]
+
     async def get_skill_analytics(
         self,
         skill_id: UUID,
