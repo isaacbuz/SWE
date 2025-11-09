@@ -108,7 +108,7 @@
 - [x] Issue #68: Integrate Google Gemini API ✅ **COMPLETE**
 - [ ] Issue #69: Integrate IBM Granite API
 - [x] Issue #70: Integrate Mistral API ✅ **COMPLETE**
-- [ ] Issue #71: Integrate Cohere API
+- [x] Issue #71: Integrate Cohere API ✅ **COMPLETE**
 - [ ] Issue #72: Complete GitHub integration (Issues, PRs, Projects, Actions)
 - [ ] Issue #73: Implement GitHub webhook handling
 - [ ] Issue #74: Integrate Google Workspace APIs
