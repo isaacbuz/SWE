@@ -2,7 +2,7 @@
 
 import { use } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Star, Download, Zap, Code, Play, Install, Trash2 } from 'lucide-react'
+import { ArrowLeft, Star, Download, Zap, Code, Play, Install, Trash2, BarChart3 } from 'lucide-react'
 import { useSkill, useInstallSkill, useUninstallSkill, useInstalledSkills } from '@/lib/hooks/use-skills'
 import { SkillPlayground } from '@/components/skills/skill-playground'
 import { Button } from '@/components/ui/button'
@@ -119,6 +119,12 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
 
           {/* Actions */}
           <div className="flex gap-2">
+            <Link href={`/skills/${id}/analytics`}>
+              <Button variant="outline">
+                <BarChart3 className="mr-2 h-4 w-4" />
+                Analytics
+              </Button>
+            </Link>
             {isInstalled ? (
               <Button
                 variant="outline"

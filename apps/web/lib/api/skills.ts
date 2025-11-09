@@ -1,7 +1,7 @@
 /**
  * Skills API Client
  */
-import { Skill, SkillDetail, SkillExecutionResult, SkillInstallation } from './types'
+import { Skill, SkillDetail, SkillExecutionResult, SkillInstallation, SkillAnalytics } from './types'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
@@ -39,18 +39,6 @@ export interface SkillExecutionRequest {
   context?: Record<string, any>
 }
 
-export interface SkillAnalytics {
-  skill_id: string
-  start_date?: string
-  end_date?: string
-  executions: number
-  installations: number
-  downloads: number
-  avg_rating: number
-  review_count: number
-  rating_breakdown: Record<number, number>
-  updated_at: string
-}
 
 async function apiRequest<T>(
   endpoint: string,
