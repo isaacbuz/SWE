@@ -120,7 +120,7 @@ export class GeminiProvider implements LLMProvider {
         {
           name: tool.name,
           description: tool.description,
-          parameters: tool.parameters,
+          parameters: tool.jsonSchema, // Use jsonSchema from ToolSpec
         },
       ],
     }));
@@ -218,10 +218,11 @@ export class GeminiProvider implements LLMProvider {
   /**
    * Complete a chat completion request
    */
-  async completion(opts: CompletionOptions): Promise<CompletionResult> {
+  async completion(opts: ExtendedCompletionOptions): Promise<CompletionResult> {
     try {
+      const modelName = opts.model || this.defaultModel;
       const model = this.client.getGenerativeModel({
-        model: opts.model || this.defaultModel,
+        model: modelName,
       });
 
       // Convert messages
@@ -257,7 +258,7 @@ export class GeminiProvider implements LLMProvider {
       const promptTokens = this.estimateTokens(promptText);
       const completionTokens = this.estimateTokens(response.text());
 
-      return this.convertResponse(response, opts.model || this.defaultModel, promptTokens, completionTokens);
+      return this.convertResponse(response, modelName, promptTokens, completionTokens);
     } catch (error: any) {
       this.handleError(error);
     }
@@ -266,10 +267,11 @@ export class GeminiProvider implements LLMProvider {
   /**
    * Stream a chat completion request
    */
-  async *streamCompletion(opts: CompletionOptions): AsyncIterable<CompletionChunk> {
+  async *streamCompletion(opts: ExtendedCompletionOptions): AsyncIterable<CompletionChunk> {
     try {
+      const modelName = opts.model || this.defaultModel;
       const model = this.client.getGenerativeModel({
-        model: opts.model || this.defaultModel,
+        model: modelName,
       });
 
       // Convert messages

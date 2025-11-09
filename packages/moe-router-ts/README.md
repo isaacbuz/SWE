@@ -25,7 +25,7 @@ pnpm add @ai-company/moe-router
 
 ```typescript
 import { MoERouter, TaskType } from '@ai-company/moe-router';
-import { OpenAIProvider, AnthropicProvider } from '@ai-company/llm-providers';
+import { OpenAIProvider, AnthropicProvider, GeminiProvider } from '@ai-company/llm-providers';
 
 // Create router
 const router = new MoERouter();
@@ -33,6 +33,7 @@ const router = new MoERouter();
 // Register providers
 router.registerProvider(new OpenAIProvider(process.env.OPENAI_API_KEY!));
 router.registerProvider(new AnthropicProvider(process.env.ANTHROPIC_API_KEY!));
+router.registerProvider(new GeminiProvider(process.env.GOOGLE_API_KEY!));
 
 // Set routing policy
 router.setPolicy(TaskType.CODE_GENERATION, {

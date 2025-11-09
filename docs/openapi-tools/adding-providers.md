@@ -62,6 +62,17 @@ Each provider has different tool calling formats:
 }
 ```
 
+**Google Gemini Format**:
+```typescript
+{
+  functionDeclarations: [{
+    name: 'toolName',
+    description: '...',
+    parameters: { /* JSON Schema */ }
+  }]
+}
+```
+
 ### 3. Handle Errors
 
 Map provider errors to standard error types:
@@ -100,6 +111,24 @@ const decision = router.selectProvider({
 });
 ```
 
+### 5. Update Quality Scores
+
+Update the MoE router's quality scoring to include your provider:
+
+```typescript
+// In MoERouter.ts
+private getQualityScore(provider: LLMProvider): number {
+  if (provider.name.includes('my-provider:premium')) {
+    return 0.95;
+  }
+  // ... other providers
+}
+```
+
+## Example: Google Gemini
+
+See `packages/llm-providers/src/providers/google/GeminiProvider.ts` for a complete example.
+
 ## Testing
 
 ```typescript
@@ -123,3 +152,7 @@ expect(result.usage.totalTokens).toBeGreaterThan(0);
 4. **Cost Tracking**: Accurately track token usage and costs
 5. **Documentation**: Document provider-specific features
 
+## Related Documentation
+
+- [LLM Provider Interface](../../packages/llm-providers/src/domain/LLMProvider.ts)
+- [MoE Router](../../packages/moe-router-ts/README.md)
