@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { CommandProvider } from '@/components/command/command-provider'
+import { ToolExecutionProvider } from '@/components/tools/ToolExecutionProvider'
 import { WebSocketProvider } from '@/lib/websocket/websocket-provider'
 import { useKeyboardShortcuts } from '@/lib/hooks/use-keyboard-shortcuts'
 
@@ -25,8 +26,10 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <WebSocketProvider>
         <CommandProvider>
-          <KeyboardShortcutsHandler />
-          {children}
+          <ToolExecutionProvider>
+            <KeyboardShortcutsHandler />
+            {children}
+          </ToolExecutionProvider>
         </CommandProvider>
       </WebSocketProvider>
     </QueryClientProvider>

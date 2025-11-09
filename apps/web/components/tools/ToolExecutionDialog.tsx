@@ -3,13 +3,15 @@
 import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { ToolSpec } from '@ai-company/openapi-tools'
+import { ToolSpec, ToolExecuteResponse } from '@/lib/api/types'
+import { executeTool } from '@/lib/api/tools'
 
 interface ToolExecutionDialogProps {
   tool: ToolSpec | null
   open: boolean
   onClose: () => void
-  onExecute: (args: unknown) => Promise<void>
+  onExecute?: (result: ToolExecuteResponse) => void
+  onError?: (error: string) => void
 }
 
 /**
@@ -37,6 +39,8 @@ export function ToolExecutionDialog({
   const required = schema.required || []
 
   const handleSubmit = async () => {
+    if (!tool) return
+
     setError(null)
     setExecuting(true)
 
@@ -48,11 +52,29 @@ export function ToolExecutionDialog({
         }
       }
 
-      await onExecute(args)
+      // Execute tool via API
+      const result = await executeTool({
+        toolName: tool.name,
+        arguments: args,
+      })
+
+      if (!result.success) {
+        throw new Error(result.error || 'Tool execution failed')
+      }
+
+      // Call success callback
+      if (onExecute) {
+        onExecute(result)
+      }
+
       onClose()
       setArgs({})
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Execution failed')
+      const errorMessage = err instanceof Error ? err.message : 'Execution failed'
+      setError(errorMessage)
+      if (onError) {
+        onError(errorMessage)
+      }
     } finally {
       setExecuting(false)
     }

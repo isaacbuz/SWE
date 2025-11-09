@@ -1,8 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useCommand } from '@/components/command/command-provider'
-import { ToolSpec } from '@ai-company/openapi-tools'
+import { ToolSpec } from '@/lib/api/types'
+import { listTools } from '@/lib/api/tools'
+import { useToolExecutionContext } from '@/components/tools/ToolExecutionProvider'
 import { Wrench, GitBranch, Code, Play } from 'lucide-react'
 
 /**
@@ -10,8 +12,10 @@ import { Wrench, GitBranch, Code, Play } from 'lucide-react'
  */
 export function useOpenAPITools() {
   const { registerAction, unregisterAction } = useCommand()
+  const { openDialog } = useToolExecutionContext()
   const [tools, setTools] = useState<ToolSpec[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     loadTools()
@@ -25,13 +29,11 @@ export function useOpenAPITools() {
         label: tool.name,
         description: tool.description,
         icon: getToolIcon(tool),
-        category: 'actions',
+        category: 'tools',
         keywords: tool.tags || [],
         onExecute: async () => {
           // Open tool execution dialog
-          // This would trigger a modal/dialog for parameter input
-          console.log(`Execute tool: ${tool.name}`)
-          // In real implementation, would open ToolExecutionDialog
+          openDialog(tool)
         },
       })
     })
@@ -44,23 +46,27 @@ export function useOpenAPITools() {
     }
   }, [tools, registerAction, unregisterAction])
 
-  async function loadTools() {
+  const loadTools = useCallback(async () => {
     try {
-      // In real implementation, would fetch from API
-      // const response = await fetch('/api/v1/tools')
-      // const data = await response.json()
-      // setTools(data.tools)
-      
-      // For now, mock data
-      setTools([])
-    } catch (error) {
-      console.error('Failed to load tools:', error)
+      setLoading(true)
+      setError(null)
+      const response = await listTools()
+      setTools(response.tools)
+    } catch (err) {
+      console.error('Failed to load tools:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load tools')
+      setTools([]) // Fallback to empty array
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  return { tools, loading }
+  return {
+    tools,
+    loading,
+    error,
+    reload: loadTools,
+  }
 }
 
 function getToolIcon(tool: ToolSpec) {
