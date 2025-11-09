@@ -1,0 +1,23 @@
+{
+  "name": "@ai-company/permissions",
+  "version": "0.1.0",
+  "description": "RBAC permission system for tool execution",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "typescript": "^5.3.3",
+    "vitest": "^1.1.0",
+    "eslint": "^8.56.0"
+  }
+}

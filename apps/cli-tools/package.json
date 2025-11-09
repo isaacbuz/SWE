@@ -1,0 +1,26 @@
+{
+  "name": "@ai-company/cli-tools",
+  "version": "0.1.0",
+  "description": "CLI tools for AI development workflows",
+  "main": "dist/index.js",
+  "bin": {
+    "spec-to-github": "./dist/spec-to-github.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/spec-to-github.js",
+    "dev": "ts-node src/spec-to-github.ts"
+  },
+  "dependencies": {
+    "@ai-company/tool-pipeline": "workspace:*",
+    "@ai-company/openapi-tools": "workspace:*",
+    "@ai-company/llm-providers": "workspace:*",
+    "@ai-company/moe-router": "workspace:*",
+    "commander": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}
