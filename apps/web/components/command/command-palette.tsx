@@ -38,6 +38,7 @@ export function CommandPalette() {
       actions: [],
       navigate: [],
       ai: [],
+      tools: [],
     }
 
     results.forEach(action => {
@@ -132,6 +133,18 @@ export function CommandPalette() {
           {grouped.ai.length > 0 && (
             <Command.Group heading="AI Recipes" className="mb-2">
               {grouped.ai.map((action) => (
+                <CommandItem
+                  key={action.id}
+                  action={action}
+                  onExecute={() => handleExecute(action.id)}
+                />
+              ))}
+            </Command.Group>
+          )}
+
+          {grouped.tools.length > 0 && (
+            <Command.Group heading="Tools" className="mb-2">
+              {grouped.tools.map((action) => (
                 <CommandItem
                   key={action.id}
                   action={action}

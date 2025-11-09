@@ -8,7 +8,7 @@ export interface CommandAction {
   description?: string
   icon?: ReactNode
   shortcut?: string
-  category: 'actions' | 'navigate' | 'ai' | 'recent'
+  category: 'actions' | 'navigate' | 'ai' | 'recent' | 'tools'
   onExecute: () => void | Promise<void>
   keywords?: string[]
 }
