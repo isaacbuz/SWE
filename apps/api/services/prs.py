@@ -337,12 +337,71 @@ class PRService:
         user_id: int
     ) -> Dict[str, Any]:
         """Sync PR with GitHub"""
-        # Verify PR exists and user has access
-        pr = await self.get_pr(pr_id, user_id)
-        
-        # TODO: Fetch latest PR data from GitHub API
-        # For now, just return current PR
-        return pr
+        conn = await self._get_connection()
+        try:
+            # Get PR data with repository info
+            pr_row = await conn.fetchrow(
+                """
+                SELECT t.task_id, t.github_pr_number, t.github_url, t.status,
+                       p.repository_owner, p.repository_name
+                FROM tasks t
+                JOIN projects p ON t.project_id = p.project_id
+                WHERE t.task_id = $1 AND p.owner_id = $2 AND t.github_pr_number IS NOT NULL
+                """,
+                pr_id, user_id
+            )
+            if not pr_row:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"PR {pr_id} not found"
+                )
+            
+            github_pr_number = pr_row["github_pr_number"]
+            owner = pr_row["repository_owner"]
+            repo = pr_row["repository_name"]
+            
+            # Fetch from GitHub API if token available
+            github_token = os.getenv("GITHUB_TOKEN")
+            if github_token:
+                try:
+                    from packages.integrations.github import GitHubClient
+                    from packages.integrations.github.prs import PullRequestOperations
+                    
+                    client = GitHubClient(token=github_token)
+                    pr_ops = PullRequestOperations(client)
+                    
+                    # Fetch PR from GitHub
+                    github_pr = await pr_ops.get_pull_request(owner, repo, github_pr_number)
+                    
+                    # Map GitHub state to our status
+                    state_map = {
+                        "open": "open",
+                        "closed": "closed"
+                    }
+                    new_status = state_map.get(github_pr.get("state", "open"), "open")
+                    
+                    # Check if merged
+                    if github_pr.get("merged", False):
+                        new_status = "merged"
+                    
+                    # Update database with latest status
+                    await conn.execute(
+                        """
+                        UPDATE tasks
+                        SET status = $1, updated_at = CURRENT_TIMESTAMP
+                        WHERE task_id = $2
+                        """,
+                        new_status, pr_id
+                    )
+                    
+                except Exception:
+                    # If GitHub API fails, continue with current data
+                    pass
+            
+            return await self.get_pr(pr_id, user_id)
+            
+        finally:
+            await self._release_connection(conn)
 
     async def delete_pr(self, pr_id: UUID, user_id: int) -> None:
         """Stop tracking PR"""
