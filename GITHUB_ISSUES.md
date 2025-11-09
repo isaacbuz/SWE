@@ -103,8 +103,8 @@
 **Milestone**: External Systems
 **Due**: Week 4
 
-- [ ] Issue #66: Integrate Anthropic Claude API
-- [ ] Issue #67: Integrate OpenAI GPT API
+- [x] Issue #66: Integrate Anthropic Claude API ✅ **COMPLETE**
+- [x] Issue #67: Integrate OpenAI GPT API ✅ **COMPLETE**
 - [x] Issue #68: Integrate Google Gemini API ✅ **COMPLETE**
 - [ ] Issue #69: Integrate IBM Granite API
 - [x] Issue #70: Integrate Mistral API ✅ **COMPLETE**
