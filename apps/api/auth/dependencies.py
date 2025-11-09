@@ -61,14 +61,19 @@ async def get_current_user_from_token(
     if not token_data:
         raise AuthenticationError("Invalid or expired token")
 
-    # TODO: Check if token is revoked in Redis
-    # TODO: Load user from database to verify it still exists and is active
+    # TODO: Check if token is revoked in Redis (when Redis is implemented)
+    # Load user from database to verify it still exists and is active
+    from services.users import user_service
+    user_data = await user_service.get_user_by_id(int(token_data.sub))
+    if not user_data or not user_data.get("is_active"):
+        return None
 
     return CurrentUser(
-        id=UUID(token_data.sub),
+        id=int(token_data.sub),
         email=token_data.email,
+        username=user_data.get("username", ""),
         role=token_data.role,
-        scopes=token_data.scopes
+        is_active=user_data.get("is_active", True)
     )
 
 
@@ -90,14 +95,43 @@ async def get_current_user_from_api_key(
     if not api_key:
         return None
 
-    # TODO: Load API key from database by prefix
-    # TODO: Verify hashed key matches
-    # TODO: Check if key is expired or inactive
-    # TODO: Update last_used_at timestamp
-    # TODO: Load associated user
+    # Extract key prefix from API key
+    key_prefix = api_key_handler.extract_key_prefix(api_key)
+    if not key_prefix:
+        return None
 
-    # For now, return None (API key auth not fully implemented)
-    return None
+    # Load API key from database by prefix
+    from services.api_keys import api_key_service
+    api_key_data = await api_key_service.get_api_key_by_prefix(key_prefix)
+    if not api_key_data:
+        return None
+    
+    # Verify hashed key matches
+    if not api_key_handler.verify_api_key(api_key, api_key_data["key_hash"]):
+        return None
+    
+    # Check if key is expired or inactive
+    if not api_key_data.get("is_active", True):
+        return None
+    
+    # Check expiration
+    if api_key_data.get("expires_at"):
+        from datetime import datetime
+        expires_at = datetime.fromisoformat(api_key_data["expires_at"])
+        if datetime.utcnow() > expires_at:
+            return None
+    
+    # Update last_used_at timestamp
+    await api_key_service.update_last_used(api_key_data["id"])
+    
+    # Load associated user
+    from services.users import user_service
+    user_data = await user_service.get_user_by_id(api_key_data["user_id"])
+    if not user_data or not user_data.get("is_active"):
+        return None
+    
+    # Convert to CurrentUser
+    return await user_service.to_current_user(user_data)
 
 
 async def get_current_user(
@@ -140,7 +174,11 @@ async def get_current_active_user(
     Raises:
         AuthenticationError: If user is inactive
     """
-    # TODO: Verify user is active in database
+    # Verify user is active in database
+    from services.users import user_service
+    user_data = await user_service.get_user_by_id(user.id)
+    if not user_data or not user_data.get("is_active"):
+        raise AuthenticationError("User account is inactive")
     return current_user
 
 
