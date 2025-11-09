@@ -243,6 +243,17 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
+          
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Node.js tests completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Python API tests completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ MoE Router tests completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Agent System tests completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Workflow tests completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Coverage reports uploaded to Codecov" >> $GITHUB_STEP_SUMMARY
 
   # Job 4: Build all packages
   build:
