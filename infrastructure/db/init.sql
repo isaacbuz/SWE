@@ -113,15 +113,20 @@ CREATE TABLE IF NOT EXISTS integrations.integration_events (
 -- ===== Audit Schema =====
 CREATE TABLE IF NOT EXISTS audit.audit_log (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  event_type VARCHAR(100) NOT NULL,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  action VARCHAR(100) NOT NULL,
-  resource_type VARCHAR(100) NOT NULL,
+  user_email VARCHAR(255),
+  resource_type VARCHAR(100),
   resource_id VARCHAR(255),
-  old_values JSONB,
-  new_values JSONB,
-  ip_address VARCHAR(45),
+  action VARCHAR(255) NOT NULL,
+  result VARCHAR(50) NOT NULL CHECK (result IN ('success', 'failure', 'pending')),
+  ip_address INET,
   user_agent TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  request_id VARCHAR(255),
+  metadata JSONB,
+  changes JSONB,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 -- ===== Indexes for performance =====
@@ -147,9 +152,13 @@ CREATE INDEX idx_integration_events_integration_id ON integrations.integration_e
 CREATE INDEX idx_integration_events_processed ON integrations.integration_events(processed);
 
 -- Audit indexes
-CREATE INDEX idx_audit_log_user_id ON audit.audit_log(user_id);
-CREATE INDEX idx_audit_log_resource_type ON audit.audit_log(resource_type);
-CREATE INDEX idx_audit_log_created_at ON audit.audit_log(created_at);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit.audit_log(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit.audit_log(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_event_type ON audit.audit_log(event_type);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_resource ON audit.audit_log(resource_type, resource_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_result ON audit.audit_log(result);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_request_id ON audit.audit_log(request_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit.audit_log(created_at);
 
 -- ===== Create default user for development =====
 -- IMPORTANT: Change password in production!

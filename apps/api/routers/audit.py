@@ -48,7 +48,7 @@ async def query_audit_logs(
     result: Optional[str] = Query(None, description="Filter by result (success/failure/pending)"),
     limit: int = Query(100, description="Maximum number of entries", le=1000),
     offset: int = Query(0, description="Offset for pagination"),
-    current_user: dict = Depends(get_current_user)
+    current_user: CurrentUser = Depends(get_current_user)
 ):
     """
     Query audit logs
@@ -89,7 +89,7 @@ async def query_audit_logs(
 @router.get("/logs/{log_id}", response_model=AuditLogEntryResponse)
 async def get_audit_log(
     log_id: str,
-    current_user: dict = Depends(get_current_user)
+    current_user: CurrentUser = Depends(get_current_user)
 ):
     """
     Get audit log by ID
@@ -110,7 +110,7 @@ async def get_audit_summary(
     start_date: Optional[str] = Query(None, description="Start date (ISO format)"),
     end_date: Optional[str] = Query(None, description="End date (ISO format)"),
     days: int = Query(7, description="Number of days (if dates not provided)"),
-    current_user: dict = Depends(get_current_user)
+    current_user: CurrentUser = Depends(get_current_user)
 ):
     """
     Get audit log summary
