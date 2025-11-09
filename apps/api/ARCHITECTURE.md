@@ -289,6 +289,7 @@ Request → Middleware → Rate Limiter
 ## Component Responsibilities
 
 ### Main Application (`main.py`)
+
 - Application initialization
 - Middleware registration
 - Router registration
@@ -297,12 +298,14 @@ Request → Middleware → Rate Limiter
 - Health checks
 
 ### Configuration (`config.py`)
+
 - Environment variable loading
 - Settings validation
 - Default values
 - Type safety
 
 ### Authentication Module (`auth/`)
+
 - JWT token creation/validation
 - Password hashing/verification
 - API key generation/validation
@@ -311,6 +314,7 @@ Request → Middleware → Rate Limiter
 - User authentication dependencies
 
 ### Routers (`routers/`)
+
 - Endpoint definitions
 - Request validation
 - Response serialization
@@ -318,11 +322,13 @@ Request → Middleware → Rate Limiter
 - Database queries (when implemented)
 
 ### Middleware (`middleware/`)
+
 - **CORS**: Cross-origin request handling
 - **Rate Limiting**: Request throttling per user/IP
 - **Logging**: Structured logging with correlation IDs
 
 ### WebSocket (`websocket/`)
+
 - Real-time connections
 - Room management
 - Event broadcasting

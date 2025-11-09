@@ -1,6 +1,6 @@
-import '@testing-library/jest-dom';
-import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import "@testing-library/jest-dom";
+import { cleanup } from "@testing-library/react";
+import { afterEach, vi } from "vitest";
 
 // Cleanup after each test
 afterEach(() => {
@@ -8,28 +8,28 @@ afterEach(() => {
 });
 
 // Mock Next.js router
-vi.mock('next/navigation', () => ({
+vi.mock("next/navigation", () => ({
   useRouter() {
     return {
       push: vi.fn(),
       replace: vi.fn(),
       prefetch: vi.fn(),
       back: vi.fn(),
-      pathname: '/',
+      pathname: "/",
       query: {},
-      asPath: '/',
+      asPath: "/",
     };
   },
   useSearchParams() {
     return new URLSearchParams();
   },
   usePathname() {
-    return '/';
+    return "/";
   },
 }));
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
     matches: false,

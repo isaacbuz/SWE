@@ -58,42 +58,42 @@ A **premium, fast, AI-native** interface that feels like a professional IDE meet
 ```typescript
 const typography = {
   display: {
-    family: 'General Sans',
+    family: "General Sans",
     weight: 800,
     sizes: {
-      xl: '3.5rem',    // 56px
-      lg: '2.5rem',    // 40px
-      md: '2rem',      // 32px
-    }
+      xl: "3.5rem", // 56px
+      lg: "2.5rem", // 40px
+      md: "2rem", // 32px
+    },
   },
   heading: {
-    family: 'Inter',
+    family: "Inter",
     weight: 700,
     sizes: {
-      h1: '1.875rem',  // 30px
-      h2: '1.5rem',    // 24px
-      h3: '1.25rem',   // 20px
-      h4: '1.125rem',  // 18px
-    }
+      h1: "1.875rem", // 30px
+      h2: "1.5rem", // 24px
+      h3: "1.25rem", // 20px
+      h4: "1.125rem", // 18px
+    },
   },
   body: {
-    family: 'Inter',
+    family: "Inter",
     weight: { regular: 400, medium: 500, semibold: 600 },
     sizes: {
-      lg: '1.125rem',  // 18px
-      md: '1rem',      // 16px
-      sm: '0.875rem',  // 14px
-      xs: '0.75rem',   // 12px
-    }
+      lg: "1.125rem", // 18px
+      md: "1rem", // 16px
+      sm: "0.875rem", // 14px
+      xs: "0.75rem", // 12px
+    },
   },
   mono: {
-    family: 'JetBrains Mono',
+    family: "JetBrains Mono",
     sizes: {
-      md: '0.875rem',  // 14px
-      sm: '0.75rem',   // 12px
-    }
-  }
-}
+      md: "0.875rem", // 14px
+      sm: "0.75rem", // 12px
+    },
+  },
+};
 ```
 
 ### Spacing & Layout
@@ -103,110 +103,112 @@ const spacing = {
   // 4pt base grid
   base: 4,
   scale: {
-    0: '0',
-    1: '0.25rem',  // 4px
-    2: '0.5rem',   // 8px
-    3: '0.75rem',  // 12px
-    4: '1rem',     // 16px
-    5: '1.25rem',  // 20px
-    6: '1.5rem',   // 24px
-    8: '2rem',     // 32px
-    10: '2.5rem',  // 40px
-    12: '3rem',    // 48px
-    16: '4rem',    // 64px
-  }
-}
+    0: "0",
+    1: "0.25rem", // 4px
+    2: "0.5rem", // 8px
+    3: "0.75rem", // 12px
+    4: "1rem", // 16px
+    5: "1.25rem", // 20px
+    6: "1.5rem", // 24px
+    8: "2rem", // 32px
+    10: "2.5rem", // 40px
+    12: "3rem", // 48px
+    16: "4rem", // 64px
+  },
+};
 
 const borderRadius = {
-  sm: '0.375rem',   // 6px
-  md: '0.75rem',    // 12px
-  lg: '1rem',       // 16px
-  xl: '1.25rem',    // 20px
-  '2xl': '1.5rem',  // 24px
-  full: '9999px'
-}
+  sm: "0.375rem", // 6px
+  md: "0.75rem", // 12px
+  lg: "1rem", // 16px
+  xl: "1.25rem", // 20px
+  "2xl": "1.5rem", // 24px
+  full: "9999px",
+};
 ```
 
 ### Color System
 
 #### Light Theme
+
 ```typescript
 const lightTheme = {
   brand: {
-    primary: '#4F46E5',    // Indigo-600
-    hover: '#4338CA',      // Indigo-700
-    active: '#3730A3',     // Indigo-800
+    primary: "#4F46E5", // Indigo-600
+    hover: "#4338CA", // Indigo-700
+    active: "#3730A3", // Indigo-800
   },
   ink: {
-    primary: '#0B1020',    // Near black
-    secondary: '#374151',  // Gray-700
-    tertiary: '#6B7280',   // Gray-500
-    disabled: '#9CA3AF',   // Gray-400
+    primary: "#0B1020", // Near black
+    secondary: "#374151", // Gray-700
+    tertiary: "#6B7280", // Gray-500
+    disabled: "#9CA3AF", // Gray-400
   },
   surface: {
-    primary: '#FFFFFF',
-    secondary: '#F9FAFB',  // Gray-50
-    tertiary: '#F3F4F6',   // Gray-100
-    overlay: '#00000014',  // Black 8%
+    primary: "#FFFFFF",
+    secondary: "#F9FAFB", // Gray-50
+    tertiary: "#F3F4F6", // Gray-100
+    overlay: "#00000014", // Black 8%
   },
   border: {
-    subtle: '#E5E7EB',     // Gray-200
-    default: '#D1D5DB',    // Gray-300
-    strong: '#9CA3AF',     // Gray-400
+    subtle: "#E5E7EB", // Gray-200
+    default: "#D1D5DB", // Gray-300
+    strong: "#9CA3AF", // Gray-400
   },
   status: {
-    success: '#10B981',    // Green-500
-    warning: '#F59E0B',    // Amber-500
-    danger: '#EF4444',     // Red-500
-    info: '#06B6D4',       // Cyan-500
-  }
-}
+    success: "#10B981", // Green-500
+    warning: "#F59E0B", // Amber-500
+    danger: "#EF4444", // Red-500
+    info: "#06B6D4", // Cyan-500
+  },
+};
 ```
 
 #### Dark Theme
+
 ```typescript
 const darkTheme = {
   brand: {
-    primary: '#A5B4FC',    // Indigo-300
-    hover: '#C7D2FE',      // Indigo-200
-    active: '#E0E7FF',     // Indigo-100
+    primary: "#A5B4FC", // Indigo-300
+    hover: "#C7D2FE", // Indigo-200
+    active: "#E0E7FF", // Indigo-100
   },
   ink: {
-    primary: '#E6EAF5',    // Near white
-    secondary: '#D1D5DB',  // Gray-300
-    tertiary: '#9CA3AF',   // Gray-400
-    disabled: '#6B7280',   // Gray-500
+    primary: "#E6EAF5", // Near white
+    secondary: "#D1D5DB", // Gray-300
+    tertiary: "#9CA3AF", // Gray-400
+    disabled: "#6B7280", // Gray-500
   },
   surface: {
-    primary: '#0B1220',    // Near black
-    secondary: '#111827',  // Gray-900
-    tertiary: '#1F2937',   // Gray-800
-    overlay: '#FFFFFF14',  // White 8%
+    primary: "#0B1220", // Near black
+    secondary: "#111827", // Gray-900
+    tertiary: "#1F2937", // Gray-800
+    overlay: "#FFFFFF14", // White 8%
   },
   border: {
-    subtle: '#1F2937',     // Gray-800
-    default: '#374151',    // Gray-700
-    strong: '#4B5563',     // Gray-600
+    subtle: "#1F2937", // Gray-800
+    default: "#374151", // Gray-700
+    strong: "#4B5563", // Gray-600
   },
   status: {
-    success: '#34D399',    // Green-400
-    warning: '#FBBF24',    // Amber-400
-    danger: '#F87171',     // Red-400
-    info: '#22D3EE',       // Cyan-400
-  }
-}
+    success: "#34D399", // Green-400
+    warning: "#FBBF24", // Amber-400
+    danger: "#F87171", // Red-400
+    info: "#22D3EE", // Cyan-400
+  },
+};
 ```
 
 ### Elevation (Shadows)
 
 ```typescript
 const shadows = {
-  e0: 'none',
-  e1: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-  e2: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-  e3: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-  e4: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-}
+  e0: "none",
+  e1: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+  e2: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+  e3: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+  e4: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+};
 ```
 
 ## Core Components
@@ -214,6 +216,7 @@ const shadows = {
 ### App Shell Components
 
 #### 1. Top Navbar
+
 ```tsx
 <TopNav>
   <Left>
@@ -232,12 +235,14 @@ const shadows = {
 ```
 
 **Key Behaviors**:
+
 - Sticky on scroll
 - Backdrop blur when scrolling (frosted glass)
 - Active route highlighted
 - Keyboard shortcut hints on hover
 
 #### 2. Left Rail (Context Navigation)
+
 ```tsx
 <LeftRail>
   <NavSection title="Workspace">
@@ -256,12 +261,14 @@ const shadows = {
 ```
 
 **Key Behaviors**:
+
 - Collapsible to icon-only (48px → 240px)
 - Tooltips on hover when collapsed
 - Active state with accent indicator
 - Keyboard navigation (Tab, Arrow keys)
 
 #### 3. AI Dock (Contextual Copilot)
+
 ```tsx
 <AIDock>
   <DockHeader>
@@ -283,15 +290,9 @@ const shadows = {
     <ExecSummary />
     <RiskList />
     <SuggestedActions>
-      <ActionChip onClick={handleAction}>
-        ✦ Summarize PR #104
-      </ActionChip>
-      <ActionChip>
-        ✦ Generate test plan
-      </ActionChip>
-      <ActionChip>
-        ✦ Estimate costs
-      </ActionChip>
+      <ActionChip onClick={handleAction}>✦ Summarize PR #104</ActionChip>
+      <ActionChip>✦ Generate test plan</ActionChip>
+      <ActionChip>✦ Estimate costs</ActionChip>
     </SuggestedActions>
   </DockContent>
 
@@ -302,6 +303,7 @@ const shadows = {
 ```
 
 **Context Awareness**:
+
 - On `/projects/:id` → Suggests: "Summarize recent PRs", "Create roadmap"
 - On PR detail → Suggests: "Review changes", "Generate tests", "Estimate risk"
 - On `/agents` → Suggests: "Compose crew for migration", "Benchmark models"
@@ -312,10 +314,7 @@ const shadows = {
 
 ```tsx
 <CommandPalette>
-  <SearchInput
-    placeholder="Search or run command..."
-    icon={<SearchIcon />}
-  />
+  <SearchInput placeholder="Search or run command..." icon={<SearchIcon />} />
 
   <ResultGroups>
     <Group title="Actions">
@@ -328,18 +327,12 @@ const shadows = {
     </Group>
 
     <Group title="Navigate">
-      <Result icon={<ProjectIcon />}>
-        Projects › Orion
-      </Result>
-      <Result icon={<IssueIcon />}>
-        #54 - Implement auth flow
-      </Result>
+      <Result icon={<ProjectIcon />}>Projects › Orion</Result>
+      <Result icon={<IssueIcon />}>#54 - Implement auth flow</Result>
     </Group>
 
     <Group title="AI Recipes">
-      <Result icon={<AIIcon />}>
-        Generate migration plan
-      </Result>
+      <Result icon={<AIIcon />}>Generate migration plan</Result>
     </Group>
   </ResultGroups>
 
@@ -354,6 +347,7 @@ const shadows = {
 ```
 
 **Features**:
+
 - Fuzzy search across entities
 - Slash commands (`/spec`, `/review`, `/deploy`)
 - Recent items prioritized
@@ -407,9 +401,7 @@ const shadows = {
     </SummaryCard>
   </NarrativeSummary>
 
-  <DiffViewer>
-    {/* Standard unified/split diff view */}
-  </DiffViewer>
+  <DiffViewer>{/* Standard unified/split diff view */}</DiffViewer>
 </NarratedDiff>
 ```
 
@@ -620,7 +612,7 @@ const shadows = {
 ```typescript
 // Global UI state (Zustand)
 interface UIStore {
-  theme: 'light' | 'dark' | 'system';
+  theme: "light" | "dark" | "system";
   commandPaletteOpen: boolean;
   aiDockCollapsed: boolean;
   leftRailCollapsed: boolean;
@@ -628,19 +620,19 @@ interface UIStore {
 
 // Server state (TanStack Query)
 const { data: projects } = useQuery({
-  queryKey: ['projects'],
+  queryKey: ["projects"],
   queryFn: fetchProjects,
   staleTime: 5 * 60 * 1000, // 5 min
-})
+});
 
 // Real-time updates (WebSocket + Query invalidation)
-useWebSocket('/ws/projects', {
+useWebSocket("/ws/projects", {
   onMessage: (event) => {
-    if (event.type === 'project.updated') {
-      queryClient.invalidateQueries(['projects', event.projectId])
+    if (event.type === "project.updated") {
+      queryClient.invalidateQueries(["projects", event.projectId]);
     }
-  }
-})
+  },
+});
 ```
 
 ## Performance Targets

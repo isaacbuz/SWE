@@ -8,21 +8,21 @@ export interface MockResponse<T = any> {
 export const createMockResponse = <T>(
   data: T,
   status: number = 200,
-  statusText: string = 'OK'
+  statusText: string = "OK",
 ): MockResponse<T> => {
   return {
     data,
     status,
     statusText,
     headers: {
-      'content-type': 'application/json',
+      "content-type": "application/json",
     },
   };
 };
 
 export const createMockErrorResponse = (
   message: string,
-  status: number = 500
+  status: number = 500,
 ): MockResponse => {
   return createMockResponse(
     {
@@ -30,7 +30,7 @@ export const createMockErrorResponse = (
       timestamp: new Date().toISOString(),
     },
     status,
-    'Error'
+    "Error",
   );
 };
 
@@ -44,7 +44,7 @@ export class MockAPIClient {
   public async request(endpoint: string, options?: any) {
     const handler = this.handlers.get(endpoint);
     if (!handler) {
-      return createMockErrorResponse('Not Found', 404);
+      return createMockErrorResponse("Not Found", 404);
     }
     return handler(options);
   }

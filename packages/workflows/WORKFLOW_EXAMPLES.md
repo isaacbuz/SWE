@@ -14,6 +14,7 @@ This document provides detailed examples of workflow executions with expected in
 ### Example 1: Simple Feature Addition
 
 **Input:**
+
 ```python
 requirement = "Add user profile page with avatar upload"
 auto_merge = False
@@ -50,6 +51,7 @@ auto_merge = False
    - Adds labels: automated, feature
 
 **Output:**
+
 ```python
 PRResult(
     pr_number=456,
@@ -72,12 +74,14 @@ PRResult(
 ```
 
 **Timeline:**
+
 - Total duration: 12-18 minutes
 - Parallel efficiency: 60% time saved vs sequential
 
 ### Example 2: Bug Fix with Auto-Merge
 
 **Input:**
+
 ```python
 requirement = "Fix memory leak in background job processor"
 auto_merge = True
@@ -92,6 +96,7 @@ auto_merge = True
 5. PR auto-merged to main
 
 **Output:**
+
 ```python
 PRResult(
     pr_number=457,
@@ -106,6 +111,7 @@ PRResult(
 ```
 
 **Timeline:**
+
 - Total duration: 6-8 minutes
 - Auto-merged in 7 minutes from start
 
@@ -114,6 +120,7 @@ PRResult(
 ### Example 1: Database Connection Pool Exhaustion
 
 **Input:**
+
 ```python
 alert = {
     'id': 'alert-db-001',
@@ -180,6 +187,7 @@ auto_fix = True
    - Prevention measures
 
 **Output:**
+
 ```python
 IncidentResult(
     alert_id='alert-db-001',
@@ -198,6 +206,7 @@ IncidentResult(
 ```
 
 **Timeline:**
+
 - Detection to diagnosis: 3 minutes
 - Fix generation and testing: 3 minutes
 - Total resolution: 7.5 minutes
@@ -205,6 +214,7 @@ IncidentResult(
 ### Example 2: Low Confidence - Manual Intervention
 
 **Input:**
+
 ```python
 alert = {
     'id': 'alert-perf-002',
@@ -228,6 +238,7 @@ alert = {
 4. **No auto-fix applied** - Creates manual issue instead
 
 **Output:**
+
 ```python
 IncidentResult(
     alert_id='alert-perf-002',
@@ -249,6 +260,7 @@ IncidentResult(
 ### Example 1: React 16 → 18 Upgrade
 
 **Input:**
+
 ```python
 migration_type = "react-upgrade"
 source_version = "16.14.0"
@@ -307,6 +319,7 @@ auto_rollback = True
    - Lists all changes by step
 
 **Output:**
+
 ```python
 MigrationResult(
     plan_name='Migration to 18.2.0',
@@ -328,6 +341,7 @@ MigrationResult(
 ```
 
 **Timeline:**
+
 - Analysis and planning: 8 minutes
 - Migration execution: 25 minutes
 - Total duration: 36.5 minutes
@@ -335,6 +349,7 @@ MigrationResult(
 ### Example 2: Migration with Rollback
 
 **Input:**
+
 ```python
 migration_type = "python3-migration"
 source_version = "2.7"
@@ -355,6 +370,7 @@ auto_rollback = True
 5. Returns to clean state
 
 **Output:**
+
 ```python
 MigrationResult(
     plan_name='Migration to 3.11',
@@ -373,6 +389,7 @@ MigrationResult(
 ### Example 1: All Checks Pass
 
 **Input:**
+
 ```python
 pr_number = 123
 branch = "feature/add-notifications"
@@ -402,6 +419,7 @@ required_score = 85.0
    - Comment added with detailed results
 
 **Output:**
+
 ```python
 QualityGateResult(
     pr_number=123,
@@ -418,6 +436,7 @@ QualityGateResult(
 ### Example 2: Blocking Issues
 
 **Input:**
+
 ```python
 pr_number = 124
 branch = "feature/new-api"
@@ -444,6 +463,7 @@ required_score = 85.0
    - Cannot merge
 
 **Output:**
+
 ```python
 QualityGateResult(
     pr_number=124,
@@ -507,12 +527,12 @@ except Exception:
 
 ### Typical Execution Times
 
-| Workflow | Simple | Medium | Complex |
-|----------|--------|--------|---------|
-| Plan-Patch-PR | 8-12 min | 15-25 min | 30-45 min |
-| Incident Swarm | 4-8 min | 8-15 min | 15-30 min |
+| Workflow       | Simple    | Medium    | Complex   |
+| -------------- | --------- | --------- | --------- |
+| Plan-Patch-PR  | 8-12 min  | 15-25 min | 30-45 min |
+| Incident Swarm | 4-8 min   | 8-15 min  | 15-30 min |
 | Code Migration | 20-40 min | 40-80 min | 2-4 hours |
-| Quality Gate | 3-5 min | 5-10 min | 10-20 min |
+| Quality Gate   | 3-5 min   | 5-10 min  | 10-20 min |
 
 ### Parallelization Benefits
 

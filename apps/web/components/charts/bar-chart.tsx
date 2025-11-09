@@ -1,16 +1,31 @@
-'use client'
+"use client";
 
-import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  BarChart as RechartsBarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface BarChartProps {
-  title?: string
-  description?: string
-  data: any[]
-  dataKeys: { key: string; color: string; label: string }[]
-  xAxisKey: string
-  height?: number
-  layout?: 'horizontal' | 'vertical'
+  title?: string;
+  description?: string;
+  data: any[];
+  dataKeys: { key: string; color: string; label: string }[];
+  xAxisKey: string;
+  height?: number;
+  layout?: "horizontal" | "vertical";
 }
 
 export function BarChart({
@@ -20,7 +35,7 @@ export function BarChart({
   dataKeys,
   xAxisKey,
   height = 350,
-  layout = 'horizontal',
+  layout = "horizontal",
 }: BarChartProps) {
   return (
     <Card>
@@ -36,20 +51,20 @@ export function BarChart({
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis
               dataKey={xAxisKey}
-              type={layout === 'horizontal' ? 'category' : 'number'}
+              type={layout === "horizontal" ? "category" : "number"}
               className="text-xs"
-              tick={{ fill: 'currentColor' }}
+              tick={{ fill: "currentColor" }}
             />
             <YAxis
-              type={layout === 'horizontal' ? 'number' : 'category'}
+              type={layout === "horizontal" ? "number" : "category"}
               className="text-xs"
-              tick={{ fill: 'currentColor' }}
+              tick={{ fill: "currentColor" }}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '0.5rem',
+                backgroundColor: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
+                borderRadius: "0.5rem",
               }}
             />
             <Legend />
@@ -66,5 +81,5 @@ export function BarChart({
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

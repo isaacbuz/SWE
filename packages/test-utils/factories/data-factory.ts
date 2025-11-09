@@ -1,7 +1,7 @@
-import { createMockAgent } from '../mocks/agent-mocks';
-import { createTaskFixture } from '../fixtures/task-fixtures';
-import { createUserFixture } from '../fixtures/user-fixtures';
-import { createProjectFixture } from '../fixtures/project-fixtures';
+import { createMockAgent } from "../mocks/agent-mocks";
+import { createTaskFixture } from "../fixtures/task-fixtures";
+import { createUserFixture } from "../fixtures/user-fixtures";
+import { createProjectFixture } from "../fixtures/project-fixtures";
 
 export class DataFactory {
   public static agents(count: number = 5) {

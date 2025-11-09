@@ -33,4 +33,3 @@ curl -X POST http://localhost:8000/api/v1/skills \
 ## Skills List
 
 See individual YAML files in the `skills/` directory for complete definitions.
-

@@ -1,4 +1,3 @@
-
 # MCP Integration Plan
 
 We define logical tools in `config/mcp_tools.yaml`. A host runner (e.g., MCP-capable orchestrator)

@@ -1,19 +1,19 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { Send } from 'lucide-react'
+import React, { useState } from "react";
+import { Send } from "lucide-react";
 
 export function PromptBar() {
-  const [prompt, setPrompt] = useState('')
+  const [prompt, setPrompt] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!prompt.trim()) return
+    e.preventDefault();
+    if (!prompt.trim()) return;
 
-    console.log('AI Prompt:', prompt)
+    console.log("AI Prompt:", prompt);
     // This will be connected to the AI service
-    setPrompt('')
-  }
+    setPrompt("");
+  };
 
   return (
     <form onSubmit={handleSubmit} className="relative">
@@ -33,5 +33,5 @@ export function PromptBar() {
         <Send className="h-4 w-4" />
       </button>
     </form>
-  )
+  );
 }

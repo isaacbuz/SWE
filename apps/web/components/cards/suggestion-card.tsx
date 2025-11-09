@@ -1,36 +1,42 @@
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Sparkles } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SuggestionCardProps {
-  title: string
-  description?: string
-  priority?: 'high' | 'medium' | 'low'
-  category?: string
-  onAccept?: () => void
-  onDismiss?: () => void
-  className?: string
+  title: string;
+  description?: string;
+  priority?: "high" | "medium" | "low";
+  category?: string;
+  onAccept?: () => void;
+  onDismiss?: () => void;
+  className?: string;
 }
 
 export function SuggestionCard({
   title,
   description,
-  priority = 'medium',
+  priority = "medium",
   category,
   onAccept,
   onDismiss,
   className,
 }: SuggestionCardProps) {
   const priorityColors = {
-    high: 'destructive',
-    medium: 'warning',
-    low: 'secondary',
-  } as const
+    high: "destructive",
+    medium: "warning",
+    low: "secondary",
+  } as const;
 
   return (
-    <Card className={cn('hover:shadow-md transition-shadow', className)}>
+    <Card className={cn("hover:shadow-md transition-shadow", className)}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
@@ -40,7 +46,9 @@ export function SuggestionCard({
             <div className="flex-1">
               <CardTitle className="text-base font-semibold">{title}</CardTitle>
               {description && (
-                <p className="text-sm text-muted-foreground mt-1">{description}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {description}
+                </p>
               )}
             </div>
           </div>
@@ -65,5 +73,5 @@ export function SuggestionCard({
         </CardFooter>
       )}
     </Card>
-  )
+  );
 }

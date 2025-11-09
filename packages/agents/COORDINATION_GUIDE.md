@@ -125,6 +125,7 @@ await registry.release_agent(
 Manages parallel agent execution for large tasks.
 
 #### Features
+
 - Task decomposition into subtasks
 - Intelligent agent assignment
 - Progress monitoring
@@ -178,6 +179,7 @@ result = await coordinator.execute(large_task, context)
 Mediates disagreements between agents.
 
 #### Features
+
 - Conflict detection
 - Position analysis
 - Evidence gathering
@@ -239,6 +241,7 @@ result = await resolver.execute(conflict_task, context)
 Tracks workload and optimizes resource allocation.
 
 #### Features
+
 - Real-time workload tracking
 - Bottleneck detection
 - Load balancing
@@ -281,6 +284,7 @@ result = await optimizer.execute(optimization_task, context)
 Scans codebase for technical debt and recommends refactoring.
 
 #### Features
+
 - Code smell detection
 - Complexity analysis
 - Duplication detection
@@ -319,6 +323,7 @@ result = await tracker.execute(scan_task, context)
 Plans large-scale code migrations.
 
 #### Features
+
 - Dependency analysis
 - Incremental planning
 - Risk assessment
@@ -364,6 +369,7 @@ result = await planner.execute(migration_task, context)
 Handles production incidents and outages.
 
 #### Features
+
 - Rapid incident assessment
 - Incident swarm coordination
 - Hotfix generation
@@ -572,30 +578,35 @@ analysis = await incident_responder.execute(postmortem_task, context)
 ## Best Practices
 
 ### 1. Agent Communication
+
 - Always use structured messages via protocol
 - Include evidence for all decisions
 - Document handoffs clearly
 - Use appropriate priority levels
 
 ### 2. Conflict Resolution
+
 - Let agents attempt resolution first
 - Escalate when confidence is low
 - Document all resolution rationale
 - Learn from conflicts to prevent recurrence
 
 ### 3. Resource Management
+
 - Monitor continuously
 - React to bottlenecks proactively
 - Balance cost vs. performance
 - Plan for peak loads
 
 ### 4. Incident Response
+
 - Define clear severity levels
 - Maintain runbooks for common incidents
 - Always have rollback procedures
 - Conduct thorough post-mortems
 
 ### 5. Specialized Agents
+
 - Run tech debt scans regularly
 - Plan migrations incrementally
 - Test everything before deployment

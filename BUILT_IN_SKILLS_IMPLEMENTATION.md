@@ -153,6 +153,7 @@ python packages/skills-library/seed_skills.py
 ```
 
 The script will:
+
 - Load all YAML files from `skills/` directory
 - Convert to database format
 - Insert into `skills` table
@@ -211,11 +212,13 @@ Skills are configured with optimal model preferences:
 ## Next Steps
 
 ### Immediate
+
 1. **Load Skills**: Run seed script to populate database
 2. **Test Skills**: Execute each skill via playground
 3. **Gather Feedback**: Test with real use cases
 
 ### Future Enhancements
+
 1. **More Skills**: Add domain-specific Skills
 2. **Skill Chains**: Create Skills that compose other Skills
 3. **Skill Templates**: Provide templates for creating custom Skills
@@ -239,14 +242,13 @@ Skills are configured with optimal model preferences:
 ✅ **YAML Format**: Complete  
 ✅ **Seed Script**: Ready  
 ✅ **Documentation**: Complete  
-⏳ **Database Loading**: Pending execution  
+⏳ **Database Loading**: Pending execution
 
 ---
 
 **Implementation Time**: ~1.5 hours  
 **Skills Created**: 16  
 **Categories Covered**: 5  
-**Ready for**: Database seeding and testing  
+**Ready for**: Database seeding and testing
 
 The built-in Skills library is complete and ready to populate the marketplace!
-

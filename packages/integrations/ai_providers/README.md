@@ -400,40 +400,45 @@ except AIProviderError as e:
 
 ## Provider Capabilities Matrix
 
-| Feature | Anthropic | OpenAI | Google | IBM | Local |
-|---------|-----------|---------|---------|-----|-------|
-| Text Completion | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Streaming | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Function Calling | ✅ | ✅ | ✅ | ❌ | Limited |
-| Vision | ✅ | ✅ | ✅ | ❌ | ❌ |
-| JSON Mode | via prompt | ✅ | ✅ | via prompt | via prompt |
-| Prompt Caching | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Max Context | 200K | 128K | 2M | 8K | Varies |
-| Cost per 1M tokens | $3-$15 | $0.15-$10 | $0.075-$1.25 | $2-$12 | Free |
+| Feature            | Anthropic  | OpenAI    | Google       | IBM        | Local      |
+| ------------------ | ---------- | --------- | ------------ | ---------- | ---------- |
+| Text Completion    | ✅         | ✅        | ✅           | ✅         | ✅         |
+| Streaming          | ✅         | ✅        | ✅           | ✅         | ✅         |
+| Function Calling   | ✅         | ✅        | ✅           | ❌         | Limited    |
+| Vision             | ✅         | ✅        | ✅           | ❌         | ❌         |
+| JSON Mode          | via prompt | ✅        | ✅           | via prompt | via prompt |
+| Prompt Caching     | ✅         | ❌        | ❌           | ❌         | ❌         |
+| Max Context        | 200K       | 128K      | 2M           | 8K         | Varies     |
+| Cost per 1M tokens | $3-$15     | $0.15-$10 | $0.075-$1.25 | $2-$12     | Free       |
 
 ## Model Selection Guide
 
 ### For Code Generation
+
 1. **IBM Granite** - Specialized for code
 2. **Claude 3.5 Sonnet** - Excellent reasoning
 3. **GPT-4o** - Strong general coding
 
 ### For Analysis & Reasoning
+
 1. **Claude 3 Opus** - Best reasoning
 2. **Claude 3.5 Sonnet** - Balanced
 3. **GPT-4 Turbo** - Strong analysis
 
 ### For Long Context
+
 1. **Gemini 1.5 Pro** - 2M tokens
 2. **Claude 3.5 Sonnet** - 200K tokens
 3. **GPT-4o** - 128K tokens
 
 ### For Cost Optimization
+
 1. **Gemini 1.5 Flash** - $0.075/$0.30 per 1M
 2. **Claude 3.5 Haiku** - $1/$5 per 1M
 3. **GPT-4o Mini** - $0.15/$0.60 per 1M
 
 ### For Sensitive Data
+
 1. **Local (Ollama/vLLM)** - Zero external calls
 2. **IBM watsonx.ai** - Enterprise compliance
 

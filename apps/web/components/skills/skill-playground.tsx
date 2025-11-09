@@ -1,50 +1,50 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Play, Loader2, CheckCircle2, XCircle, Zap } from 'lucide-react'
-import { useExecuteSkill } from '@/lib/hooks/use-skills'
-import { SkillDetail, SkillExecutionResult } from '@/lib/api/skills'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { useState } from "react";
+import { Play, Loader2, CheckCircle2, XCircle, Zap } from "lucide-react";
+import { useExecuteSkill } from "@/lib/hooks/use-skills";
+import { SkillDetail, SkillExecutionResult } from "@/lib/api/skills";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 interface SkillPlaygroundProps {
-  skill: SkillDetail
+  skill: SkillDetail;
 }
 
 export function SkillPlayground({ skill }: SkillPlaygroundProps) {
-  const [inputs, setInputs] = useState<Record<string, any>>({})
-  const [result, setResult] = useState<SkillExecutionResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [inputs, setInputs] = useState<Record<string, any>>({});
+  const [result, setResult] = useState<SkillExecutionResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const executeSkill = useExecuteSkill()
+  const executeSkill = useExecuteSkill();
 
   // Initialize inputs from schema
   const initializeInputs = () => {
-    const initial: Record<string, any> = {}
+    const initial: Record<string, any> = {};
     if (skill.input_schema?.properties) {
       Object.keys(skill.input_schema.properties).forEach((key) => {
-        const prop = skill.input_schema.properties[key]
+        const prop = skill.input_schema.properties[key];
         if (prop.default !== undefined) {
-          initial[key] = prop.default
-        } else if (prop.type === 'string') {
-          initial[key] = ''
-        } else if (prop.type === 'number') {
-          initial[key] = 0
-        } else if (prop.type === 'boolean') {
-          initial[key] = false
-        } else if (prop.type === 'array') {
-          initial[key] = []
-        } else if (prop.type === 'object') {
-          initial[key] = {}
+          initial[key] = prop.default;
+        } else if (prop.type === "string") {
+          initial[key] = "";
+        } else if (prop.type === "number") {
+          initial[key] = 0;
+        } else if (prop.type === "boolean") {
+          initial[key] = false;
+        } else if (prop.type === "array") {
+          initial[key] = [];
+        } else if (prop.type === "object") {
+          initial[key] = {};
         }
-      })
+      });
     }
-    setInputs(initial)
-  }
+    setInputs(initial);
+  };
 
   const handleExecute = async () => {
-    setError(null)
-    setResult(null)
+    setError(null);
+    setResult(null);
 
     try {
       const executionResult = await executeSkill.mutateAsync({
@@ -54,23 +54,23 @@ export function SkillPlayground({ skill }: SkillPlaygroundProps) {
           inputs,
           context: {},
         },
-      })
-      setResult(executionResult)
+      });
+      setResult(executionResult);
     } catch (err: any) {
-      setError(err.message || 'Failed to execute skill')
+      setError(err.message || "Failed to execute skill");
     }
-  }
+  };
 
   const updateInput = (key: string, value: any) => {
-    setInputs((prev) => ({ ...prev, [key]: value }))
-  }
+    setInputs((prev) => ({ ...prev, [key]: value }));
+  };
 
   // Render input field based on schema type
   const renderInput = (key: string, prop: any) => {
-    const value = inputs[key] ?? ''
-    const isRequired = skill.input_schema?.required?.includes(key)
+    const value = inputs[key] ?? "";
+    const isRequired = skill.input_schema?.required?.includes(key);
 
-    if (prop.type === 'string' && prop.format === 'textarea') {
+    if (prop.type === "string" && prop.format === "textarea") {
       return (
         <div key={key} className="space-y-2">
           <label className="text-sm font-medium text-ink-primary">
@@ -88,10 +88,10 @@ export function SkillPlayground({ skill }: SkillPlaygroundProps) {
             <p className="text-xs text-ink-tertiary">{prop.description}</p>
           )}
         </div>
-      )
+      );
     }
 
-    if (prop.type === 'string') {
+    if (prop.type === "string") {
       return (
         <div key={key} className="space-y-2">
           <label className="text-sm font-medium text-ink-primary">
@@ -109,10 +109,10 @@ export function SkillPlayground({ skill }: SkillPlaygroundProps) {
             <p className="text-xs text-ink-tertiary">{prop.description}</p>
           )}
         </div>
-      )
+      );
     }
 
-    if (prop.type === 'number') {
+    if (prop.type === "number") {
       return (
         <div key={key} className="space-y-2">
           <label className="text-sm font-medium text-ink-primary">
@@ -130,10 +130,10 @@ export function SkillPlayground({ skill }: SkillPlaygroundProps) {
             <p className="text-xs text-ink-tertiary">{prop.description}</p>
           )}
         </div>
-      )
+      );
     }
 
-    if (prop.type === 'boolean') {
+    if (prop.type === "boolean") {
       return (
         <div key={key} className="flex items-center gap-2">
           <input
@@ -147,7 +147,7 @@ export function SkillPlayground({ skill }: SkillPlaygroundProps) {
             {isRequired && <span className="text-status-error">*</span>}
           </label>
         </div>
-      )
+      );
     }
 
     return (
@@ -160,7 +160,7 @@ export function SkillPlayground({ skill }: SkillPlaygroundProps) {
           value={JSON.stringify(value, null, 2)}
           onChange={(e) => {
             try {
-              updateInput(key, JSON.parse(e.target.value))
+              updateInput(key, JSON.parse(e.target.value));
             } catch {
               // Invalid JSON, ignore
             }
@@ -170,8 +170,8 @@ export function SkillPlayground({ skill }: SkillPlaygroundProps) {
           rows={4}
         />
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -179,19 +179,15 @@ export function SkillPlayground({ skill }: SkillPlaygroundProps) {
       <Card className="p-6">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-ink-primary">Inputs</h3>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={initializeInputs}
-          >
+          <Button variant="outline" size="sm" onClick={initializeInputs}>
             Reset
           </Button>
         </div>
 
         <div className="space-y-4">
           {skill.input_schema?.properties ? (
-            Object.entries(skill.input_schema.properties).map(([key, prop]: [string, any]) =>
-              renderInput(key, prop)
+            Object.entries(skill.input_schema.properties).map(
+              ([key, prop]: [string, any]) => renderInput(key, prop),
             )
           ) : (
             <p className="text-sm text-ink-tertiary">No inputs required</p>
@@ -225,7 +221,9 @@ export function SkillPlayground({ skill }: SkillPlaygroundProps) {
           <div className="flex items-start gap-3">
             <XCircle className="h-5 w-5 text-status-error" />
             <div>
-              <h3 className="font-semibold text-status-error">Execution Failed</h3>
+              <h3 className="font-semibold text-status-error">
+                Execution Failed
+              </h3>
               <p className="mt-1 text-sm text-status-error">{error}</p>
             </div>
           </div>
@@ -241,7 +239,9 @@ export function SkillPlayground({ skill }: SkillPlaygroundProps) {
               ) : (
                 <XCircle className="h-5 w-5 text-status-error" />
               )}
-              <h3 className="text-lg font-semibold text-ink-primary">Results</h3>
+              <h3 className="text-lg font-semibold text-ink-primary">
+                Results
+              </h3>
             </div>
             {result.cache_hit && (
               <span className="text-xs text-ink-tertiary">Cached</span>
@@ -297,24 +297,32 @@ export function SkillPlayground({ skill }: SkillPlaygroundProps) {
           {/* Validation */}
           {result.validation_result && (
             <div className="mt-4 space-y-2">
-              <h4 className="text-sm font-medium text-ink-secondary">Validation</h4>
+              <h4 className="text-sm font-medium text-ink-secondary">
+                Validation
+              </h4>
               <div className="rounded-md border border-border-default bg-surface-secondary p-3">
-                <p className={`text-sm ${result.validation_passed ? 'text-status-success' : 'text-status-error'}`}>
-                  {result.validation_passed ? '✓ Validation passed' : '✗ Validation failed'}
+                <p
+                  className={`text-sm ${result.validation_passed ? "text-status-success" : "text-status-error"}`}
+                >
+                  {result.validation_passed
+                    ? "✓ Validation passed"
+                    : "✗ Validation failed"}
                 </p>
-                {result.validation_result.errors && result.validation_result.errors.length > 0 && (
-                  <ul className="mt-2 list-disc list-inside text-sm text-status-error">
-                    {result.validation_result.errors.map((err: string, i: number) => (
-                      <li key={i}>{err}</li>
-                    ))}
-                  </ul>
-                )}
+                {result.validation_result.errors &&
+                  result.validation_result.errors.length > 0 && (
+                    <ul className="mt-2 list-disc list-inside text-sm text-status-error">
+                      {result.validation_result.errors.map(
+                        (err: string, i: number) => (
+                          <li key={i}>{err}</li>
+                        ),
+                      )}
+                    </ul>
+                  )}
               </div>
             </div>
           )}
         </Card>
       )}
     </div>
-  )
+  );
 }
-

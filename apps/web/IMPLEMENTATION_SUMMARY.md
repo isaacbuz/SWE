@@ -15,12 +15,14 @@
 **Location:** `/apps/web/components/command/`
 
 **Files Created:**
+
 - `command-palette.tsx` - Main UI component with cmdk integration
 - `command-provider.tsx` - React Context for command state management
 - `use-command.ts` - Custom hook for ⌘K keyboard shortcut
 - `index.ts` - Barrel export file
 
 **Features Implemented:**
+
 - ✅ Fuzzy search using Fuse.js
 - ✅ Grouped results (Actions, Navigate, AI Recipes, Recent)
 - ✅ Keyboard navigation (↑↓ arrows, Enter, Escape)
@@ -38,16 +40,19 @@
 **Location:** `/apps/web/lib/commands/`
 
 **Files Created:**
+
 - `registry.ts` - Command registry with handler system
 - `index.ts` - Public API for command execution
 
 **Commands Implemented:**
+
 1. `/spec new` - Create new specification document
 2. `/review` - Start AI-powered code review
 3. `/deploy` - Deploy to environment
 4. `/diagram` - Generate architecture diagram
 
 **Features:**
+
 - ✅ Extensible registry pattern
 - ✅ Parameter validation support
 - ✅ Async handler execution
@@ -61,6 +66,7 @@
 **Location:** `/apps/web/components/ai-dock/`
 
 **Files Created:**
+
 - `ai-dock-content.tsx` - Main container with tabbed interface
 - `suggestion-chip.tsx` - Interactive action suggestion buttons
 - `prompt-bar.tsx` - AI input interface with send button
@@ -69,6 +75,7 @@
 - `index.ts` - Barrel export file
 
 **Features Implemented:**
+
 - ✅ Three-tab interface (Exec Summary, Risks, Actions)
 - ✅ Context-aware suggestions based on route
 - ✅ Collapsible sidebar with ⌘/ shortcut
@@ -79,6 +86,7 @@
 - ✅ Beautiful card-based UI
 
 **Context Awareness:**
+
 - Projects route → "Summarize recent PRs", "Create roadmap"
 - Agents route → "Compose crew", "Benchmark models"
 - Default → "Summarize activity", "Review PRs"
@@ -92,11 +100,13 @@
 **Location:** `/apps/web/lib/websocket/`
 
 **Files Created:**
+
 - `websocket-provider.tsx` - Socket.io connection manager
 - `use-websocket.ts` - Custom hooks for WebSocket events
 - `index.ts` - Barrel export file
 
 **Features Implemented:**
+
 - ✅ Socket.io-client integration
 - ✅ Automatic reconnection with exponential backoff
 - ✅ Connection state management
@@ -106,6 +116,7 @@
 - ✅ Global WebSocket provider
 
 **Event Types:**
+
 - `ai:suggestion` - Real-time AI suggestions
 - `project:update` - Project event updates
 - Custom subscription/unsubscription patterns
@@ -117,16 +128,19 @@
 **Location:** `/apps/web/lib/`
 
 **Files Created:**
+
 - `shortcuts.ts` - Centralized shortcut configuration
 - `hooks/use-keyboard-shortcuts.ts` - Global shortcut handler
 
 **Shortcuts Implemented:**
+
 - `⌘K` - Toggle Command Palette
 - `⌘/` - Toggle AI Dock
 - `⌘B` - Toggle Left Rail (placeholder)
 - `Escape` - Close overlays
 
 **Features:**
+
 - ✅ Platform-aware (Meta/Ctrl detection)
 - ✅ Input field detection (doesn't interfere with typing)
 - ✅ Modifier key combinations
@@ -141,9 +155,11 @@
 **Location:** `/apps/web/lib/stores/`
 
 **Files Created:**
+
 - `ui-store.ts` - Zustand store for UI state
 
 **State Managed:**
+
 - ✅ Theme preference (light/dark/system)
 - ✅ Command Palette open/closed
 - ✅ AI Dock collapsed state
@@ -151,6 +167,7 @@
 - ✅ Recent commands history (max 10)
 
 **Features:**
+
 - ✅ LocalStorage persistence
 - ✅ Automatic hydration
 - ✅ Type-safe actions
@@ -226,18 +243,18 @@ apps/web/
 
 ## Technology Stack
 
-| Category | Technology | Version |
-|----------|-----------|---------|
-| Framework | Next.js | 14.1.0 |
-| Language | TypeScript | 5.3.3 |
-| Styling | Tailwind CSS | 3.4.1 |
-| Command Palette | cmdk | 0.2.1 |
-| State (UI) | Zustand | 4.5.0 |
-| State (Server) | TanStack Query | 5.17.19 |
-| WebSocket | Socket.io-client | 4.6.1 |
-| Search | Fuse.js | 7.0.0 |
-| Icons | Lucide React | 0.312.0 |
-| Utilities | clsx + tailwind-merge | Latest |
+| Category        | Technology            | Version |
+| --------------- | --------------------- | ------- |
+| Framework       | Next.js               | 14.1.0  |
+| Language        | TypeScript            | 5.3.3   |
+| Styling         | Tailwind CSS          | 3.4.1   |
+| Command Palette | cmdk                  | 0.2.1   |
+| State (UI)      | Zustand               | 4.5.0   |
+| State (Server)  | TanStack Query        | 5.17.19 |
+| WebSocket       | Socket.io-client      | 4.6.1   |
+| Search          | Fuse.js               | 7.0.0   |
+| Icons           | Lucide React          | 0.312.0 |
+| Utilities       | clsx + tailwind-merge | Latest  |
 
 ---
 
@@ -246,25 +263,30 @@ apps/web/
 All components follow the design specifications from `/docs/architecture/FRONTEND.md`:
 
 ### Typography ✓
+
 - Display: General Sans
 - Body: Inter
 - Code: JetBrains Mono
 
 ### Color System ✓
+
 - Brand: Indigo (#4F46E5)
 - Ink: Near black to gray scale
 - Surface: White to light gray
 - Border: Gray scale
 
 ### Spacing ✓
+
 - 4pt base grid (0.25rem increments)
 - Consistent padding/margins
 
 ### Elevation ✓
+
 - Shadow levels e0 through e4
 - Applied to cards and overlays
 
 ### Accessibility ✓
+
 - WCAG 2.2 AA compliant
 - Keyboard navigation
 - ARIA labels
@@ -327,18 +349,20 @@ open http://localhost:3000
 
 ```typescript
 // Server should emit these events
-socket.emit('ai:suggestion', {
-  type: 'suggestion',
-  data: { label: '...', onClick: '...' },
-  timestamp: Date.now()
-})
+socket.emit("ai:suggestion", {
+  type: "suggestion",
+  data: { label: "...", onClick: "..." },
+  timestamp: Date.now(),
+});
 
-socket.emit('project:update', {
-  projectId: 'proj-123',
-  type: 'pr',
-  data: { /* PR data */ },
-  timestamp: Date.now()
-})
+socket.emit("project:update", {
+  projectId: "proj-123",
+  type: "pr",
+  data: {
+    /* PR data */
+  },
+  timestamp: Date.now(),
+});
 ```
 
 **API Endpoints Needed:**
@@ -354,16 +378,16 @@ socket.emit('project:update', {
 
 ```typescript
 registerAction({
-  id: 'my-command',
-  label: 'My Command',
-  description: 'Does something',
-  category: 'actions',
+  id: "my-command",
+  label: "My Command",
+  description: "Does something",
+  category: "actions",
   onExecute: async () => {
-    const result = await fetch('/api/my-endpoint')
+    const result = await fetch("/api/my-endpoint");
     // Handle result
   },
-  keywords: ['my', 'command', 'tags']
-})
+  keywords: ["my", "command", "tags"],
+});
 ```
 
 **WebSocket Subscription Example:**
@@ -371,8 +395,8 @@ registerAction({
 ```typescript
 useProjectUpdates(projectId, (update) => {
   // Handle real-time project updates
-  console.log('Update:', update)
-})
+  console.log("Update:", update);
+});
 ```
 
 ---
@@ -400,26 +424,26 @@ it('should open palette on ⌘K', () => {
 ### E2E Tests
 
 ```typescript
-test('Command Palette workflow', async ({ page }) => {
-  await page.goto('/')
-  await page.keyboard.press('Meta+K')
-  await page.fill('[placeholder="Search..."]', 'spec')
-  await page.keyboard.press('Enter')
+test("Command Palette workflow", async ({ page }) => {
+  await page.goto("/");
+  await page.keyboard.press("Meta+K");
+  await page.fill('[placeholder="Search..."]', "spec");
+  await page.keyboard.press("Enter");
   // Assert command executed
-})
+});
 ```
 
 ---
 
 ## Performance Metrics
 
-| Metric | Target | Status |
-|--------|--------|--------|
-| Command Palette Open | < 50ms | ✅ |
-| Fuzzy Search | < 100ms | ✅ |
-| WebSocket Latency | < 100ms | ✅ |
-| Bundle Size | Optimized | ✅ |
-| Lighthouse Score | > 95 | ⚠️ (Not measured) |
+| Metric               | Target    | Status            |
+| -------------------- | --------- | ----------------- |
+| Command Palette Open | < 50ms    | ✅                |
+| Fuzzy Search         | < 100ms   | ✅                |
+| WebSocket Latency    | < 100ms   | ✅                |
+| Bundle Size          | Optimized | ✅                |
+| Lighthouse Score     | > 95      | ⚠️ (Not measured) |
 
 ---
 
@@ -467,6 +491,7 @@ test('Command Palette workflow', async ({ page }) => {
 ## File Manifest
 
 ### Configuration Files (7)
+
 - `package.json` - Dependencies and scripts
 - `tsconfig.json` - TypeScript configuration
 - `next.config.js` - Next.js configuration
@@ -476,6 +501,7 @@ test('Command Palette workflow', async ({ page }) => {
 - `.env.example` - Environment variables template
 
 ### Application Files (5)
+
 - `app/layout.tsx` - Root layout
 - `app/providers.tsx` - Global providers
 - `app/globals.css` - Global styles
@@ -483,12 +509,14 @@ test('Command Palette workflow', async ({ page }) => {
 - `app/(dashboard)/page.tsx` - Demo home page
 
 ### Command Palette (4)
+
 - `components/command/command-palette.tsx`
 - `components/command/command-provider.tsx`
 - `components/command/use-command.ts`
 - `components/command/index.ts`
 
 ### AI Dock (6)
+
 - `components/ai-dock/ai-dock-content.tsx`
 - `components/ai-dock/suggestion-chip.tsx`
 - `components/ai-dock/prompt-bar.tsx`
@@ -497,23 +525,28 @@ test('Command Palette workflow', async ({ page }) => {
 - `components/ai-dock/index.ts`
 
 ### Commands System (2)
+
 - `lib/commands/registry.ts`
 - `lib/commands/index.ts`
 
 ### WebSocket (3)
+
 - `lib/websocket/websocket-provider.tsx`
 - `lib/websocket/use-websocket.ts`
 - `lib/websocket/index.ts`
 
 ### State & Hooks (3)
+
 - `lib/stores/ui-store.ts`
 - `lib/hooks/use-keyboard-shortcuts.ts`
 - `lib/shortcuts.ts`
 
 ### Utilities (1)
+
 - `lib/utils/cn.ts`
 
 ### Documentation (3)
+
 - `README.md` - Comprehensive documentation
 - `IMPLEMENTATION_SUMMARY.md` - This file
 - `.gitignore` - Git ignore rules

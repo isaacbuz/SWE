@@ -1,14 +1,20 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
-import { Sun, Moon, Monitor, Palette, Layout, Type } from 'lucide-react'
-import { useState } from 'react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { Sun, Moon, Monitor, Palette, Layout, Type } from "lucide-react";
+import { useState } from "react";
 
 export default function AppearanceSettingsPage() {
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
+  const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
 
   return (
     <div className="space-y-8 max-w-4xl">
@@ -23,18 +29,16 @@ export default function AppearanceSettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Theme</CardTitle>
-          <CardDescription>
-            Choose your preferred color scheme
-          </CardDescription>
+          <CardDescription>Choose your preferred color scheme</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <button
-              onClick={() => setTheme('light')}
+              onClick={() => setTheme("light")}
               className={`flex flex-col items-center gap-3 rounded-lg border-2 p-4 transition-all ${
-                theme === 'light'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-primary/50'
+                theme === "light"
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50"
               }`}
             >
               <Sun className="h-8 w-8" />
@@ -47,11 +51,11 @@ export default function AppearanceSettingsPage() {
             </button>
 
             <button
-              onClick={() => setTheme('dark')}
+              onClick={() => setTheme("dark")}
               className={`flex flex-col items-center gap-3 rounded-lg border-2 p-4 transition-all ${
-                theme === 'dark'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-primary/50'
+                theme === "dark"
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50"
               }`}
             >
               <Moon className="h-8 w-8" />
@@ -64,11 +68,11 @@ export default function AppearanceSettingsPage() {
             </button>
 
             <button
-              onClick={() => setTheme('system')}
+              onClick={() => setTheme("system")}
               className={`flex flex-col items-center gap-3 rounded-lg border-2 p-4 transition-all ${
-                theme === 'system'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-primary/50'
+                theme === "system"
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50"
               }`}
             >
               <Monitor className="h-8 w-8" />
@@ -87,19 +91,17 @@ export default function AppearanceSettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Color Scheme</CardTitle>
-          <CardDescription>
-            Select your preferred accent color
-          </CardDescription>
+          <CardDescription>Select your preferred accent color</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-6 gap-3">
             {[
-              { name: 'Indigo', color: '#4F46E5' },
-              { name: 'Blue', color: '#3B82F6' },
-              { name: 'Green', color: '#10B981' },
-              { name: 'Purple', color: '#8B5CF6' },
-              { name: 'Pink', color: '#EC4899' },
-              { name: 'Orange', color: '#F59E0B' },
+              { name: "Indigo", color: "#4F46E5" },
+              { name: "Blue", color: "#3B82F6" },
+              { name: "Green", color: "#10B981" },
+              { name: "Purple", color: "#8B5CF6" },
+              { name: "Pink", color: "#EC4899" },
+              { name: "Orange", color: "#F59E0B" },
             ].map((colorScheme) => (
               <button
                 key={colorScheme.name}
@@ -216,9 +218,7 @@ export default function AppearanceSettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Accessibility</CardTitle>
-          <CardDescription>
-            Enhance accessibility features
-          </CardDescription>
+          <CardDescription>Enhance accessibility features</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
@@ -258,5 +258,5 @@ export default function AppearanceSettingsPage() {
         <Button size="lg">Save Preferences</Button>
       </div>
     </div>
-  )
+  );
 }

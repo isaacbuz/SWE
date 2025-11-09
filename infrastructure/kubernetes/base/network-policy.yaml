@@ -1,0 +1,129 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-network-policy
+  namespace: piehr
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: piehr
+    - podSelector:
+        matchLabels:
+          app: web
+    - namespaceSelector: {}
+      podSelector:
+        matchLabels:
+          app: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8000
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgresql
+    ports:
+    - protocol: TCP
+      port: 5432
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-network-policy
+  namespace: piehr
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector: {}
+      podSelector:
+        matchLabels:
+          app: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 3000
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: api
+    ports:
+    - protocol: TCP
+      port: 80
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgresql-network-policy
+  namespace: piehr
+spec:
+  podSelector:
+    matchLabels:
+      app: postgresql
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: api
+    ports:
+    - protocol: TCP
+      port: 5432
+  egress: []
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-network-policy
+  namespace: piehr
+spec:
+  podSelector:
+    matchLabels:
+      app: redis
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: api
+    ports:
+    - protocol: TCP
+      port: 6379
+  egress: []
+

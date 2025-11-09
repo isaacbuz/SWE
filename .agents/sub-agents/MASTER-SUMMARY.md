@@ -18,6 +18,7 @@ Due to message length constraints, I cannot generate all 20 complete implementat
 ## 🎯 RECOMMENDED APPROACH
 
 ### Option A: Issue-by-Issue Generation (Best Quality)
+
 **Ask me to generate specific issues as needed:**
 
 ```
@@ -28,6 +29,7 @@ Due to message length constraints, I cannot generate all 20 complete implementat
 I'll provide complete, production-ready code for each issue (~2,000-3,000 lines per issue).
 
 ### Option B: Stream-by-Stream (Balanced)
+
 **Generate one stream at a time:**
 
 ```
@@ -37,7 +39,9 @@ I'll provide complete, production-ready code for each issue (~2,000-3,000 lines 
 I'll create all 5 issues for Stream 1 in one response.
 
 ### Option C: Summaries + Code on Demand (Fastest Start)
+
 **I provide:**
+
 1. Detailed implementation specifications for all 20 issues (architecture, types, APIs)
 2. You request full code for specific issues as needed
 
@@ -48,12 +52,14 @@ I'll create all 5 issues for Stream 1 in one response.
 ### Stream 1: OpenAPI Tooling
 
 #### ✅ Issue #7: Tool Registry (COMPLETE ABOVE)
+
 - Package: `@ai-company/openapi-tools`
 - Files: 8 source files, 2 test files
 - Coverage: 94.2%
 - Status: Ready to copy/paste
 
 #### Issue #8: Spec Converter
+
 - **Package**: Extends `@ai-company/openapi-tools`
 - **Key File**: `src/converter.ts`
 - **Function**: `convertOpenAPIToToolSchema()`
@@ -62,6 +68,7 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 400 lines code + 300 lines tests
 
 #### Issue #9: Tool Executor
+
 - **Package**: `@ai-company/tool-executor`
 - **Key Classes**: `ToolExecutor`, `ValidationEngine`
 - **Features**: Ajv validation, sanitization, rate limiting
@@ -70,6 +77,7 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 600 lines code + 400 lines tests
 
 #### Issue #10: Internal Tools Spec
+
 - **File**: `tools/openapi/ai-dev-tools.yaml`
 - **Tools**: 15 operations (GitHub, Code, CI/CD)
 - **Format**: OpenAPI 3.1.0 spec
@@ -77,6 +85,7 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 800 lines YAML
 
 #### Issue #11: External API Wrappers
+
 - **Package**: `@ai-company/api-wrappers`
 - **Wrappers**: GitHub API, Open GSA API
 - **Features**: Credential management, caching, rate limiting
@@ -89,6 +98,7 @@ I'll create all 5 issues for Stream 1 in one response.
 ### Stream 2: LLM Providers
 
 #### Issue #12: Provider Interface
+
 - **Package**: `@ai-company/llm-providers`
 - **Key Interface**: `LLMProvider`
 - **Methods**: `complete()`, `stream()`, `callTool()`
@@ -97,6 +107,7 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 300 lines types + 200 lines tests
 
 #### Issue #13: OpenAI Provider
+
 - **Package**: Extends `@ai-company/llm-providers`
 - **Class**: `OpenAIProvider implements LLMProvider`
 - **Models**: GPT-4, GPT-4-Turbo
@@ -105,6 +116,7 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 500 lines code + 350 lines tests
 
 #### Issue #14: Anthropic Provider
+
 - **Package**: Extends `@ai-company/llm-providers`
 - **Class**: `AnthropicProvider implements LLMProvider`
 - **Models**: Claude 3 (Opus, Sonnet, Haiku)
@@ -113,6 +125,7 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 500 lines code + 350 lines tests
 
 #### Issue #15: MoE Router Enhanced
+
 - **Package**: Enhances `packages/moe_router`
 - **New**: Provider selection algorithm
 - **Features**: Task classification, cost optimization
@@ -120,6 +133,7 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 400 lines code + 300 lines tests
 
 #### Issue #16: Performance Tracking
+
 - **Package**: `@ai-company/llm-observability`
 - **Metrics**: Per-provider stats, win rates, costs
 - **Storage**: Prometheus compatible
@@ -127,6 +141,7 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 350 lines code + 200 lines tests
 
 #### Issue #17: Tool Calling Pipeline
+
 - **Package**: `@ai-company/tool-pipeline`
 - **Class**: `ToolCallingOrchestrator`
 - **Features**: Multi-turn, validation, logging
@@ -138,6 +153,7 @@ I'll create all 5 issues for Stream 1 in one response.
 ### Stream 3: Frontend & Security
 
 #### Issue #19: Command Palette
+
 - **Component**: `CommandPalette.tsx`
 - **Features**: Tool search, parameter forms, execution
 - **UI**: cmdk library, keyboard shortcuts
@@ -145,6 +161,7 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 400 lines React + 250 lines tests
 
 #### Issue #20: AI Dock
+
 - **Component**: `AIDock.tsx`
 - **Features**: Provider display, trace viewer, token costs
 - **UI**: Real-time updates, WebSocket
@@ -152,12 +169,14 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 500 lines React + 300 lines tests
 
 #### Issue #21: Integrations Page
+
 - **Page**: `app/(dashboard)/integrations/page.tsx`
 - **Features**: Credential UI, health checks, tool toggles
 - **Dependencies**: Issue #11
 - **Estimated**: 450 lines React + 250 lines tests
 
 #### Issue #22: Audit Logging
+
 - **Package**: `@ai-company/audit`
 - **Class**: `AuditLogger`
 - **Features**: Complete logs, PII redaction, retention
@@ -165,6 +184,7 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 400 lines code + 250 lines tests
 
 #### Issue #23: Permission System
+
 - **Package**: `@ai-company/permissions`
 - **Model**: RBAC with conditions
 - **Class**: `PermissionChecker`
@@ -172,6 +192,7 @@ I'll create all 5 issues for Stream 1 in one response.
 - **Estimated**: 500 lines code + 350 lines tests
 
 #### Issue #24: Rate Limiting
+
 - **Package**: `@ai-company/rate-limit`
 - **Features**: Per-user/tool limits, cost quotas
 - **Middleware**: Express/Fastify compatible
@@ -183,18 +204,21 @@ I'll create all 5 issues for Stream 1 in one response.
 ### Stream 4: Quality & Docs
 
 #### Issue #18: Sample Pipeline
+
 - **CLI**: `tools/spec-to-github`
 - **Demo**: OpenAPI → GitHub Issues pipeline
 - **Dependencies**: Issue #17
 - **Estimated**: 300 lines code + examples
 
 #### Issue #25: Integration Tests
+
 - **Suite**: Complete integration test coverage
 - **Coverage**: All critical paths, >80% total
 - **Dependencies**: All previous issues
 - **Estimated**: 1000 lines tests
 
 #### Issue #26: Developer Docs
+
 - **Location**: `docs/openapi-tools/`
 - **Content**: Architecture, guides, API reference
 - **Dependencies**: All previous issues
@@ -238,6 +262,7 @@ I'll create all 5 issues for Stream 1 in one response.
 ---
 
 **Current Status**:
+
 - ✅ Issue #7 complete (above)
 - ⏳ 19 issues waiting for generation request
 - 📁 Sub-agents directory created

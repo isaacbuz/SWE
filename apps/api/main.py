@@ -12,12 +12,14 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from config import settings
 from middleware import setup_cors, setup_logging, setup_rate_limiting, logger
 from routers import (
+    auth_router,
     projects_router,
     agents_router,
     issues_router,
     prs_router,
     analytics_router,
     skills_router,
+    webhooks_router,
 )
 from websocket import init_websocket_server
 from events import init_broadcaster
@@ -41,7 +43,15 @@ async def lifespan(app: FastAPI):
     broadcaster = init_broadcaster()
     logger.info("event_broadcaster_initialized")
 
-    # TODO: Initialize database connection pool
+    # Initialize database connection pool
+    from apps.api.db import get_db_pool, close_db_pool
+    try:
+        await get_db_pool()
+        logger.info("database_pool_initialized")
+    except Exception as e:
+        logger.error("database_pool_init_failed", error=str(e))
+        # Continue startup even if DB fails (for development)
+
     # TODO: Initialize Redis connection pool
     # TODO: Run database migrations
     # TODO: Initialize background task queues
@@ -54,7 +64,13 @@ async def lifespan(app: FastAPI):
     # Shutdown
     logger.info("application_shutting_down")
 
-    # TODO: Close database connections
+    # Close database connections
+    try:
+        await close_db_pool()
+        logger.info("database_pool_closed")
+    except Exception as e:
+        logger.error("database_pool_close_failed", error=str(e))
+
     # TODO: Close Redis connections
     # TODO: Gracefully shutdown background tasks
     # TODO: Flush logs and metrics
@@ -262,13 +278,15 @@ async def root() -> Dict[str, Any]:
     }
 
 
-# Register routers with API prefix
+# Register routers
+app.include_router(auth_router, prefix=settings.api_prefix)
 app.include_router(projects_router, prefix=settings.api_prefix)
 app.include_router(agents_router, prefix=settings.api_prefix)
 app.include_router(issues_router, prefix=settings.api_prefix)
 app.include_router(prs_router, prefix=settings.api_prefix)
 app.include_router(analytics_router, prefix=settings.api_prefix)
 app.include_router(skills_router, prefix=settings.api_prefix)
+app.include_router(webhooks_router, prefix=settings.api_prefix)
 
 
 # Mount WebSocket server

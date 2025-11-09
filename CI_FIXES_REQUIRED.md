@@ -9,15 +9,17 @@
 ### Primary Issue: Missing pnpm
 
 **All frontend jobs failing with same error:**
+
 ```
-##[error]Unable to locate executable file: pnpm. Please verify either the file path exists 
+##[error]Unable to locate executable file: pnpm. Please verify either the file path exists
 or the file can be found within a directory specified by the PATH environment variable.
 ```
 
 **Failed Jobs:**
+
 1. ✗ Lint & Format
 2. ✗ Security Scanning
-3. ✗ Test & Coverage  
+3. ✗ Test & Coverage
 4. ✗ CI Status (dependent on others)
 
 **Why?** The CI workflow uses `cache: pnpm` in `actions/setup-node@v4`, but pnpm is not installed before this step.
@@ -40,28 +42,31 @@ or the file can be found within a directory specified by the PATH environment va
 **File**: `.github/workflows/ci.yml`
 
 **Current (incorrect):**
+
 ```yaml
 - uses: actions/setup-node@v4
   with:
     node-version: ${{ env.NODE_VERSION }}
-    cache: 'pnpm'
+    cache: "pnpm"
 ```
 
 **Fixed:**
+
 ```yaml
 - uses: pnpm/action-setup@v2
   with:
-    version: 8.12.1  # Match package.json
+    version: 8.12.1 # Match package.json
 
 - uses: actions/setup-node@v4
   with:
     node-version: ${{ env.NODE_VERSION }}
-    cache: 'pnpm'
+    cache: "pnpm"
 ```
 
 **Apply to all jobs that use Node:**
+
 - `lint` job
-- `security` job  
+- `security` job
 - `test` job
 - `build` job
 - `e2e` job
@@ -71,16 +76,19 @@ or the file can be found within a directory specified by the PATH environment va
 **File**: `.github/workflows/ci.yml`
 
 **Current:**
+
 ```yaml
 - uses: github/codeql-action/upload-sarif@v2
 ```
 
 **Fixed:**
+
 ```yaml
 - uses: github/codeql-action/upload-sarif@v3
 ```
 
 **Apply to both instances:**
+
 - OWASP DependencyCheck upload
 - Trivy upload
 
@@ -89,12 +97,13 @@ or the file can be found within a directory specified by the PATH environment va
 **Issue**: Security tools aren't running before SARIF upload
 
 **Current flow:**
+
 ```yaml
 security:
   steps:
     # ... checkout, setup ...
-    - name: Upload SARIF (OWASP)      # ← Runs before DependencyCheck!
-    - name: Upload SARIF (Trivy)       # ← Runs before Trivy!
+    - name: Upload SARIF (OWASP) # ← Runs before DependencyCheck!
+    - name: Upload SARIF (Trivy) # ← Runs before Trivy!
 ```
 
 **Need to add the actual security scanning steps:**
@@ -113,14 +122,14 @@ security:
       --format SARIF \
       --out dependency-check-report.sarif \
       --suppression .dependency-check-suppressions.xml || true
-      
+
 - name: Run Trivy Security Scan
   uses: aquasecurity/trivy-action@master
   with:
-    scan-type: 'fs'
-    scan-ref: '.'
-    format: 'sarif'
-    output: 'trivy-results.sarif'
+    scan-type: "fs"
+    scan-ref: "."
+    format: "sarif"
+    output: "trivy-results.sarif"
 ```
 
 ## Complete Fixed Workflow
@@ -132,9 +141,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
   REGISTRY: ghcr.io
@@ -158,7 +167,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -193,7 +202,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -225,11 +234,11 @@ jobs:
       - name: Run Trivy Security Scan
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
+          scan-type: "fs"
+          scan-ref: "."
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
 
       # FIX 2: Upgrade to v3
       - name: Upload Trivy Results
@@ -277,12 +286,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
+          cache: "pip"
 
       - name: Install dependencies
         run: |
@@ -318,7 +327,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - uses: actions/setup-python@v4
         with:
@@ -349,7 +358,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -453,10 +462,10 @@ Since this is a new repo, you may not have tests yet. Add placeholders:
 
 ```typescript
 // apps/web/app/page.test.tsx
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 
-describe('Placeholder', () => {
-  it('should pass', () => {
+describe("Placeholder", () => {
+  it("should pass", () => {
     expect(true).toBe(true);
   });
 });
@@ -474,7 +483,7 @@ You can mark some jobs as allowed to fail while you build them out:
 
 ```yaml
 e2e:
-  continue-on-error: true  # Allow to fail for now
+  continue-on-error: true # Allow to fail for now
 ```
 
 ### 3. Add Pre-commit Hooks

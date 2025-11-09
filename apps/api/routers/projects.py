@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 from auth import get_current_active_user, require_user, CurrentUser
 from middleware import limiter
+from services.projects import project_service
 
 
 router = APIRouter(prefix="/projects", tags=["projects"])
@@ -80,15 +81,15 @@ async def create_project(
     - **branch**: Git branch to monitor (default: main)
     - **enabled**: Whether project is enabled (default: true)
     """
-    # TODO: Validate repository exists and user has access
-    # TODO: Create project in database
-    # TODO: Initialize project configuration
-    # TODO: Queue initial repository scan
-
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Project creation not yet implemented"
+    project_data = await project_service.create_project(
+        name=project.name,
+        repository_url=project.repository_url,
+        owner_id=current_user.id,
+        description=project.description,
+        branch=project.branch,
+        enabled=project.enabled
     )
+    return Project(**project_data)
 
 
 @router.get(
@@ -108,11 +109,18 @@ async def list_projects(
 
     Supports pagination and filtering.
     """
-    # TODO: Query projects from database with filters
-    # TODO: Apply pagination
-    # TODO: Return project list
-
-    return ProjectList(items=[], total=0, page=page, page_size=page_size)
+    result = await project_service.list_projects(
+        user_id=current_user.id,
+        page=page,
+        page_size=page_size,
+        enabled=enabled
+    )
+    return ProjectList(
+        items=[Project(**item) for item in result["items"]],
+        total=result["total"],
+        page=result["page"],
+        page_size=result["page_size"]
+    )
 
 
 @router.get(
@@ -130,14 +138,8 @@ async def get_project(
 
     - **project_id**: Project UUID
     """
-    # TODO: Load project from database
-    # TODO: Verify user has access to project
-    # TODO: Return project details
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Project {project_id} not found"
-    )
+    project_data = await project_service.get_project(project_id, current_user.id)
+    return Project(**project_data)
 
 
 @router.patch(
@@ -156,16 +158,13 @@ async def update_project(
 
     Only provided fields will be updated.
     """
-    # TODO: Load project from database
-    # TODO: Verify user has access to project
-    # TODO: Validate updates
-    # TODO: Update project in database
-    # TODO: Return updated project
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Project {project_id} not found"
+    updates = update.dict(exclude_unset=True)
+    project_data = await project_service.update_project(
+        project_id=project_id,
+        user_id=current_user.id,
+        updates=updates
     )
+    return Project(**project_data)
 
 
 @router.delete(
@@ -183,12 +182,4 @@ async def delete_project(
 
     This will also delete all associated data (agents, issues, PRs, etc.).
     """
-    # TODO: Load project from database
-    # TODO: Verify user has access to project
-    # TODO: Delete project and associated data
-    # TODO: Cancel any running agents
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Project {project_id} not found"
-    )
+    await project_service.delete_project(project_id, current_user.id)

@@ -1,7 +1,7 @@
-
 # Model Registry
 
 Extend `config/models.yaml` with new providers. Include:
+
 - context window
 - strengths
 - pricing hints

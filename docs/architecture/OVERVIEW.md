@@ -17,15 +17,18 @@ The AI-First Software Engineering Company is a production-grade platform that tr
 ## Layered Architecture
 
 ### Layer 0: Interface Layer
+
 **Purpose**: Multiple entry points for human and machine interactions
 
 **Components**:
+
 - **Web UI** (Next.js 14): Premium AI-native interface with Command Palette, AI Dock
 - **CLI**: Terminal-based workflow for power users
 - **GitHub App**: Webhook-driven automation
 - **IDE Extensions**: VSCode/IntelliJ integrations
 
 **Key Design Decisions**:
+
 - WebSocket-based real-time updates (no polling)
 - Command Palette as primary interaction model
 - AI Dock provides contextual suggestions based on current view
@@ -36,15 +39,18 @@ The AI-First Software Engineering Company is a production-grade platform that tr
 ---
 
 ### Layer 1: Gateway & Router
+
 **Purpose**: Single entry point with intelligent request routing
 
 **Components**:
+
 - **API Gateway** (FastAPI): Authentication, rate limiting, request validation
 - **MoE Router**: Intelligent model selection based on task, cost, performance
 - **Load Balancer**: Distribute across model providers
 - **Circuit Breaker**: Automatic failover on provider outages
 
 **Key Algorithms**:
+
 - **Cost Prediction**: Pre-estimate token usage before execution
 - **Performance Tracking**: Real-time success rates per model/task type
 - **Hybrid Routing**: Parallel execution with judge model selection
@@ -55,15 +61,18 @@ The AI-First Software Engineering Company is a production-grade platform that tr
 ---
 
 ### Layer 2: Orchestration Layer
+
 **Purpose**: Stateful workflow coordination across multiple agents
 
 **Components**:
+
 - **Temporal Workflows**: Durable execution for Plan→Design→Code→Test→Deploy
 - **Workflow Engine**: State machines for complex multi-agent flows
 - **Event Bus**: Pub/sub for agent coordination
 - **Saga Orchestrator**: Distributed transaction management
 
 **Key Workflows**:
+
 1. **Plan→Patch→PR**: Requirement → Spec → Implementation → Review → Merge
 2. **Incident Swarm**: Alert → Diagnosis → Fix → Deploy → Post-mortem
 3. **Migration Pipeline**: Analysis → Planning → Incremental Migration → Validation
@@ -74,6 +83,7 @@ The AI-First Software Engineering Company is a production-grade platform that tr
 ---
 
 ### Layer 3: Agent System
+
 **Purpose**: Specialized AI agents for different engineering roles
 
 **Agent Categories**:
@@ -106,6 +116,7 @@ The AI-First Software Engineering Company is a production-grade platform that tr
    - Resource Optimizer: Manages agent workload distribution
 
 **Agent Communication Protocol**:
+
 ```typescript
 interface AgentMessage {
   messageId: string;
@@ -123,6 +134,7 @@ interface AgentMessage {
 ---
 
 ### Layer 4: Tools & Integrations
+
 **Purpose**: Vendor-neutral abstractions for external systems
 
 **Tool Categories**:
@@ -157,6 +169,7 @@ interface AgentMessage {
    - OpenTelemetry: Distributed tracing
 
 **Tool Interface Standard**:
+
 ```python
 class Tool(Protocol):
     name: str
@@ -176,6 +189,7 @@ class Tool(Protocol):
 ---
 
 ### Layer 5: Data Layer
+
 **Purpose**: Persistent storage with strong consistency guarantees
 
 **Components**:
@@ -204,6 +218,7 @@ class Tool(Protocol):
    - Historical PR outcomes for learning
 
 **Data Models**:
+
 - **Contract-First**: All schemas defined in Pydantic (Python) and Zod (TypeScript)
 - **Event Sourcing**: Critical entities (Projects, PRs) maintain event history
 - **CQRS**: Separate read/write models for analytics
@@ -213,9 +228,11 @@ class Tool(Protocol):
 ---
 
 ### Layer 6: Observability & Governance
+
 **Purpose**: Visibility, compliance, and continuous improvement
 
 **Observability Components**:
+
 1. **Metrics** (Prometheus)
    - Request latency (p50, p95, p99)
    - Cost per operation
@@ -239,6 +256,7 @@ class Tool(Protocol):
    - Security vulnerabilities detected
 
 **Governance Components**:
+
 1. **Evidence Registry**
    - Source credibility scoring
    - Freshness tracking
@@ -267,6 +285,7 @@ class Tool(Protocol):
 ## Cross-Cutting Concerns
 
 ### Security
+
 - **Authentication**: OAuth 2.0 + OIDC
 - **Authorization**: RBAC with fine-grained permissions
 - **Secrets**: GitHub Secrets + HashiCorp Vault
@@ -274,11 +293,13 @@ class Tool(Protocol):
 - **Audit**: Tamper-proof logs with digital signatures
 
 ### Performance
+
 - **Caching**: Multi-tier (Redis, CDN, browser)
 - **Optimization**: Prompt compression, batching, parallelization
 - **Scalability**: Horizontal scaling via Kubernetes
 
 ### Reliability
+
 - **Circuit Breakers**: Prevent cascade failures
 - **Retries**: Exponential backoff with jitter
 - **Failover**: Multi-provider redundancy
@@ -289,6 +310,7 @@ class Tool(Protocol):
 See [ADR Index](../adrs/INDEX.md) for detailed Architecture Decision Records.
 
 Key decisions:
+
 - [ADR-0001: Monorepo with Turborepo](../adrs/0001-monorepo-turborepo.md)
 - [ADR-0002: Next.js 14 for Frontend](../adrs/0002-nextjs-14-frontend.md)
 - [ADR-0003: FastAPI for Gateway](../adrs/0003-fastapi-gateway.md)

@@ -21,8 +21,8 @@ WebSocket connections require JWT authentication. Include the token when establi
 ```javascript
 const socket = io("http://localhost:8000/ws", {
   auth: {
-    token: "your-jwt-token"
-  }
+    token: "your-jwt-token",
+  },
 });
 ```
 
@@ -47,6 +47,7 @@ const socket = io("http://localhost:8000/ws?token=your-jwt-token");
 Emitted when connection is successfully established.
 
 **Payload:**
+
 ```json
 {
   "type": "connection.established",
@@ -64,6 +65,7 @@ Emitted when connection is successfully established.
 Emitted when connection fails.
 
 **Payload:**
+
 ```json
 {
   "type": "connection.error",
@@ -83,21 +85,28 @@ Emitted when connection fails.
 Subscribe to receive updates from a specific room.
 
 **Request:**
+
 ```javascript
-socket.emit("subscribe", {
-  room: "project:550e8400-e29b-41d4-a716-446655440000"
-}, (response) => {
-  console.log(response); // {status: "success", room: "project:..."}
-});
+socket.emit(
+  "subscribe",
+  {
+    room: "project:550e8400-e29b-41d4-a716-446655440000",
+  },
+  (response) => {
+    console.log(response); // {status: "success", room: "project:..."}
+  },
+);
 ```
 
 **Supported Rooms:**
+
 - `project:<project_id>` - Project-specific updates
 - `user:<user_id>` - User-specific updates (auto-subscribed)
 - `agent:<agent_id>` - Agent-specific updates
 - `global` - Global updates (auto-subscribed)
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -110,15 +119,21 @@ socket.emit("subscribe", {
 Unsubscribe from a room to stop receiving updates.
 
 **Request:**
+
 ```javascript
-socket.emit("unsubscribe", {
-  room: "project:550e8400-e29b-41d4-a716-446655440000"
-}, (response) => {
-  console.log(response); // {status: "success", room: "project:..."}
-});
+socket.emit(
+  "unsubscribe",
+  {
+    room: "project:550e8400-e29b-41d4-a716-446655440000",
+  },
+  (response) => {
+    console.log(response); // {status: "success", room: "project:..."}
+  },
+);
 ```
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -131,6 +146,7 @@ socket.emit("unsubscribe", {
 Send a ping to keep connection alive and check latency.
 
 **Request:**
+
 ```javascript
 socket.emit("ping", {}, (response) => {
   console.log(response); // {status: "pong"}
@@ -138,6 +154,7 @@ socket.emit("ping", {}, (response) => {
 ```
 
 **Response:**
+
 ```json
 {
   "status": "pong"
@@ -153,6 +170,7 @@ socket.emit("ping", {}, (response) => {
 Emitted when a project is updated.
 
 **Payload:**
+
 ```json
 {
   "type": "project.updated",
@@ -179,6 +197,7 @@ Emitted when a project is updated.
 Emitted when a project is deleted.
 
 **Payload:**
+
 ```json
 {
   "type": "project.deleted",
@@ -200,6 +219,7 @@ Emitted when a project is deleted.
 Emitted when an agent's status changes.
 
 **Payload:**
+
 ```json
 {
   "type": "agent.status_changed",
@@ -239,6 +259,7 @@ Emitted when an agent disconnects from the system.
 Emitted as a workflow executes, providing real-time progress updates.
 
 **Payload:**
+
 ```json
 {
   "type": "workflow.progress",
@@ -284,6 +305,7 @@ Emitted when a workflow fails.
 Emitted when a new pull request is created.
 
 **Payload:**
+
 ```json
 {
   "type": "pr.created",
@@ -310,6 +332,7 @@ Emitted when a new pull request is created.
 Emitted when a pull request is updated.
 
 **Payload:**
+
 ```json
 {
   "type": "pr.updated",
@@ -337,6 +360,7 @@ Emitted when a pull request is closed.
 Emitted when an issue is updated.
 
 **Payload:**
+
 ```json
 {
   "type": "issue.updated",
@@ -376,6 +400,7 @@ Emitted when an issue is closed.
 Emitted when an AI suggestion or recommendation is generated.
 
 **Payload:**
+
 ```json
 {
   "type": "ai.suggestion",
@@ -417,12 +442,12 @@ Emitted when AI analysis completes.
 
 ### Room Types
 
-| Room Type | Format | Auto-Subscribe | Purpose |
-|-----------|--------|----------------|---------|
-| User | `user:<user_id>` | Yes | User-specific updates |
-| Project | `project:<project_id>` | No | Project-specific updates |
-| Agent | `agent:<agent_id>` | No | Agent-specific updates |
-| Global | `global` | Yes | System-wide updates |
+| Room Type | Format                 | Auto-Subscribe | Purpose                  |
+| --------- | ---------------------- | -------------- | ------------------------ |
+| User      | `user:<user_id>`       | Yes            | User-specific updates    |
+| Project   | `project:<project_id>` | No             | Project-specific updates |
+| Agent     | `agent:<agent_id>`     | No             | Agent-specific updates   |
+| Global    | `global`               | Yes            | System-wide updates      |
 
 ### Room Access Control
 
@@ -441,12 +466,12 @@ import io from "socket.io-client";
 // Connect with authentication
 const socket = io("http://localhost:8000/ws", {
   auth: {
-    token: localStorage.getItem("jwt_token")
+    token: localStorage.getItem("jwt_token"),
   },
   reconnection: true,
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
-  reconnectionAttempts: 5
+  reconnectionAttempts: 5,
 });
 
 // Handle connection established
@@ -467,13 +492,17 @@ socket.on("workflow.progress", (event) => {
 });
 
 // Subscribe to project room
-socket.emit("subscribe", {
-  room: "project:550e8400-e29b-41d4-a716-446655440000"
-}, (response) => {
-  if (response.status === "success") {
-    console.log("Subscribed to project");
-  }
-});
+socket.emit(
+  "subscribe",
+  {
+    room: "project:550e8400-e29b-41d4-a716-446655440000",
+  },
+  (response) => {
+    if (response.status === "success") {
+      console.log("Subscribed to project");
+    }
+  },
+);
 
 // Handle errors
 socket.on("connect_error", (error) => {
@@ -497,7 +526,7 @@ export const useWebSocket = (token: string) => {
 
   useEffect(() => {
     socketRef.current = io("http://localhost:8000/ws", {
-      auth: { token }
+      auth: { token },
     });
 
     socketRef.current.on("connect", () => setConnected(true));
@@ -555,12 +584,12 @@ async def send_project_update():
 
 ### Connection Errors
 
-| Error Code | Message | Action |
-|------------|---------|--------|
-| `AUTH_FAILED` | Invalid or expired token | Refresh token and reconnect |
-| `AUTH_MISSING` | No authentication provided | Provide valid JWT token |
-| `ROOM_ACCESS_DENIED` | Access denied to room | Check permissions |
-| `INVALID_ROOM` | Invalid room format | Use valid room name |
+| Error Code           | Message                    | Action                      |
+| -------------------- | -------------------------- | --------------------------- |
+| `AUTH_FAILED`        | Invalid or expired token   | Refresh token and reconnect |
+| `AUTH_MISSING`       | No authentication provided | Provide valid JWT token     |
+| `ROOM_ACCESS_DENIED` | Access denied to room      | Check permissions           |
+| `INVALID_ROOM`       | Invalid room format        | Use valid room name         |
 
 ### Recovery Strategy
 
@@ -615,6 +644,7 @@ GET /api/v1/websocket/stats
 ```
 
 Response:
+
 ```json
 {
   "connections": 156,
@@ -683,6 +713,7 @@ services:
 **Problem:** WebSocket connection is refused
 
 **Solutions:**
+
 1. Check API server is running
 2. Verify WebSocket endpoint is mounted
 3. Check CORS configuration
@@ -693,6 +724,7 @@ services:
 **Problem:** Client keeps disconnecting and reconnecting
 
 **Solutions:**
+
 1. Check token expiration time
 2. Verify server-side logging
 3. Check network connectivity
@@ -703,6 +735,7 @@ services:
 **Problem:** Events are not being received by client
 
 **Solutions:**
+
 1. Verify subscription to correct room
 2. Check server-side event emission
 3. Verify event type names
@@ -714,6 +747,7 @@ services:
 ### From REST Polling to WebSocket
 
 Before (REST polling):
+
 ```javascript
 setInterval(async () => {
   const response = await fetch("/api/v1/projects/123");
@@ -722,6 +756,7 @@ setInterval(async () => {
 ```
 
 After (WebSocket):
+
 ```javascript
 socket.emit("subscribe", { room: "project:123" });
 
@@ -731,6 +766,7 @@ socket.on("project.updated", (event) => {
 ```
 
 Benefits:
+
 - Real-time updates (no polling interval)
 - Lower bandwidth usage
 - Lower server load
@@ -739,6 +775,7 @@ Benefits:
 ## Support and Issues
 
 For issues or questions:
+
 1. Check this documentation
 2. Review example code in `/apps/api/events/example_usage.py`
 3. Check WebSocket server logs

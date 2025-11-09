@@ -3,10 +3,10 @@ export class MockDatabase {
 
   constructor() {
     // Initialize tables
-    this.data.set('agents', new Map());
-    this.data.set('tasks', new Map());
-    this.data.set('users', new Map());
-    this.data.set('projects', new Map());
+    this.data.set("agents", new Map());
+    this.data.set("tasks", new Map());
+    this.data.set("users", new Map());
+    this.data.set("projects", new Map());
   }
 
   public async insert(table: string, id: string, data: any) {
@@ -14,7 +14,12 @@ export class MockDatabase {
     if (!tableData) {
       throw new Error(`Table ${table} does not exist`);
     }
-    tableData.set(id, { ...data, id, createdAt: new Date(), updatedAt: new Date() });
+    tableData.set(id, {
+      ...data,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
     return data;
   }
 

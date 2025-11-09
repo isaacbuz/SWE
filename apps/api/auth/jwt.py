@@ -64,8 +64,7 @@ class JWTHandler:
     def create_refresh_token(
         self,
         user_id: str,
-        email: str,
-        role: UserRole
+        email: str
     ) -> str:
         """
         Create JWT refresh token.
@@ -84,7 +83,6 @@ class JWTHandler:
         payload = {
             "sub": user_id,
             "email": email,
-            "role": role.value,
             "token_type": TokenType.REFRESH.value,
             "exp": expires_at,
             "iat": now,
@@ -113,10 +111,17 @@ class JWTHandler:
                 return None
 
             # Extract token data
+            # Refresh tokens don't have role, so use USER as default
+            role_str = payload.get("role")
+            if role_str:
+                role = UserRole(role_str)
+            else:
+                role = UserRole.USER  # Default for refresh tokens
+            
             token_data = TokenData(
                 sub=payload.get("sub"),
                 email=payload.get("email"),
-                role=UserRole(payload.get("role")),
+                role=role,
                 scopes=payload.get("scopes", []),
                 token_type=TokenType(token_type),
                 exp=datetime.fromtimestamp(payload.get("exp")),

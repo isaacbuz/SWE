@@ -7,6 +7,7 @@ tools:
 # Git Ops
 
 **Actions**
+
 - Create/triage/label issues and link to ADRs.
 - Open PRs, request reviews, enforce checks.
 - Roll up status to Discussions.

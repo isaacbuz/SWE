@@ -138,12 +138,14 @@ The router uses a multi-stage selection algorithm:
 ### Parallel Execution Decision
 
 Parallel execution is triggered when:
+
 - Explicitly requested (`enable_parallel=True`)
 - Task type is critical (security_audit, code_review, planning, reasoning)
 - High quality requirement (≥0.9) with sufficient budget (≥$0.05)
 - Metadata flag `critical=true`
 
 When parallel execution is used:
+
 1. Select 3 diverse models (preferring different providers)
 2. Select judge model (high-quality model not in parallel set)
 3. Execute all models in parallel
@@ -154,11 +156,13 @@ When parallel execution is used:
 The router includes 18 pre-configured models:
 
 ### Anthropic
+
 - **claude-opus-4**: Highest quality (0.98), premium cost
 - **claude-sonnet-4**: Balanced quality (0.95), good value
 - **claude-haiku-4**: Fast & cheap (0.80), 300ms P50 latency
 
 ### OpenAI
+
 - **gpt-5**: Premium quality (0.94), good reasoning
 - **gpt-4o**: Fast multimodal (0.92), 600ms latency
 - **gpt-4o-mini**: Budget option (0.82), very fast
@@ -166,15 +170,18 @@ The router includes 18 pre-configured models:
 - **o1-mini**: Good reasoning (0.90), faster (8s P50)
 
 ### Google
+
 - **gemini-2.0-flash-thinking**: FREE, 1M context, experimental
 - **gemini-pro-1.5**: 2M context window, good quality (0.89)
 - **gemini-flash-1.5**: 1M context, fast & cheap
 
 ### Mistral
+
 - **mistral-large-2**: European option, good quality (0.87)
 - **mistral-small-2**: Budget European option
 
 ### Cohere
+
 - **command-r-plus**: RAG-optimized, good quality (0.86)
 - **command-r**: Budget RAG option
 
@@ -183,18 +190,22 @@ The router includes 18 pre-configured models:
 The router includes optimized model preferences for each task type:
 
 ### Code Generation
+
 - Preferred: claude-sonnet-4, gpt-4o, gemini-pro-1.5
 - Budget: claude-haiku-4, gpt-4o-mini, mistral-small-2
 
 ### Reasoning
+
 - Preferred: claude-opus-4, o1, claude-sonnet-4
 - Budget: o1-mini, claude-sonnet-4, mistral-large-2
 
 ### Security Audit
+
 - Preferred: claude-opus-4, o1, claude-sonnet-4
 - Budget: claude-sonnet-4, gpt-5
 
 ### Long Context
+
 - Preferred: gemini-pro-1.5, claude-sonnet-4, gemini-2.0-flash-thinking
 - Budget: gemini-flash-1.5, claude-haiku-4
 
@@ -225,8 +236,9 @@ print(f"Recommendation Weight: {weight:.2f}")  # 0-1 scale
 ### Confidence Calculation
 
 Confidence scores combine sample size and recency:
+
 - Sample confidence: min(1.0, total_requests / 100)
-- Recency decay: 0.5^(age_hours / 168)  # Half-life of 1 week
+- Recency decay: 0.5^(age_hours / 168) # Half-life of 1 week
 - Final confidence: sample_confidence × recency_decay
 
 ## Learning Loop
@@ -254,6 +266,7 @@ router.learning_loop.collect_feedback(feedback)
 ### Feedback Scoring
 
 Feedback is scored based on:
+
 - Outcome: success=1.0, partial=0.5, failure=0.0
 - Quality score: 0-1 (averaged with outcome)
 - PR merged: +0.2 bonus
@@ -289,11 +302,13 @@ print(f"Recommendation: {results['recommendation']}")
 The circuit breaker protects against cascading failures:
 
 ### States
+
 - **Closed**: Normal operation
 - **Open**: Provider blocked after 5 consecutive failures
 - **Half-Open**: Testing if provider has recovered
 
 ### Configuration
+
 - Failure Threshold: 5 consecutive failures
 - Retry Timeout: 60 seconds
 - Automatic state transitions

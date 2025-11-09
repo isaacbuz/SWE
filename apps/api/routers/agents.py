@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from auth import get_current_active_user, require_user, CurrentUser
 from middleware import limiter
+from services.agents import agent_service
 
 
 router = APIRouter(prefix="/agents", tags=["agents"])
@@ -111,15 +112,14 @@ async def create_agent(
     - **config**: Agent-specific configuration
     - **auto_start**: Whether to start agent immediately
     """
-    # TODO: Verify project exists and user has access
-    # TODO: Validate agent configuration
-    # TODO: Create agent in database
-    # TODO: If auto_start, queue agent for execution
-
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Agent creation not yet implemented"
+    agent_data = await agent_service.create_agent(
+        project_id=agent.project_id,
+        agent_type=agent.agent_type.value,
+        config=agent.config,
+        user_id=current_user.id,
+        auto_start=agent.auto_start
     )
+    return Agent(**agent_data)
 
 
 @router.get(
@@ -141,11 +141,20 @@ async def list_agents(
 
     Supports filtering by project, type, and status.
     """
-    # TODO: Query agents from database with filters
-    # TODO: Apply pagination
-    # TODO: Return agent list
-
-    return AgentList(items=[], total=0, page=page, page_size=page_size)
+    result = await agent_service.list_agents(
+        user_id=current_user.id,
+        project_id=project_id,
+        agent_type=agent_type.value if agent_type else None,
+        status_filter=status.value if status else None,
+        page=page,
+        page_size=page_size
+    )
+    return AgentList(
+        items=[Agent(**item) for item in result["items"]],
+        total=result["total"],
+        page=result["page"],
+        page_size=result["page_size"]
+    )
 
 
 @router.get(
@@ -163,14 +172,8 @@ async def get_agent(
 
     - **agent_id**: Agent UUID
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Return agent details
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
-    )
+    agent_data = await agent_service.get_agent(agent_id, current_user.id)
+    return Agent(**agent_data)
 
 
 @router.patch(
@@ -190,16 +193,15 @@ async def update_agent(
     - **config**: Updated configuration
     - **status**: Updated status (admin only for certain transitions)
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Validate updates
-    # TODO: Update agent in database
-    # TODO: If status changed, handle agent lifecycle
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
+    updates = update.dict(exclude_unset=True)
+    if "status" in updates:
+        updates["status"] = updates["status"].value if updates["status"] else None
+    agent_data = await agent_service.update_agent(
+        agent_id=agent_id,
+        user_id=current_user.id,
+        updates=updates
     )
+    return Agent(**agent_data)
 
 
 @router.post(
@@ -217,16 +219,8 @@ async def start_agent(
 
     Agent must be in PENDING or FAILED status.
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Verify agent can be started
-    # TODO: Queue agent for execution
-    # TODO: Update agent status to RUNNING
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
-    )
+    agent_data = await agent_service.start_agent(agent_id, current_user.id)
+    return Agent(**agent_data)
 
 
 @router.post(
@@ -244,16 +238,8 @@ async def cancel_agent(
 
     Agent must be in RUNNING status.
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Verify agent is running
-    # TODO: Send cancellation signal to agent
-    # TODO: Update agent status to CANCELLED
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
-    )
+    agent_data = await agent_service.cancel_agent(agent_id, current_user.id)
+    return Agent(**agent_data)
 
 
 @router.get(
@@ -275,16 +261,13 @@ async def get_agent_logs(
     - **level**: Filter by log level (DEBUG, INFO, WARNING, ERROR)
     - **limit**: Maximum number of log entries to return
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Fetch logs from storage
-    # TODO: Apply filters and limits
-    # TODO: Return logs
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
+    logs_data = await agent_service.get_agent_logs(
+        agent_id=agent_id,
+        user_id=current_user.id,
+        level=level,
+        limit=limit
     )
+    return AgentLogs(**logs_data)
 
 
 @router.delete(
@@ -302,12 +285,4 @@ async def delete_agent(
 
     Agent must be in COMPLETED, FAILED, or CANCELLED status.
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Verify agent can be deleted
-    # TODO: Delete agent and associated data
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
-    )
+    await agent_service.delete_agent(agent_id, current_user.id)

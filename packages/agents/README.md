@@ -38,9 +38,11 @@ packages/agents/
 ### Executive Agents
 
 #### 1. Chief Architect
+
 **Purpose**: Translate requirements into concrete, evolvable architectures
 
 **Capabilities**:
+
 - Architecture design and decision making
 - ADR (Architecture Decision Record) generation
 - Mermaid diagram creation (C4, sequence, ER, deployment)
@@ -49,6 +51,7 @@ packages/agents/
 - Non-functional requirements specification
 
 **Outputs**:
+
 - Architecture documents
 - ADRs with context, decisions, consequences, alternatives
 - Mermaid diagrams
@@ -56,6 +59,7 @@ packages/agents/
 - Migration and rollback strategies
 
 **Example Usage**:
+
 ```python
 from agents import ChiefArchitectAgent, Task, Context, TaskType
 
@@ -92,9 +96,11 @@ for artifact in result.artifacts:
 ```
 
 #### 2. Planner
+
 **Purpose**: Break architecture into actionable epics and stories
 
 **Capabilities**:
+
 - Epic creation with business value
 - Story breakdown with acceptance criteria
 - Effort estimation
@@ -103,6 +109,7 @@ for artifact in result.artifacts:
 - Milestone planning
 
 **Outputs**:
+
 - Epics with business value
 - User stories with acceptance criteria
 - Project backlog (JSON)
@@ -110,6 +117,7 @@ for artifact in result.artifacts:
 - Dependency graph
 
 **Example Usage**:
+
 ```python
 from agents import PlannerAgent
 
@@ -139,9 +147,11 @@ print(f"Created {len(epics)} epics and {len(stories)} stories")
 ```
 
 #### 3. Technical Director
+
 **Purpose**: Technical leadership and governance
 
 **Capabilities**:
+
 - Decision review and approval
 - Conflict resolution
 - Technical standards setting
@@ -149,6 +159,7 @@ print(f"Created {len(epics)} epics and {len(stories)} stories")
 - Risk management
 
 **Outputs**:
+
 - Decision reviews (approve/reject/revise)
 - Technical standards
 - Review reports
@@ -157,9 +168,11 @@ print(f"Created {len(epics)} epics and {len(stories)} stories")
 ### Development Agents
 
 #### 4. Code Generator
+
 **Purpose**: Implement user stories with high-quality code
 
 **Capabilities**:
+
 - Test-driven development (TDD)
 - SOLID principles adherence
 - Security best practices
@@ -167,12 +180,14 @@ print(f"Created {len(epics)} epics and {len(stories)} stories")
 - Documentation updates
 
 **Outputs**:
+
 - Implementation code
 - Test files (unit, integration)
 - Documentation updates
 - Implementation summary
 
 **Example Usage**:
+
 ```python
 from agents import CodegenAgent
 
@@ -213,9 +228,11 @@ print(f"Tests created: {result.output['tests_created']}")
 ```
 
 #### 5. Refactor Agent
+
 **Purpose**: Improve code quality through systematic refactoring
 
 **Capabilities**:
+
 - Code smell detection
 - Refactoring plan generation
 - Safe, incremental refactoring
@@ -223,6 +240,7 @@ print(f"Tests created: {result.output['tests_created']}")
 - Quality metrics tracking
 
 **Outputs**:
+
 - Code smell reports
 - Refactoring plans with risk assessment
 - Refactored code
@@ -230,6 +248,7 @@ print(f"Tests created: {result.output['tests_created']}")
 - Refactoring report
 
 **Example Usage**:
+
 ```python
 from agents import RefactorAgent
 
@@ -260,9 +279,11 @@ print(f"Refactorings applied: {result.output['refactorings_applied']}")
 ```
 
 #### 6. Migration Specialist
+
 **Purpose**: Handle complex migrations safely
 
 **Capabilities**:
+
 - Migration scope analysis
 - Incremental migration planning
 - Schema, data, and code migrations
@@ -270,6 +291,7 @@ print(f"Refactorings applied: {result.output['refactorings_applied']}")
 - Rollback procedures
 
 **Outputs**:
+
 - Migration scope analysis
 - Step-by-step migration plan
 - Migration scripts (schema, data, code)
@@ -277,6 +299,7 @@ print(f"Refactorings applied: {result.output['refactorings_applied']}")
 - Comprehensive migration guide
 
 **Example Usage**:
+
 ```python
 from agents import MigrationSpecialistAgent
 
@@ -559,27 +582,32 @@ print(f"Total cost: ${stats['total_cost']:.4f}")
 ## Best Practices
 
 ### 1. Task Design
+
 - Make tasks focused and specific
 - Include all necessary context in input_data
 - Define clear success criteria
 - Use appropriate task types
 
 ### 2. Evidence Tracking
+
 - Review evidence for all decisions
 - Use evidence weights to indicate importance
 - Trace decisions back to requirements
 
 ### 3. Error Handling
+
 - Check result.success before using outputs
 - Review result.error for failure details
 - Implement retry logic for transient failures
 
 ### 4. Cost Management
+
 - Set appropriate cost budgets
 - Monitor total costs across workflows
 - Use quality_requirement to balance cost/quality
 
 ### 5. Workflow Orchestration
+
 - Define dependencies clearly
 - Use parallel execution where appropriate
 - Monitor workflow progress
@@ -587,6 +615,7 @@ print(f"Total cost: ${stats['total_cost']:.4f}")
 ## Integration with Other Systems
 
 ### GitHub Integration
+
 ```python
 # Use Planner output to create GitHub issues
 plan_result = await planner.execute_with_tracking(task, context)
@@ -602,6 +631,7 @@ for story in plan_result.output["stories"]:
 ```
 
 ### CI/CD Integration
+
 ```python
 # Use Codegen output in CI pipeline
 impl_result = await codegen.execute_with_tracking(task, context)
@@ -649,16 +679,19 @@ async def test_codegen_agent():
 ### Common Issues
 
 **Issue**: Agent not producing expected outputs
+
 - Check input_data has all required fields
 - Review agent's system prompt requirements
 - Verify quality_requirement isn't too high
 
 **Issue**: High costs
+
 - Reduce max_tokens
 - Increase quality_requirement to use cheaper models
 - Set cost_budget limits
 
 **Issue**: Slow execution
+
 - Use parallel execution for independent tasks
 - Check network latency to API providers
 - Review model selection (faster models available?)

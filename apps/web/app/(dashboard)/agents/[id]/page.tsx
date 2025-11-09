@@ -1,26 +1,30 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { mockAgents } from '@/lib/api/mock-data'
-import { Settings } from 'lucide-react'
-import { use } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { mockAgents } from "@/lib/api/mock-data";
+import { Settings } from "lucide-react";
+import { use } from "react";
 
-export default function AgentDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
-  const agent = mockAgents.find((a) => a.id === id)
+export default function AgentDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const agent = mockAgents.find((a) => a.id === id);
 
   if (!agent) {
-    return <div>Agent not found</div>
+    return <div>Agent not found</div>;
   }
 
   const statusColors = {
-    active: 'success',
-    idle: 'secondary',
-    busy: 'warning',
-  } as const
+    active: "success",
+    idle: "secondary",
+    busy: "warning",
+  } as const;
 
   return (
     <div className="space-y-6">
@@ -28,7 +32,7 @@ export default function AgentDetailPage({ params }: { params: Promise<{ id: stri
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-4">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-4xl">
-            {agent.avatar || '🤖'}
+            {agent.avatar || "🤖"}
           </div>
           <div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
@@ -39,9 +43,7 @@ export default function AgentDetailPage({ params }: { params: Promise<{ id: stri
             <h1 className="text-3xl font-bold tracking-tight">{agent.name}</h1>
             <p className="text-muted-foreground mt-1">{agent.role}</p>
             <div className="flex gap-2 mt-3">
-              <Badge variant={statusColors[agent.status]}>
-                {agent.status}
-              </Badge>
+              <Badge variant={statusColors[agent.status]}>{agent.status}</Badge>
             </div>
           </div>
         </div>
@@ -147,5 +149,5 @@ export default function AgentDetailPage({ params }: { params: Promise<{ id: stri
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

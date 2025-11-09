@@ -15,6 +15,7 @@ Your AI-First Software Engineering Company has a solid foundation with **Phase 1
 **Workflow**: https://github.com/isaacbuz/SWE/actions/runs/19198288382
 
 ### Action Required
+
 1. Get failed job logs to diagnose issue
 2. Fix CI pipeline configuration
 3. Ensure all tests pass before proceeding with new features
@@ -66,6 +67,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
 **Sprint Goal**: Fix CI pipeline, establish OpenAPI foundation
 
 #### Day 1-2: CI/CD Repair & Validation
+
 - [ ] Get CI failure logs
 - [ ] Fix linting issues
 - [ ] Fix test failures
@@ -73,6 +75,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
 - [ ] Green CI pipeline
 
 #### Day 3-5: OpenAPI Foundation
+
 - [ ] **Issue #7**: OpenAPI Tool Registry Foundation (3-5 days)
   - Create `packages/openapi-tools` package
   - Implement ToolRegistry class
@@ -91,6 +94,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
 **Sprint Goal**: Complete OpenAPI infrastructure (Epic #1)
 
 #### Day 1-2: Tool Spec Converter
+
 - [ ] **Issue #8**: OpenAPI to Tool Spec Converter (3-4 days)
   - Implement `openApiToToolSpecs()` function
   - Support OpenAPI 3.0 and 3.1
@@ -99,6 +103,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
   - Comprehensive tests
 
 #### Day 3-5: Tool Executor & Internal Tools
+
 - [ ] **Issue #9**: Tool Executor with Schema Validation (4-5 days)
   - Build ToolExecutor class
   - Integrate Ajv/Zod for validation
@@ -125,6 +130,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
 **Sprint Goal**: Complete provider integration (Epic #2)
 
 #### Day 1-2: Provider Interface & OpenAI
+
 - [ ] **Issue #12**: Provider-Agnostic LLM Interface (2-3 days)
   - Create `packages/llm-providers` package
   - Define LLMProvider interface
@@ -142,6 +148,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
   - Comprehensive tests
 
 #### Day 3-5: Anthropic Provider & External APIs
+
 - [ ] **Issue #14**: Anthropic Provider (4-5 days - parallel)
   - Implement AnthropicProvider class
   - Claude 3 models (Opus, Sonnet, Haiku)
@@ -168,6 +175,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
 **Sprint Goal**: Connect all pieces with intelligent routing
 
 #### Day 1-3: MoE Router Enhancement
+
 - [ ] **Issue #15**: MoE Router with Provider Selection (5-7 days)
   - Enhance existing MoE router in `packages/moe_router/`
   - Provider scoring algorithm
@@ -179,6 +187,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
   - Configuration for routing policies
 
 #### Day 3-5: Tool Calling Pipeline & Performance Tracking
+
 - [ ] **Issue #17**: Tool Calling Pipeline (5-6 days)
   - Create `packages/tool-pipeline` package
   - Tool discovery from OpenAPI registry
@@ -210,6 +219,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
 **Sprint Goal**: Security hardening and user-facing features
 
 #### Day 1-2: Security Features
+
 - [ ] **Issue #22**: Tool Execution Audit Logging (4-5 days)
   - Extend `packages/observability` with audit logging
   - Complete audit log entries
@@ -227,6 +237,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
   - UI for permission management
 
 #### Day 3-5: Frontend Integration
+
 - [ ] **Issue #19**: Command Palette with OpenAPI Tools (4-5 days)
   - Extend command palette in `apps/web`
   - Load tools from registry
@@ -262,6 +273,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
 **Sprint Goal**: Quality assurance and documentation
 
 #### Day 1-3: Comprehensive Testing
+
 - [ ] **Issue #25**: Integration Tests for Tool Calling (5-6 days)
   - Create integration test suite
   - Mock external APIs
@@ -273,6 +285,7 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
   - Coverage reporting (>80% target)
 
 #### Day 3-5: Rate Limiting & Documentation
+
 - [ ] **Issue #24**: Rate Limiting and Quotas (4-5 days)
   - Rate limiting middleware
   - Per-user and per-tool limits
@@ -317,21 +330,25 @@ Epic #6: Testing & Documentation (MEDIUM PRIORITY)
 To maximize velocity, we can run 3 parallel workstreams:
 
 **Stream 1: Core Infrastructure** (Priority: CRITICAL)
+
 - Issues #7, #8, #9, #10, #11
 - Focus: OpenAPI tooling foundation
 - Owner: Backend/Infrastructure agents
 
 **Stream 2: LLM Integration** (Priority: CRITICAL)
+
 - Issues #12, #13, #14, #15, #16, #17
 - Focus: Provider integration and routing
 - Owner: AI/ML agents
 
 **Stream 3: Security & Frontend** (Priority: HIGH)
+
 - Issues #18, #19, #20, #21, #22, #23, #24
 - Focus: User-facing features and security
 - Owner: Frontend/Security agents
 
 **Stream 4: Quality** (Priority: MEDIUM - Week 6)
+
 - Issues #25, #26
 - Focus: Testing and documentation
 - Owner: QA/Docs agents
@@ -378,36 +395,44 @@ Based on your 18 specialized agents:
 ### Technical Risks
 
 **Risk 1: CI/CD Pipeline Issues**
+
 - **Mitigation**: Fix CI first before any new development
 - **Action**: Get logs, diagnose, fix linting/tests
 
 **Risk 2: OpenAPI Tool Spec Complexity**
+
 - **Mitigation**: Start with simple tools, iterate
 - **Action**: Use GitHub API as reference implementation
 
 **Risk 3: LLM Provider API Changes**
+
 - **Mitigation**: Abstract provider interface, version pinning
 - **Action**: Follow provider changelogs, implement adapters
 
 **Risk 4: Performance/Cost Overruns**
+
 - **Mitigation**: Early metrics, quotas, circuit breakers
 - **Action**: Implement Issue #16 (tracking) early
 
 **Risk 5: Security Vulnerabilities**
+
 - **Mitigation**: Security-first design, early auditing
 - **Action**: Implement Issue #22 (audit logs) before production
 
 ### Project Risks
 
 **Risk 1: Scope Creep**
+
 - **Mitigation**: Stick to defined issues, no "just one more thing"
 - **Action**: Use project board to track scope
 
 **Risk 2: Dependency Blocking**
+
 - **Mitigation**: Clear dependency graph, parallel streams
 - **Action**: Start independent tasks first
 
 **Risk 3: Testing Delays**
+
 - **Mitigation**: Test as you go, don't save for end
 - **Action**: Each issue includes tests in acceptance criteria
 
@@ -416,19 +441,22 @@ Based on your 18 specialized agents:
 ## Success Metrics
 
 ### Week 2 Checkpoint
+
 - [ ] CI pipeline green
 - [ ] OpenAPI registry functional
 - [ ] At least 5 internal tools defined
 
 ### Week 4 Checkpoint
+
 - [ ] OpenAI and Anthropic providers working
 - [ ] MoE router selecting providers intelligently
 - [ ] Tool calling pipeline executing successfully
 - [ ] At least 1 end-to-end demo working
 
 ### Week 6 Checkpoint (Phase 2 Complete)
+
 - [ ] All 26 issues closed
-- [ ] >80% test coverage
+- [ ] > 80% test coverage
 - [ ] Complete documentation published
 - [ ] Security audit passed
 - [ ] Performance targets met (<200ms routing, <$12/small PR)
@@ -463,6 +491,7 @@ Based on your 18 specialized agents:
 ## Immediate Next Steps
 
 ### 1. Fix CI Pipeline (TODAY)
+
 ```bash
 # Get failed job logs
 gh run view 19198288382 --log-failed
@@ -476,6 +505,7 @@ git push
 ```
 
 ### 2. Create Project Board (TODAY)
+
 ```bash
 # Create GitHub Project board
 gh project create --owner isaacbuz --title "OpenAPI & LLM Integration"
@@ -490,9 +520,11 @@ gh api repos/isaacbuz/SWE/milestones -f title="Epic 1: OpenAPI Tooling" -f due_o
 ```
 
 ### 3. Assign Issues to Agents (TODAY)
+
 Review the agent assignments above and assign issues in GitHub.
 
 ### 4. Kick Off Week 1 (MONDAY)
+
 Start with Epic #1, Issue #7: OpenAPI Tool Registry Foundation.
 
 ---
@@ -500,17 +532,20 @@ Start with Epic #1, Issue #7: OpenAPI Tool Registry Foundation.
 ## Resources & References
 
 ### External Documentation
+
 - [OpenAPI 3.1 Specification](https://spec.openapis.org/oas/v3.1.0)
 - [OpenAI Function Calling](https://platform.openai.com/docs/guides/function-calling)
 - [Anthropic Tool Use](https://docs.anthropic.com/claude/docs/tool-use)
 - [JSON Schema](https://json-schema.org/)
 
 ### Internal Documentation
+
 - [Architecture Overview](/docs/architecture/OVERVIEW.md)
 - [MoE Router Spec](/docs/architecture/MOE_ROUTER.md)
 - [Skills Integration](/docs/architecture/CLAUDE_SKILLS.md)
 
 ### Tools & Libraries
+
 - **OpenAPI**: `openapi3-ts`, `swagger-parser`
 - **Validation**: `ajv`, `zod`
 - **LLM SDKs**: `openai`, `@anthropic-ai/sdk`
@@ -523,6 +558,7 @@ Start with Epic #1, Issue #7: OpenAPI Tool Registry Foundation.
 You have a well-structured roadmap with clear dependencies and 6 weeks to implement a production-ready OpenAPI + LLM Provider Integration system. The foundation from Phase 1 is solid - now it's time to build the intelligence layer.
 
 **Priority Order**:
+
 1. ✅ Fix CI (CRITICAL)
 2. 🔧 Epic #1: OpenAPI Tooling (CRITICAL)
 3. 🤖 Epic #2: LLM Providers (CRITICAL)

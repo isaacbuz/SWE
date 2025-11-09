@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: piehr-ingress
+  namespace: piehr
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "200"
+spec:
+  tls:
+  - hosts:
+    - api.piehr.example.com
+    - piehr.example.com
+    secretName: piehr-tls-secret
+  rules:
+  - host: api.piehr.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api
+            port:
+              number: 80
+  - host: piehr.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web
+            port:
+              number: 80
+

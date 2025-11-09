@@ -1,0 +1,68 @@
+---
+# Let's Encrypt Production ClusterIssuer
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@piehr.example.com  # Replace with your email
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+
+---
+# Let's Encrypt Staging ClusterIssuer (for testing)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: admin@piehr.example.com  # Replace with your email
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+
+---
+# Certificate for production domains
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: piehr-tls-cert
+  namespace: piehr
+spec:
+  secretName: piehr-tls-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - api.piehr.example.com
+    - piehr.example.com
+  commonName: piehr.example.com
+
+---
+# Certificate for staging domains
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: piehr-staging-tls-cert
+  namespace: piehr-staging
+spec:
+  secretName: piehr-staging-tls-secret
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+    - api-staging.piehr.example.com
+    - staging.piehr.example.com
+  commonName: staging.piehr.example.com
+

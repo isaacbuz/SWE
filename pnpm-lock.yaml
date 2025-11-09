@@ -12,7 +12,7 @@ importers:
         specifier: ^1.11.2
         version: 1.13.4(@types/node@20.19.24)(typescript@5.9.3)
       prettier:
-        specifier: ^3.1.1
+        specifier: ^3.6.2
         version: 3.6.2
       turbo:
         specifier: ^1.11.2

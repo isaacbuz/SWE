@@ -1,34 +1,36 @@
-'use client'
+"use client";
 
-import { Search, Trash2, Zap, Clock } from 'lucide-react'
-import Link from 'next/link'
-import { useInstalledSkills, useUninstallSkill } from '@/lib/hooks/use-skills'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { useState } from 'react'
+import { Search, Trash2, Zap, Clock } from "lucide-react";
+import Link from "next/link";
+import { useInstalledSkills, useUninstallSkill } from "@/lib/hooks/use-skills";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 export default function InstalledSkillsPage() {
-  const [search, setSearch] = useState('')
-  const { data: installedSkills, isLoading } = useInstalledSkills()
-  const uninstallSkill = useUninstallSkill()
+  const [search, setSearch] = useState("");
+  const { data: installedSkills, isLoading } = useInstalledSkills();
+  const uninstallSkill = useUninstallSkill();
 
   const filteredSkills = installedSkills?.filter((skill) =>
-    skill.skill_id.toLowerCase().includes(search.toLowerCase())
-  )
+    skill.skill_id.toLowerCase().includes(search.toLowerCase()),
+  );
 
   const handleUninstall = (skillId: string) => {
-    if (confirm('Are you sure you want to uninstall this skill?')) {
-      uninstallSkill.mutate(skillId)
+    if (confirm("Are you sure you want to uninstall this skill?")) {
+      uninstallSkill.mutate(skillId);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-ink-primary">Installed Skills</h1>
+        <h1 className="text-3xl font-bold text-ink-primary">
+          Installed Skills
+        </h1>
         <p className="mt-2 text-ink-secondary">
           Manage your installed Skills and view usage statistics
         </p>
@@ -50,7 +52,10 @@ export default function InstalledSkillsPage() {
       {isLoading && (
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-32 animate-pulse rounded-lg bg-surface-secondary" />
+            <div
+              key={i}
+              className="h-32 animate-pulse rounded-lg bg-surface-secondary"
+            />
           ))}
         </div>
       )}
@@ -61,13 +66,17 @@ export default function InstalledSkillsPage() {
             <Card className="p-12 text-center">
               {installedSkills.length === 0 ? (
                 <>
-                  <p className="text-ink-secondary">You haven&apos;t installed any skills yet.</p>
+                  <p className="text-ink-secondary">
+                    You haven&apos;t installed any skills yet.
+                  </p>
                   <Link href="/skills">
                     <Button className="mt-4">Browse Marketplace</Button>
                   </Link>
                 </>
               ) : (
-                <p className="text-ink-secondary">No skills match your search.</p>
+                <p className="text-ink-secondary">
+                  No skills match your search.
+                </p>
               )}
             </Card>
           ) : (
@@ -102,13 +111,19 @@ export default function InstalledSkillsPage() {
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
                             <span>
-                              Last used {new Date(installation.last_used_at).toLocaleDateString()}
+                              Last used{" "}
+                              {new Date(
+                                installation.last_used_at,
+                              ).toLocaleDateString()}
                             </span>
                           </div>
                         )}
                         <div className="flex items-center gap-1">
                           <span>
-                            Installed {new Date(installation.installed_at).toLocaleDateString()}
+                            Installed{" "}
+                            {new Date(
+                              installation.installed_at,
+                            ).toLocaleDateString()}
                           </span>
                         </div>
                         {installation.auto_update && (
@@ -142,6 +157,5 @@ export default function InstalledSkillsPage() {
         </>
       )}
     </div>
-  )
+  );
 }
-

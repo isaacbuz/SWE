@@ -34,16 +34,19 @@ Open [http://localhost:3000](http://localhost:3000)
 ## Try It Out
 
 ### Command Palette
+
 - Press `⌘K` (or `Ctrl+K`)
 - Type "spec" or "review"
 - Use arrow keys, press Enter
 
 ### AI Dock
+
 - Press `⌘/` (or `Ctrl+/`)
 - Click through tabs
 - Try suggestions
 
 ### Keyboard Shortcuts
+
 - `⌘K` - Command Palette
 - `⌘/` - AI Dock
 - `Escape` - Close

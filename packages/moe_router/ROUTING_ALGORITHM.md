@@ -31,6 +31,7 @@ OUTPUT: List of capable models
 ```
 
 **Example:**
+
 ```
 Request: Code generation, quality >= 0.8, budget <= $0.005
 18 models → Filter by enabled (18)

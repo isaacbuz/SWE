@@ -7,17 +7,17 @@ export class MockWebSocket {
     this.url = url;
     setTimeout(() => {
       this.readyState = WebSocket.OPEN;
-      this.trigger('open', {});
+      this.trigger("open", {});
     }, 0);
   }
 
   public send(data: string | ArrayBufferLike | Blob | ArrayBufferView) {
     if (this.readyState !== WebSocket.OPEN) {
-      throw new Error('WebSocket is not open');
+      throw new Error("WebSocket is not open");
     }
     // Echo back for testing
     setTimeout(() => {
-      this.trigger('message', { data });
+      this.trigger("message", { data });
     }, 0);
   }
 
@@ -25,7 +25,7 @@ export class MockWebSocket {
     this.readyState = WebSocket.CLOSING;
     setTimeout(() => {
       this.readyState = WebSocket.CLOSED;
-      this.trigger('close', { code, reason });
+      this.trigger("close", { code, reason });
     }, 0);
   }
 
@@ -52,18 +52,18 @@ export class MockWebSocket {
 
   // Helper methods for testing
   public simulateMessage(data: any) {
-    this.trigger('message', { data: JSON.stringify(data) });
+    this.trigger("message", { data: JSON.stringify(data) });
   }
 
   public simulateError(error: Error) {
-    this.trigger('error', error);
+    this.trigger("error", error);
   }
 
-  public simulateClose(code: number = 1000, reason: string = 'Normal closure') {
+  public simulateClose(code: number = 1000, reason: string = "Normal closure") {
     this.close(code, reason);
   }
 }
 
-export const createMockWebSocket = (url: string = 'ws://localhost:8000') => {
+export const createMockWebSocket = (url: string = "ws://localhost:8000") => {
   return new MockWebSocket(url);
 };

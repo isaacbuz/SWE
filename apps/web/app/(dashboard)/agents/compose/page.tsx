@@ -1,81 +1,87 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { WizardSteps } from '@/components/wizard/wizard-steps'
-import { WizardNavigation } from '@/components/wizard/wizard-navigation'
-import { mockAgents } from '@/lib/api/mock-data'
-import { Rocket, Wrench, Bug, CheckCircle } from 'lucide-react'
-import { useState } from 'react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { WizardSteps } from "@/components/wizard/wizard-steps";
+import { WizardNavigation } from "@/components/wizard/wizard-navigation";
+import { mockAgents } from "@/lib/api/mock-data";
+import { Rocket, Wrench, Bug, CheckCircle } from "lucide-react";
+import { useState } from "react";
 
 const steps = [
-  { id: '1', title: 'Select Goal', description: 'Choose your objective' },
-  { id: '2', title: 'Choose Agents', description: 'Pick your team' },
-  { id: '3', title: 'Configure', description: 'Set parameters' },
-  { id: '4', title: 'Review & Launch', description: 'Final review' },
-]
+  { id: "1", title: "Select Goal", description: "Choose your objective" },
+  { id: "2", title: "Choose Agents", description: "Pick your team" },
+  { id: "3", title: "Configure", description: "Set parameters" },
+  { id: "4", title: "Review & Launch", description: "Final review" },
+];
 
 const goals = [
   {
-    id: 'mvp',
+    id: "mvp",
     icon: <Rocket className="w-8 h-8" />,
-    title: 'Ship MVP',
-    description: 'Plan, design, implement, test, deploy',
+    title: "Ship MVP",
+    description: "Plan, design, implement, test, deploy",
   },
   {
-    id: 'refactor',
+    id: "refactor",
     icon: <Wrench className="w-8 h-8" />,
-    title: 'Refactor Legacy',
-    description: 'Analyze, plan migration, incremental updates',
+    title: "Refactor Legacy",
+    description: "Analyze, plan migration, incremental updates",
   },
   {
-    id: 'incident',
+    id: "incident",
     icon: <Bug className="w-8 h-8" />,
-    title: 'Fix Incident',
-    description: 'Diagnose, patch, test, deploy hotfix',
+    title: "Fix Incident",
+    description: "Diagnose, patch, test, deploy hotfix",
   },
-]
+];
 
 export default function CrewComposerPage() {
-  const [currentStep, setCurrentStep] = useState(1)
-  const [selectedGoal, setSelectedGoal] = useState<string | null>(null)
-  const [selectedAgents, setSelectedAgents] = useState<string[]>([])
-  const [budget, setBudget] = useState(50)
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
+  const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
+  const [budget, setBudget] = useState(50);
 
   const handleNext = () => {
     if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1)
+      setCurrentStep(currentStep + 1);
     }
-  }
+  };
 
   const handleBack = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
+      setCurrentStep(currentStep - 1);
     }
-  }
+  };
 
   const handleComplete = () => {
-    console.log('Launching crew...', {
+    console.log("Launching crew...", {
       goal: selectedGoal,
       agents: selectedAgents,
       budget,
-    })
-  }
+    });
+  };
 
   const toggleAgent = (agentId: string) => {
     setSelectedAgents((prev) =>
       prev.includes(agentId)
         ? prev.filter((id) => id !== agentId)
-        : [...prev, agentId]
-    )
-  }
+        : [...prev, agentId],
+    );
+  };
 
   const canGoNext = () => {
-    if (currentStep === 1) return selectedGoal !== null
-    if (currentStep === 2) return selectedAgents.length > 0
-    return true
-  }
+    if (currentStep === 1) return selectedGoal !== null;
+    if (currentStep === 2) return selectedAgents.length > 0;
+    return true;
+  };
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -94,7 +100,9 @@ export default function CrewComposerPage() {
       <Card>
         <CardHeader>
           <CardTitle>{steps[currentStep - 1].title}</CardTitle>
-          <CardDescription>{steps[currentStep - 1].description}</CardDescription>
+          <CardDescription>
+            {steps[currentStep - 1].description}
+          </CardDescription>
         </CardHeader>
         <CardContent className="min-h-[400px]">
           {/* Step 1: Select Goal */}
@@ -105,8 +113,8 @@ export default function CrewComposerPage() {
                   key={goal.id}
                   className={`cursor-pointer transition-all ${
                     selectedGoal === goal.id
-                      ? 'ring-2 ring-primary bg-primary/5'
-                      : 'hover:shadow-md'
+                      ? "ring-2 ring-primary bg-primary/5"
+                      : "hover:shadow-md"
                   }`}
                   onClick={() => setSelectedGoal(goal.id)}
                 >
@@ -128,17 +136,19 @@ export default function CrewComposerPage() {
                   key={agent.id}
                   className={`cursor-pointer transition-all ${
                     selectedAgents.includes(agent.id)
-                      ? 'ring-2 ring-primary bg-primary/5'
-                      : 'hover:shadow-md'
+                      ? "ring-2 ring-primary bg-primary/5"
+                      : "hover:shadow-md"
                   }`}
                   onClick={() => toggleAgent(agent.id)}
                 >
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3 flex-1">
-                        <div className="text-2xl">{agent.avatar || '🤖'}</div>
+                        <div className="text-2xl">{agent.avatar || "🤖"}</div>
                         <div>
-                          <CardTitle className="text-base">{agent.name}</CardTitle>
+                          <CardTitle className="text-base">
+                            {agent.name}
+                          </CardTitle>
                           <CardDescription className="text-xs">
                             {agent.role}
                           </CardDescription>
@@ -152,7 +162,11 @@ export default function CrewComposerPage() {
                   <CardContent>
                     <div className="flex flex-wrap gap-1">
                       {agent.skills.slice(0, 2).map((skill) => (
-                        <Badge key={skill} variant="outline" className="text-xs">
+                        <Badge
+                          key={skill}
+                          variant="outline"
+                          className="text-xs"
+                        >
                           {skill}
                         </Badge>
                       ))}
@@ -214,27 +228,37 @@ export default function CrewComposerPage() {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {selectedAgents.map((agentId) => {
-                        const agent = mockAgents.find((a) => a.id === agentId)
+                        const agent = mockAgents.find((a) => a.id === agentId);
                         return (
                           <Badge key={agentId} variant="secondary">
                             {agent?.name}
                           </Badge>
-                        )
+                        );
                       })}
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-4 pt-4 border-t">
                     <div>
-                      <div className="text-sm text-muted-foreground">Est. Cost</div>
-                      <div className="text-xl font-bold">${budget - 8} - ${budget + 8}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Est. Cost
+                      </div>
+                      <div className="text-xl font-bold">
+                        ${budget - 8} - ${budget + 8}
+                      </div>
                     </div>
                     <div>
-                      <div className="text-sm text-muted-foreground">Est. Time</div>
+                      <div className="text-sm text-muted-foreground">
+                        Est. Time
+                      </div>
                       <div className="text-xl font-bold">2-3 hours</div>
                     </div>
                     <div>
-                      <div className="text-sm text-muted-foreground">Agents</div>
-                      <div className="text-xl font-bold">{selectedAgents.length}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Agents
+                      </div>
+                      <div className="text-xl font-bold">
+                        {selectedAgents.length}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -255,5 +279,5 @@ export default function CrewComposerPage() {
         </div>
       </Card>
     </div>
-  )
+  );
 }

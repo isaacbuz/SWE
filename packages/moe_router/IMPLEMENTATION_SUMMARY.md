@@ -42,6 +42,7 @@ packages/moe_router/
 **Main Class**: `MoERouter`
 
 **Key Methods**:
+
 - `select_model(request)` - Main routing logic with multi-stage algorithm
 - `_filter_available_models()` - Filter by capabilities and requirements
 - `_score_models()` - Multi-factor scoring (0-100 points)
@@ -50,6 +51,7 @@ packages/moe_router/
 - `get_routing_stats()` - Analytics and reporting
 
 **Features**:
+
 - 7-factor scoring algorithm
 - Circuit breaker protection
 - Fallback logic
@@ -61,6 +63,7 @@ packages/moe_router/
 ### 2. Data Models (`models.py`)
 
 **Key Classes**:
+
 - `ModelDefinition` - Model configuration and metadata
 - `RoutingRequest` - Request with requirements
 - `RoutingDecision` - Selection result with evidence
@@ -71,6 +74,7 @@ packages/moe_router/
 - `CircuitBreakerState` - Circuit breaker state
 
 **Enums**:
+
 - `TaskType` (12 types)
 - `Provider` (5 providers)
 - `ModelCapability` (8 capabilities)
@@ -82,6 +86,7 @@ packages/moe_router/
 **Main Class**: `CostPredictor`
 
 **Features**:
+
 - Token estimation from task description
 - Task-type specific multipliers
 - Cost range prediction (min/max/expected)
@@ -90,6 +95,7 @@ packages/moe_router/
 - Cost comparison across models
 
 **Key Methods**:
+
 - `estimate_tokens_from_description()` - Smart token estimation
 - `predict_cost()` - Cost prediction for model+request
 - `filter_by_budget()` - Budget constraint filtering
@@ -102,6 +108,7 @@ packages/moe_router/
 **Main Class**: `PerformanceTracker`
 
 **Features**:
+
 - Redis-backed storage (with in-memory fallback)
 - Success/failure rate tracking
 - Exponential moving averages
@@ -110,6 +117,7 @@ packages/moe_router/
 - Aggregate statistics
 
 **Key Methods**:
+
 - `record_request()` - Record request outcome
 - `get_metrics()` - Retrieve performance metrics
 - `calculate_confidence_score()` - Sample size + recency
@@ -118,6 +126,7 @@ packages/moe_router/
 - `record_feedback()` - Feedback integration
 
 **Storage**:
+
 - Redis with 30-day TTL
 - Namespace: `moe:perf`
 - Keys: `{namespace}:{model_id}:{task_type}`
@@ -129,6 +138,7 @@ packages/moe_router/
 **Main Class**: `HybridRouter`
 
 **Features**:
+
 - Parallel model execution
 - Consensus mechanisms (4 strategies)
 - Judge model selection
@@ -136,12 +146,14 @@ packages/moe_router/
 - Vendor diversity optimization
 
 **Consensus Strategies**:
+
 - `JUDGE` - Judge model evaluates outputs
 - `QUALITY_WEIGHTED` - Highest quality model wins
 - `VOTING` - Majority voting
 - `FIRST_SUCCESS` - First successful response
 
 **Key Methods**:
+
 - `should_use_parallel()` - Parallel execution decision
 - `select_parallel_models()` - Select diverse models
 - `select_judge_model()` - Judge selection
@@ -150,6 +162,7 @@ packages/moe_router/
 - `calculate_cost_quality_tradeoff()` - Analysis
 
 **Parallel Triggers**:
+
 - Critical tasks (security, review, planning, reasoning)
 - High quality requirement (≥0.9) + budget (≥$0.05)
 - Explicit request
@@ -162,6 +175,7 @@ packages/moe_router/
 **Main Class**: `LearningLoop`
 
 **Features**:
+
 - Feedback collection and scoring
 - A/B testing framework
 - Continuous weight updates
@@ -169,6 +183,7 @@ packages/moe_router/
 - Metrics export
 
 **Feedback Scoring**:
+
 - Outcome weights (success=1.0, partial=0.5, failure=0.0)
 - Quality score integration
 - PR merged bonus (+0.2)
@@ -176,12 +191,14 @@ packages/moe_router/
 - User rating normalization (1-5 → 0-1)
 
 **A/B Testing**:
+
 - Traffic splitting
 - Statistical comparison
 - Automatic winner determination
 - Minimum sample requirements
 
 **Key Methods**:
+
 - `collect_feedback()` - Process feedback
 - `get_model_weight()` - Learned weight (0-1)
 - `start_ab_test()` - Initialize A/B test
@@ -198,11 +215,13 @@ packages/moe_router/
 **18 Models Across 5 Providers**:
 
 #### Anthropic (3 models)
+
 - `claude-opus-4` - Highest quality (0.98), $0.015/$0.075 per 1k
 - `claude-sonnet-4` - Balanced (0.95), $0.003/$0.015 per 1k
 - `claude-haiku-4` - Fast & cheap (0.80), $0.00025/$0.00125 per 1k
 
 #### OpenAI (5 models)
+
 - `gpt-5` - Premium (0.94), $0.005/$0.020 per 1k
 - `gpt-4o` - Fast multimodal (0.92), $0.0025/$0.010 per 1k
 - `gpt-4o-mini` - Budget (0.82), $0.00015/$0.00060 per 1k
@@ -210,21 +229,25 @@ packages/moe_router/
 - `o1-mini` - Good reasoning (0.90), $0.003/$0.012 per 1k
 
 #### Google (3 models)
+
 - `gemini-2.0-flash-thinking` - FREE, experimental, 1M context
 - `gemini-pro-1.5` - 2M context (0.89), $0.00125/$0.00500 per 1k
 - `gemini-flash-1.5` - 1M context (0.81), $0.000075/$0.000300 per 1k
 
 #### Mistral (2 models)
+
 - `mistral-large-2` - European (0.87), $0.002/$0.006 per 1k
 - `mistral-small-2` - Budget European (0.78), $0.0002/$0.0006 per 1k
 
 #### Cohere (2 models)
+
 - `command-r-plus` - RAG-optimized (0.86), $0.0025/$0.0100 per 1k
 - `command-r` - Budget RAG (0.79), $0.0005/$0.0015 per 1k
 
 ### Task Preferences
 
 Optimized model selections for 12 task types:
+
 - Code Generation, Code Review, Testing, Refactoring
 - Reasoning, Planning, Analysis
 - Security Audit
@@ -234,6 +257,7 @@ Optimized model selections for 12 task types:
 - Long Context
 
 Each task type has:
+
 - **Preferred models** - Highest quality recommendations
 - **Budget models** - Cost-effective alternatives
 
@@ -244,6 +268,7 @@ Each task type has:
 ### Multi-Stage Selection
 
 **Stage 1: Filtering**
+
 - Enabled models only
 - Circuit breaker check
 - Quality threshold
@@ -253,6 +278,7 @@ Each task type has:
 - Budget constraints
 
 **Stage 2: Scoring (0-100 points)**
+
 1. Quality Score (0-50 pts) - Base model quality
 2. Cost Efficiency (0-20 pts) - Cost per token optimization
 3. Performance History (0-15 pts) - Success rate with decay
@@ -262,10 +288,12 @@ Each task type has:
 7. Vendor Preference (0-2 pts) - User-specified provider
 
 **Stage 3: Selection**
+
 - Standard: Top scoring model + 3 fallbacks
 - Parallel: 3 diverse models + judge model
 
 **Stage 4: Evidence**
+
 - Complete audit trail
 - Source attribution
 - Weight scoring
@@ -274,12 +302,14 @@ Each task type has:
 ### Parallel Execution
 
 **When Triggered**:
+
 - Critical tasks (security_audit, code_review, planning, reasoning)
 - High quality requirement (≥0.9) with budget (≥$0.05)
 - Explicit parallel flag
 - Critical metadata flag
 
 **Process**:
+
 1. Select 3 diverse models (prefer different providers)
 2. Select judge model (high quality, not in parallel set)
 3. Execute all in parallel with timeout
@@ -289,6 +319,7 @@ Each task type has:
 ## Example Flows
 
 ### Example 1: Budget Code Generation
+
 ```
 Request: CODE_GENERATION, budget=$0.001
 Result: claude-haiku-4
@@ -297,6 +328,7 @@ Rationale: Cheapest capable model, 74.7/100 score
 ```
 
 ### Example 2: High-Quality Reasoning
+
 ```
 Request: REASONING, quality≥0.95, budget=$0.15
 Result: claude-opus-4
@@ -305,6 +337,7 @@ Rationale: Highest quality for reasoning, 87.7/100 score
 ```
 
 ### Example 3: Parallel Security Audit
+
 ```
 Request: SECURITY_AUDIT, quality≥0.95, parallel=True
 Result: [claude-opus-4, o1, claude-sonnet-4] + judge(gpt-5)
@@ -313,6 +346,7 @@ Rationale: Critical task, 3-model consensus with judge
 ```
 
 ### Example 4: Long Context
+
 ```
 Request: LONG_CONTEXT, context=150k tokens
 Result: gemini-pro-1.5
@@ -321,6 +355,7 @@ Rationale: 2M context window, preferred for long context
 ```
 
 ### Example 5: Fast Multimodal
+
 ```
 Request: MULTIMODAL, vision=True, latency<3s
 Result: claude-sonnet-4
@@ -331,23 +366,27 @@ Rationale: Vision support, 800ms P50 latency, high quality
 ## Technical Features
 
 ### Circuit Breaker
+
 - **States**: Closed → Open (5 failures) → Half-Open (60s) → Closed
 - **Protection**: Provider-level failure isolation
 - **Recovery**: Automatic retry with exponential backoff
 
 ### Performance Tracking
+
 - **Storage**: Redis with 30-day TTL (fallback: in-memory)
 - **Metrics**: Success rate, latency, cost, quality
 - **Decay**: Half-life of 1 week for time-based relevance
 - **Confidence**: Sample size × recency decay
 
 ### Learning Loop
+
 - **Feedback**: PR outcomes, user ratings, quality scores
 - **Updates**: Exponential moving average (α=0.1)
 - **A/B Testing**: Statistical comparison, automatic winners
 - **Analytics**: Comprehensive reporting and exports
 
 ### Cost Prediction
+
 - **Token Estimation**: Word count + task multipliers
 - **Variance**: ±30% range
 - **Validation**: Budget constraint checking
@@ -457,11 +496,13 @@ router.learning_loop.collect_feedback(feedback)
 ## Testing
 
 Run comprehensive examples:
+
 ```bash
 python examples.py
 ```
 
 Expected output:
+
 - 10 detailed examples
 - Algorithm description
 - Selection flows
@@ -496,6 +537,7 @@ Expected output:
 ## Contact & Support
 
 For questions or issues, refer to:
+
 - README.md for usage documentation
 - ROUTING_ALGORITHM.md for algorithm details
 - examples.py for code examples

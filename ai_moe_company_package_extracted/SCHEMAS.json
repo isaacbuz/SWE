@@ -2,18 +2,14 @@
   "SystemSpec": {
     "title": "string",
     "summary": "string",
-    "non_functional_reqs": [
-      "string"
-    ],
+    "non_functional_reqs": ["string"],
     "architectural_style": "string",
     "tech_choices": [
       {
         "area": "string",
         "choice": "string",
         "why": "string",
-        "evidence_ids": [
-          "string"
-        ]
+        "evidence_ids": ["string"]
       }
     ],
     "apis_needed": [
@@ -26,23 +22,17 @@
     "security": {
       "auth": "string",
       "secrets": "string",
-      "threats": [
-        "string"
-      ]
+      "threats": ["string"]
     },
     "deployment": {
       "target": "string",
-      "environments": [
-        "string"
-      ]
+      "environments": ["string"]
     },
     "acceptance_tests": [
       {
         "id": "string",
         "desc": "string",
-        "criteria": [
-          "string"
-        ]
+        "criteria": ["string"]
       }
     ],
     "risks": [
@@ -57,15 +47,9 @@
     "id": "string",
     "title": "string",
     "type": "feature|chore|doc|security",
-    "files_touched": [
-      "string"
-    ],
-    "acceptance_criteria": [
-      "string"
-    ],
-    "dependencies": [
-      "string"
-    ],
+    "files_touched": ["string"],
+    "acceptance_criteria": ["string"],
+    "dependencies": ["string"],
     "estimate_hours": "number"
   },
   "PolicyFacts": {
@@ -112,15 +96,9 @@
     "title": "string",
     "body": "string",
     "links": {
-      "issues": [
-        "string"
-      ],
-      "evidence": [
-        "string"
-      ]
+      "issues": ["string"],
+      "evidence": ["string"]
     },
-    "labels": [
-      "string"
-    ]
+    "labels": ["string"]
   }
 }

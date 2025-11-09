@@ -110,7 +110,7 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", 
 **docker-compose.yml**:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   api:
@@ -238,45 +238,45 @@ spec:
         app: swe-api
     spec:
       containers:
-      - name: api
-        image: swe-agent/api:latest
-        ports:
-        - containerPort: 8000
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: swe-api-secrets
-              key: database-url
-        - name: REDIS_URL
-          valueFrom:
-            secretKeyRef:
-              name: swe-api-secrets
-              key: redis-url
-        - name: JWT_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: swe-api-secrets
-              key: jwt-secret
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: api
+          image: swe-agent/api:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: swe-api-secrets
+                  key: database-url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: swe-api-secrets
+                  key: redis-url
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: swe-api-secrets
+                  key: jwt-secret
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ---
 apiVersion: v1
 kind: Service
@@ -286,9 +286,9 @@ spec:
   selector:
     app: swe-api
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8000
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
   type: LoadBalancer
 ```
 
@@ -609,6 +609,7 @@ alembic current
 ## Support
 
 For issues, check:
+
 1. Application logs
 2. Database logs
 3. Redis logs

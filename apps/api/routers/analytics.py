@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 
 from auth import get_current_active_user, require_user, CurrentUser
 from middleware import limiter
+from services.analytics import analytics_service
 
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
@@ -118,19 +119,8 @@ async def get_dashboard_metrics(
 
     Returns aggregated metrics across all user's projects.
     """
-    # TODO: Query aggregated metrics from database
-    # TODO: Fetch recent activity
-    # TODO: Return dashboard metrics
-
-    return DashboardMetrics(
-        total_projects=0,
-        total_issues=0,
-        resolved_issues=0,
-        total_prs=0,
-        reviewed_prs=0,
-        active_agents=0,
-        recent_activity=[]
-    )
+    metrics = await analytics_service.get_dashboard_metrics(current_user.id)
+    return DashboardMetrics(**metrics)
 
 
 @router.get(
@@ -148,15 +138,8 @@ async def get_project_metrics(
 
     - **project_id**: Project UUID
     """
-    # TODO: Verify user has access to project
-    # TODO: Query project metrics from database
-    # TODO: Calculate averages and scores
-    # TODO: Return project metrics
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Project {project_id} not found"
-    )
+    metrics = await analytics_service.get_project_metrics(project_id, current_user.id)
+    return ProjectMetrics(**metrics)
 
 
 @router.get(
@@ -174,15 +157,8 @@ async def get_agent_metrics(
 
     - **agent_id**: Agent UUID
     """
-    # TODO: Verify user has access to agent
-    # TODO: Query agent metrics from database
-    # TODO: Calculate success rate and averages
-    # TODO: Return agent metrics
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
-    )
+    metrics = await analytics_service.get_agent_metrics(agent_id, current_user.id)
+    return AgentMetrics(**metrics)
 
 
 @router.get(
@@ -204,20 +180,13 @@ async def get_metric_timeseries(
     - **time_range**: Time range for data
     - **project_id**: Optional project filter
     """
-    # TODO: Query time series data from database
-    # TODO: Apply project filter if provided
-    # TODO: Calculate aggregates
-    # TODO: Return metric series
-
-    return MetricSeries(
-        metric_type=metric_type,
-        time_range=time_range,
-        data=[],
-        total=0.0,
-        average=0.0,
-        min=0.0,
-        max=0.0
+    series = await analytics_service.get_timeseries_metrics(
+        metric_type=metric_type.value,
+        time_range=time_range.value,
+        user_id=current_user.id,
+        project_id=project_id
     )
+    return MetricSeries(**series)
 
 
 @router.get(
@@ -234,17 +203,11 @@ async def get_performance_metrics(
 
     Requires admin role for detailed metrics.
     """
-    # TODO: Check if user is admin for detailed metrics
-    # TODO: Query performance metrics from monitoring system
-    # TODO: Return performance metrics
-
+    metrics = await analytics_service.get_performance_metrics(current_user.id)
     return PerformanceMetrics(
-        avg_response_time_ms=0.0,
-        requests_per_minute=0.0,
-        error_rate=0.0,
-        active_users=0,
-        database_connections=0,
-        cache_hit_rate=0.0
+        **metrics,
+        database_connections=0,  # Would come from connection pool stats
+        cache_hit_rate=0.0  # Would come from Redis stats
     )
 
 
@@ -300,9 +263,9 @@ async def record_analytics_event(
     - **event_data**: Event metadata
     - **project_id**: Optional associated project
     """
-    # TODO: Validate event data
-    # TODO: Store event in analytics database
-    # TODO: Update relevant metrics
-    # TODO: Return acknowledgment
-
+    await analytics_service.record_event(
+        event_type=event_type,
+        event_data=event_data,
+        user_id=current_user.id
+    )
     return {"status": "accepted", "message": "Event recorded"}

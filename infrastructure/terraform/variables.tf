@@ -119,3 +119,32 @@ variable "kube_namespace" {
   type        = string
   default     = "default"
 }
+
+variable "dns_zone_name" {
+  description = "DNS zone name (e.g., piehr.example.com)"
+  type        = string
+  default     = "piehr.example.com"
+}
+
+variable "alert_email" {
+  description = "Email address for alerts"
+  type        = string
+}
+
+variable "blocked_ip_ranges" {
+  description = "List of IP ranges to block"
+  type        = list(string)
+  default     = []
+}
+
+variable "enable_multi_region" {
+  description = "Enable multi-region deployment"
+  type        = bool
+  default     = false
+}
+
+variable "secondary_region" {
+  description = "Secondary region for multi-region deployment"
+  type        = string
+  default     = "us-east1"
+}

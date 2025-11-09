@@ -1,4 +1,3 @@
-
 # AI Dev Team — Mixture-of-Experts (MoE) Platform (v4)
 
 This repository scaffolds a **platform-leveraging AI software development team** that uses a **Mixture of Experts (MoE)** router to pick the best model for each role and phase, integrates with **GitHub** for PM/PR/CI, and is designed to plug in **MCP servers** as tool backends.
@@ -8,4 +7,4 @@ This repository scaffolds a **platform-leveraging AI software development team**
 - MCP tool plan in `config/mcp_tools.yaml` + docs.
 - Quality gates and GitHub automation stubs.
 
-> Generated 2025-11-08 15:08:34 
+> Generated 2025-11-08 15:08:34

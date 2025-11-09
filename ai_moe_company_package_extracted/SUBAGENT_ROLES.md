@@ -1,4 +1,5 @@
 # Claude Sub‑Agents (Roles)
+
 - **ceo_agent** — policy/tie‑breaks/synthesis, owns deliverable integrity.
 - **api_facts_agent** — queries gov endpoints; outputs `PolicyFacts` with `Evidence` metadata.
 - **google_agent** — reads Sheets/Drive; maps rows to spec inputs.

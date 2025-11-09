@@ -13,7 +13,9 @@ export default function SettingsPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-ink-primary">Settings</h1>
-        <p className="mt-2 text-ink-secondary">Manage your account and preferences</p>
+        <p className="mt-2 text-ink-secondary">
+          Manage your account and preferences
+        </p>
       </div>
 
       {/* Tabs */}
@@ -22,7 +24,12 @@ export default function SettingsPage() {
           {tabs.map((tab, index) => (
             <button
               key={tab}
-              className={"pb-4 text-sm font-medium transition-colors " + (index === 2 ? "border-b-2 border-brand-primary text-brand-primary" : "text-ink-tertiary hover:text-ink-secondary")}
+              className={
+                "pb-4 text-sm font-medium transition-colors " +
+                (index === 2
+                  ? "border-b-2 border-brand-primary text-brand-primary"
+                  : "text-ink-tertiary hover:text-ink-secondary")
+              }
             >
               {tab}
             </button>
@@ -65,7 +72,8 @@ export default function SettingsPage() {
 
         <div className="rounded-lg border border-border-default bg-surface-secondary p-4">
           <p className="text-sm text-ink-secondary">
-            Current theme: <strong className="text-ink-primary">{resolvedTheme}</strong>
+            Current theme:{" "}
+            <strong className="text-ink-primary">{resolvedTheme}</strong>
           </p>
         </div>
 
@@ -78,8 +86,12 @@ export default function SettingsPage() {
           <div className="mt-4 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-ink-primary">Compact mode</p>
-                <p className="text-xs text-ink-tertiary">Show more content on screen</p>
+                <p className="text-sm font-medium text-ink-primary">
+                  Compact mode
+                </p>
+                <p className="text-xs text-ink-tertiary">
+                  Show more content on screen
+                </p>
               </div>
               <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-surface-tertiary transition-colors hover:bg-border-default">
                 <span className="inline-block h-4 w-4 translate-x-1 transform rounded-full bg-white shadow-e1 transition-transform" />
@@ -88,8 +100,12 @@ export default function SettingsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-ink-primary">Animations</p>
-                <p className="text-xs text-ink-tertiary">Enable interface animations</p>
+                <p className="text-sm font-medium text-ink-primary">
+                  Animations
+                </p>
+                <p className="text-xs text-ink-tertiary">
+                  Enable interface animations
+                </p>
               </div>
               <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-brand-primary transition-colors">
                 <span className="inline-block h-4 w-4 translate-x-6 transform rounded-full bg-white shadow-e1 transition-transform" />
@@ -127,18 +143,35 @@ function ThemeOption({
   return (
     <button
       onClick={onClick}
-      className={"relative flex flex-col items-center gap-3 rounded-lg border p-6 transition-all " + (active ? "border-brand-primary bg-brand-primary/5" : "border-border-default bg-surface-secondary hover:border-brand-primary/50")}
+      className={
+        "relative flex flex-col items-center gap-3 rounded-lg border p-6 transition-all " +
+        (active
+          ? "border-brand-primary bg-brand-primary/5"
+          : "border-border-default bg-surface-secondary hover:border-brand-primary/50")
+      }
     >
       {active && (
         <div className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-brand-primary text-white">
           <Check className="h-3 w-3" />
         </div>
       )}
-      <div className={"flex h-10 w-10 items-center justify-center rounded-full " + (active ? "bg-brand-primary/10 text-brand-primary" : "bg-surface-tertiary text-ink-tertiary")}>
+      <div
+        className={
+          "flex h-10 w-10 items-center justify-center rounded-full " +
+          (active
+            ? "bg-brand-primary/10 text-brand-primary"
+            : "bg-surface-tertiary text-ink-tertiary")
+        }
+      >
         {icon}
       </div>
       <div className="text-center">
-        <p className={"text-sm font-medium " + (active ? "text-brand-primary" : "text-ink-primary")}>
+        <p
+          className={
+            "text-sm font-medium " +
+            (active ? "text-brand-primary" : "text-ink-primary")
+          }
+        >
           {label}
         </p>
         <p className="text-xs text-ink-tertiary">{description}</p>

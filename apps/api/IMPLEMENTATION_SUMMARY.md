@@ -57,6 +57,7 @@ apps/api/
 ### ✅ 2. FastAPI Application (`main.py`)
 
 **Features Implemented**:
+
 - ✅ FastAPI app initialization with lifespan management
 - ✅ CORS middleware configuration
 - ✅ Rate limiting middleware
@@ -94,6 +95,7 @@ async def health_check() -> Dict[str, Any]
 ### ✅ 3. Configuration (`config.py`)
 
 **Implemented with Pydantic Settings**:
+
 - ✅ Environment variable loading
 - ✅ Type validation
 - ✅ Default values
@@ -108,6 +110,7 @@ async def health_check() -> Dict[str, Any]
 - ✅ Feature flags
 
 **Settings Categories**:
+
 1. Application settings (name, version, environment)
 2. Server settings (host, port, workers)
 3. API settings (prefix, docs URLs)
@@ -122,16 +125,19 @@ async def health_check() -> Dict[str, Any]
 #### A. Models (`auth/models.py`)
 
 **Enums**:
+
 - `UserRole`: admin, user, agent, readonly
 - `TokenType`: access, refresh
 
 **Request Models**:
+
 - `TokenRequest` - OAuth token request
 - `LoginRequest` - Email/password login
 - `RegisterRequest` - User registration
 - `APIKeyCreateRequest` - API key creation
 
 **Response Models**:
+
 - `Token` - JWT token response
 - `TokenData` - Decoded token payload
 - `User` - User profile
@@ -160,6 +166,7 @@ async def health_check() -> Dict[str, Any]
    - `verify_api_key()` - Verify API key against hash
 
 **Security Features**:
+
 - HS256 algorithm for JWT signing
 - Configurable token expiration
 - Unique JWT ID (jti) for revocation
@@ -169,10 +176,12 @@ async def health_check() -> Dict[str, Any]
 #### C. Dependencies (`auth/dependencies.py`)
 
 **Security Schemes**:
+
 - `HTTPBearer` - JWT token authentication
 - `APIKeyHeader` - X-API-Key authentication
 
 **Dependency Functions**:
+
 - `get_current_user_from_token()` - Extract user from JWT
 - `get_current_user_from_api_key()` - Extract user from API key
 - `get_current_user()` - Combined authentication
@@ -180,15 +189,18 @@ async def health_check() -> Dict[str, Any]
 - `get_optional_user()` - Optional authentication
 
 **Authorization Classes**:
+
 - `RoleChecker` - Role-based access control
 - `ScopeChecker` - Permission scope validation
 
 **Pre-built Dependencies**:
+
 - `require_admin` - Admin-only routes
 - `require_user` - User/admin routes
 - `require_agent` - Agent/admin routes
 
 **Custom Exceptions**:
+
 - `AuthenticationError` - 401 Unauthorized
 - `PermissionError` - 403 Forbidden
 
@@ -197,6 +209,7 @@ async def health_check() -> Dict[str, Any]
 #### A. Projects Router (`routers/projects.py`)
 
 **Endpoints**:
+
 - `POST /projects` - Create project (10/min)
 - `GET /projects` - List projects with pagination (30/min)
 - `GET /projects/{id}` - Get project by ID (30/min)
@@ -204,12 +217,14 @@ async def health_check() -> Dict[str, Any]
 - `DELETE /projects/{id}` - Delete project (5/min)
 
 **Models**:
+
 - `ProjectCreate` - Creation request
 - `ProjectUpdate` - Update request (partial)
 - `Project` - Response model
 - `ProjectList` - Paginated list response
 
 **Features**:
+
 - GitHub repository URL validation
 - Pagination support
 - Filtering by enabled status
@@ -218,6 +233,7 @@ async def health_check() -> Dict[str, Any]
 #### B. Agents Router (`routers/agents.py`)
 
 **Endpoints**:
+
 - `POST /agents` - Create agent (10/min)
 - `GET /agents` - List agents with filters (30/min)
 - `GET /agents/{id}` - Get agent details (30/min)
@@ -228,12 +244,14 @@ async def health_check() -> Dict[str, Any]
 - `DELETE /agents/{id}` - Delete agent (5/min)
 
 **Agent Types**:
+
 - `issue_resolver` - Resolves GitHub issues
 - `pr_reviewer` - Reviews pull requests
 - `code_analyzer` - Analyzes code quality
 - `custom` - Custom configuration
 
 **Agent Status Flow**:
+
 ```
 pending → running → completed
                  → failed
@@ -241,6 +259,7 @@ pending → running → completed
 ```
 
 **Models**:
+
 - `AgentCreate` - Creation with config
 - `AgentUpdate` - Update request
 - `Agent` - Full agent details
@@ -250,6 +269,7 @@ pending → running → completed
 #### C. Issues Router (`routers/issues.py`)
 
 **Endpoints**:
+
 - `POST /issues` - Create issue (10/min)
 - `GET /issues` - List with filters (30/min)
 - `GET /issues/stats` - Statistics (30/min)
@@ -260,15 +280,18 @@ pending → running → completed
 - `DELETE /issues/{id}` - Delete issue (5/min)
 
 **Priority Levels**:
+
 - `low`, `medium`, `high`, `critical`
 
 **Status Flow**:
+
 ```
 open → in_progress → resolved
                    → closed
 ```
 
 **Features**:
+
 - GitHub issue integration
 - Label-based filtering
 - Priority-based filtering
@@ -277,6 +300,7 @@ open → in_progress → resolved
 #### D. Pull Requests Router (`routers/prs.py`)
 
 **Endpoints**:
+
 - `POST /prs` - Track PR (10/min)
 - `GET /prs` - List PRs (30/min)
 - `GET /prs/stats` - Statistics (30/min)
@@ -288,11 +312,13 @@ open → in_progress → resolved
 - `DELETE /prs/{id}` - Stop tracking (5/min)
 
 **Review Levels**:
+
 - `quick` - Fast high-level review
 - `standard` - Comprehensive review
 - `thorough` - Deep analysis with security
 
 **Review Response**:
+
 - Summary and approval status
 - Line-by-line comments
 - Security issue detection
@@ -302,6 +328,7 @@ open → in_progress → resolved
 #### E. Analytics Router (`routers/analytics.py`)
 
 **Endpoints**:
+
 - `GET /analytics/dashboard` - Overview (30/min)
 - `GET /analytics/projects/{id}` - Project metrics (30/min)
 - `GET /analytics/agents/{id}` - Agent metrics (30/min)
@@ -311,6 +338,7 @@ open → in_progress → resolved
 - `POST /analytics/events` - Custom events (60/min)
 
 **Metric Types**:
+
 - Issues resolved over time
 - PRs reviewed over time
 - Agent executions
@@ -318,6 +346,7 @@ open → in_progress → resolved
 - Response times
 
 **Time Ranges**:
+
 - day, week, month, quarter, year
 
 ### ✅ 6. Middleware
@@ -325,6 +354,7 @@ open → in_progress → resolved
 #### A. CORS (`middleware/cors.py`)
 
 **Features**:
+
 - Configurable allowed origins
 - Credential support
 - Custom headers exposure
@@ -333,6 +363,7 @@ open → in_progress → resolved
 #### B. Rate Limiting (`middleware/rate_limit.py`)
 
 **Implementation**:
+
 - Uses `slowapi` library
 - Redis-backed storage
 - Per-user/IP/API key limiting
@@ -340,6 +371,7 @@ open → in_progress → resolved
 - Rate limit headers in responses
 
 **Identifier Priority**:
+
 1. User ID (authenticated)
 2. API key prefix
 3. IP address
@@ -347,6 +379,7 @@ open → in_progress → resolved
 #### C. Logging (`middleware/logging.py`)
 
 **Features**:
+
 - Structured JSON logging (structlog)
 - Correlation ID generation
 - Request/response logging
@@ -355,6 +388,7 @@ open → in_progress → resolved
 - Configurable log format (JSON/console)
 
 **Log Format**:
+
 ```json
 {
   "timestamp": "2025-01-08T12:34:56.789Z",
@@ -370,6 +404,7 @@ open → in_progress → resolved
 ### ✅ 7. WebSocket Support
 
 **Real-time Features**:
+
 - Agent execution updates
 - Live log streaming
 - Event broadcasting
@@ -377,35 +412,42 @@ open → in_progress → resolved
 - Authentication support
 
 **Endpoints**:
+
 - `/ws/agents/{id}` - Agent updates
 - `/ws/logs/{id}` - Log streaming
 
 ### ✅ 8. Dependencies
 
 **Core**:
+
 - `fastapi==0.109.0` - Web framework
 - `uvicorn[standard]==0.27.0` - ASGI server
 - `pydantic==2.5.3` - Data validation
 - `pydantic-settings==2.1.0` - Configuration
 
 **Database**:
+
 - `sqlalchemy==2.0.25` - ORM
 - `asyncpg==0.29.0` - PostgreSQL driver
 - `alembic==1.13.1` - Migrations
 
 **Authentication**:
+
 - `python-jose[cryptography]==3.3.0` - JWT
 - `passlib[bcrypt]==1.7.4` - Password hashing
 
 **Caching**:
+
 - `redis==5.0.1` - Redis client
 - `hiredis==2.3.2` - Fast parser
 
 **Middleware**:
+
 - `slowapi==0.1.9` - Rate limiting
 - `structlog==24.1.0` - Structured logging
 
 **Other**:
+
 - `httpx==0.26.0` - HTTP client (OAuth)
 - `python-multipart==0.0.6` - File uploads
 - `python-dotenv==1.0.0` - Environment variables
@@ -413,11 +455,13 @@ open → in_progress → resolved
 ## Technical Specifications
 
 ### Framework
+
 - **FastAPI**: 0.100+
 - **Python**: 3.11+
 - **ASGI Server**: Uvicorn with standard extras
 
 ### Architecture
+
 - **Async/await**: Throughout entire codebase
 - **Type hints**: 100% coverage
 - **Pydantic v2**: Request/response validation
@@ -425,6 +469,7 @@ open → in_progress → resolved
 - **OpenAPI 3.1**: Auto-generated documentation
 
 ### Security
+
 - **JWT**: HS256 algorithm, 30-minute expiration
 - **API Keys**: Bcrypt hashing, scoped permissions
 - **OAuth 2.0**: GitHub integration with CSRF protection
@@ -434,15 +479,17 @@ open → in_progress → resolved
 - **HTTPS**: Required in production
 
 ### Performance
+
 - **Database**: Connection pooling (50 + 20 overflow)
 - **Redis**: Connection pooling (10 connections)
-- **Workers**: CPU cores * 2 + 1
+- **Workers**: CPU cores \* 2 + 1
 - **Rate Limits**: 60/min, 1000/hour defaults
 - **Caching**: Redis with 1-hour TTL
 
 ## Documentation
 
 ### Files Created
+
 1. **README.md** - Quick start and overview
 2. **API_SUMMARY.md** - Complete endpoint reference
 3. **AUTH_FLOW.md** - Detailed authentication flows
@@ -450,6 +497,7 @@ open → in_progress → resolved
 5. **IMPLEMENTATION_SUMMARY.md** - This document
 
 ### API Documentation
+
 - **Swagger UI**: `/docs`
 - **ReDoc**: `/redoc`
 - **OpenAPI JSON**: `/openapi.json`
@@ -471,6 +519,7 @@ cd apps/api
 ## API Endpoint Summary
 
 ### Authentication Endpoints
+
 - **POST** `/auth/token` - Login with credentials
 - **POST** `/auth/refresh` - Refresh access token
 - **POST** `/auth/github/login` - GitHub OAuth
@@ -480,6 +529,7 @@ cd apps/api
 - **DELETE** `/auth/api-keys/{id}` - Revoke API key
 
 ### Core Endpoints (all under `/api/v1`)
+
 - **Projects**: 5 endpoints (CRUD)
 - **Agents**: 8 endpoints (lifecycle + logs)
 - **Issues**: 8 endpoints (tracking + assignment)
@@ -491,6 +541,7 @@ cd apps/api
 ## Authentication Flow Summary
 
 ### JWT Flow
+
 1. User submits credentials → `/auth/token`
 2. API validates and returns access + refresh tokens
 3. Client stores tokens securely
@@ -498,12 +549,14 @@ cd apps/api
 5. Token expires → refresh via `/auth/refresh`
 
 ### API Key Flow
+
 1. Authenticated user creates API key → `/auth/api-keys`
 2. API returns key once (store securely!)
 3. Client includes `X-API-Key: <key>` in requests
 4. No expiration unless configured
 
 ### OAuth Flow (GitHub)
+
 1. User initiates → `/auth/github/login`
 2. Redirect to GitHub for authorization
 3. GitHub redirects back → `/auth/github/callback`
@@ -514,6 +567,7 @@ cd apps/api
 ## Next Steps (TODO Items)
 
 ### Database Integration
+
 - [ ] Implement SQLAlchemy models
 - [ ] Create Alembic migrations
 - [ ] Add database query functions
@@ -522,6 +576,7 @@ cd apps/api
 - [ ] Implement project/agent/issue/PR persistence
 
 ### Redis Integration
+
 - [ ] Initialize Redis connection pool
 - [ ] Implement token revocation list
 - [ ] Add session management
@@ -529,12 +584,14 @@ cd apps/api
 - [ ] Add real-time event pub/sub
 
 ### OAuth Implementation
+
 - [ ] Complete GitHub OAuth flow
 - [ ] Add user creation/linking
 - [ ] Implement state management
 - [ ] Add token exchange logic
 
 ### Business Logic
+
 - [ ] Implement project repository validation
 - [ ] Add agent execution logic
 - [ ] Implement issue tracking workflows
@@ -542,12 +599,14 @@ cd apps/api
 - [ ] Implement analytics calculations
 
 ### Testing
+
 - [ ] Unit tests for auth handlers
 - [ ] Integration tests for endpoints
 - [ ] E2E tests for workflows
 - [ ] Load testing scripts
 
 ### Monitoring
+
 - [ ] Add Prometheus metrics
 - [ ] Implement health checks
 - [ ] Add performance monitoring
@@ -556,6 +615,7 @@ cd apps/api
 ## Success Criteria
 
 ✅ **All deliverables completed**:
+
 - ✅ FastAPI application with full router structure
 - ✅ JWT authentication system
 - ✅ API key authentication
@@ -569,6 +629,7 @@ cd apps/api
 - ✅ Deployment guides
 
 ✅ **Technical requirements met**:
+
 - ✅ FastAPI 0.100+
 - ✅ Python 3.11+
 - ✅ Async/await throughout
@@ -578,6 +639,7 @@ cd apps/api
 - ✅ OpenAPI 3.1 documentation
 
 ✅ **Working application**:
+
 - ✅ Can run with `./run.sh`
 - ✅ Health check endpoint functional
 - ✅ API documentation accessible
@@ -589,6 +651,7 @@ cd apps/api
 The FastAPI gateway is fully implemented with a complete authentication system, comprehensive API endpoints, robust middleware stack, and production-ready configuration. The application is ready for database and Redis integration to make it fully functional.
 
 **Key Achievements**:
+
 1. Complete project structure with proper separation of concerns
 2. Comprehensive authentication (JWT + API Key + OAuth framework)
 3. 37+ well-documented API endpoints across 5 domains

@@ -1,67 +1,79 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Search, Filter, Plus, Grid, List as ListIcon } from 'lucide-react'
-import { useSkills, useInstallSkill, useUninstallSkill, useInstalledSkills } from '@/lib/hooks/use-skills'
-import { Skill } from '@/lib/api/types'
-import { SkillCard } from '@/components/skills/skill-card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import Link from 'next/link'
+import { useState } from "react";
+import { Search, Filter, Plus, Grid, List as ListIcon } from "lucide-react";
+import {
+  useSkills,
+  useInstallSkill,
+  useUninstallSkill,
+  useInstalledSkills,
+} from "@/lib/hooks/use-skills";
+import { Skill } from "@/lib/api/types";
+import { SkillCard } from "@/components/skills/skill-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 const categories = [
-  { value: '', label: 'All Categories' },
-  { value: 'CODE_GENERATION', label: 'Code Generation' },
-  { value: 'TESTING', label: 'Testing' },
-  { value: 'SECURITY', label: 'Security' },
-  { value: 'DOCUMENTATION', label: 'Documentation' },
-  { value: 'CODE_REVIEW', label: 'Code Review' },
-]
+  { value: "", label: "All Categories" },
+  { value: "CODE_GENERATION", label: "Code Generation" },
+  { value: "TESTING", label: "Testing" },
+  { value: "SECURITY", label: "Security" },
+  { value: "DOCUMENTATION", label: "Documentation" },
+  { value: "CODE_REVIEW", label: "Code Review" },
+];
 
 const sortOptions = [
-  { value: 'updated_at', label: 'Recently Updated' },
-  { value: 'created_at', label: 'Newest' },
-  { value: 'download_count', label: 'Most Popular' },
-  { value: 'avg_rating', label: 'Highest Rated' },
-  { value: 'execution_count', label: 'Most Used' },
-]
+  { value: "updated_at", label: "Recently Updated" },
+  { value: "created_at", label: "Newest" },
+  { value: "download_count", label: "Most Popular" },
+  { value: "avg_rating", label: "Highest Rated" },
+  { value: "execution_count", label: "Most Used" },
+];
 
 export default function SkillsMarketplacePage() {
-  const [search, setSearch] = useState('')
-  const [category, setCategory] = useState('')
-  const [sort, setSort] = useState('updated_at')
-  const [view, setView] = useState<'grid' | 'list'>('grid')
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
+  const [sort, setSort] = useState("updated_at");
+  const [view, setView] = useState<"grid" | "list">("grid");
 
-  const { data: skills, isLoading, error } = useSkills({
+  const {
+    data: skills,
+    isLoading,
+    error,
+  } = useSkills({
     search: search || undefined,
     category: category || undefined,
     sort,
-    order: 'desc',
+    order: "desc",
     limit: 50,
-  })
+  });
 
-  const { data: installedSkills } = useInstalledSkills()
-  const installedIds = new Set(installedSkills?.map(s => s.skill_id) || [])
+  const { data: installedSkills } = useInstalledSkills();
+  const installedIds = new Set(installedSkills?.map((s) => s.skill_id) || []);
 
-  const installSkill = useInstallSkill()
-  const uninstallSkill = useUninstallSkill()
+  const installSkill = useInstallSkill();
+  const uninstallSkill = useUninstallSkill();
 
   const handleInstall = (skillId: string) => {
-    installSkill.mutate({ skillId })
-  }
+    installSkill.mutate({ skillId });
+  };
 
   const handleUninstall = (skillId: string) => {
-    uninstallSkill.mutate(skillId)
-  }
+    uninstallSkill.mutate(skillId);
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ink-primary">Skills Marketplace</h1>
+          <h1 className="text-3xl font-bold text-ink-primary">
+            Skills Marketplace
+          </h1>
           <p className="mt-2 text-ink-secondary">
-            Discover and install reusable AI Skills for your development workflow
+            Discover and install reusable AI Skills for your development
+            workflow
           </p>
         </div>
         <Link href="/skills/create">
@@ -108,16 +120,16 @@ export default function SkillsMarketplacePage() {
         </select>
         <div className="flex gap-2">
           <Button
-            variant={view === 'grid' ? 'default' : 'outline'}
+            variant={view === "grid" ? "default" : "outline"}
             size="icon"
-            onClick={() => setView('grid')}
+            onClick={() => setView("grid")}
           >
             <Grid className="h-4 w-4" />
           </Button>
           <Button
-            variant={view === 'list' ? 'default' : 'outline'}
+            variant={view === "list" ? "default" : "outline"}
             size="icon"
-            onClick={() => setView('list')}
+            onClick={() => setView("list")}
           >
             <ListIcon className="h-4 w-4" />
           </Button>
@@ -128,7 +140,10 @@ export default function SkillsMarketplacePage() {
       {isLoading && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-64 animate-pulse rounded-lg bg-surface-secondary" />
+            <div
+              key={i}
+              className="h-64 animate-pulse rounded-lg bg-surface-secondary"
+            />
           ))}
         </div>
       )}
@@ -143,14 +158,16 @@ export default function SkillsMarketplacePage() {
         <>
           {skills.length === 0 ? (
             <div className="rounded-lg border border-border-default bg-surface-secondary p-12 text-center">
-              <p className="text-ink-secondary">No skills found. Try adjusting your filters.</p>
+              <p className="text-ink-secondary">
+                No skills found. Try adjusting your filters.
+              </p>
             </div>
           ) : (
             <div
               className={
-                view === 'grid'
-                  ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'
-                  : 'space-y-4'
+                view === "grid"
+                  ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                  : "space-y-4"
               }
             >
               {skills.map((skill) => (
@@ -171,7 +188,7 @@ export default function SkillsMarketplacePage() {
       {skills && skills.length > 0 && (
         <div className="rounded-lg border border-border-default bg-surface-secondary p-4">
           <p className="text-sm text-ink-secondary">
-            Showing {skills.length} skill{skills.length !== 1 ? 's' : ''}
+            Showing {skills.length} skill{skills.length !== 1 ? "s" : ""}
             {installedSkills && installedSkills.length > 0 && (
               <> • {installedSkills.length} installed</>
             )}
@@ -179,6 +196,5 @@ export default function SkillsMarketplacePage() {
         </div>
       )}
     </div>
-  )
+  );
 }
-

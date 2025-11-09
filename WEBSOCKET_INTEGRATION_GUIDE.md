@@ -18,6 +18,7 @@ python main.py
 ```
 
 The WebSocket server will be available at:
+
 ```
 ws://localhost:8000/ws
 ```
@@ -493,6 +494,7 @@ GET /api/v1/websocket/stats
 **Problem:** WebSocket connection fails
 
 **Debug:**
+
 ```python
 # Enable debug logging
 import logging
@@ -513,12 +515,16 @@ curl http://localhost:8000/health
 const useTokenRefresh = (token: string) => {
   useEffect(() => {
     const tokenData = parseJWT(token);
-    const timeUntilExpiry = new Date(tokenData.exp * 1000).getTime() - Date.now();
+    const timeUntilExpiry =
+      new Date(tokenData.exp * 1000).getTime() - Date.now();
 
     // Refresh 5 minutes before expiry
-    const refreshTimer = setTimeout(() => {
-      refreshToken();
-    }, timeUntilExpiry - 5 * 60 * 1000);
+    const refreshTimer = setTimeout(
+      () => {
+        refreshToken();
+      },
+      timeUntilExpiry - 5 * 60 * 1000,
+    );
 
     return () => clearTimeout(refreshTimer);
   }, [token]);
@@ -528,6 +534,7 @@ const useTokenRefresh = (token: string) => {
 ### Event Not Received
 
 **Debug:**
+
 1. Check subscription: `socket.emit("debug:rooms", {}, console.log)`
 2. Verify event type names match
 3. Check browser console for errors
@@ -668,6 +675,7 @@ socket.on("project.updated", (event) => {
 ```
 
 **Benefits:**
+
 - Real-time (no polling interval)
 - 80% less bandwidth
 - Lower server load
@@ -686,6 +694,7 @@ socket.on("project.updated", (event) => {
 ## Support
 
 For issues:
+
 1. Check `/WEBSOCKET_API.md`
 2. Review `/apps/api/events/example_usage.py`
 3. Check server logs: `grep -i websocket logs/app.log`

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: temporal-worker
+  namespace: piehr
+  labels:
+    app: temporal-worker
+    component: workflow
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: temporal-worker
+  template:
+    metadata:
+      labels:
+        app: temporal-worker
+        component: workflow
+    spec:
+      serviceAccountName: temporal-service-account
+      containers:
+      - name: temporal-worker
+        image: gcr.io/PROJECT_ID/temporal-worker:latest
+        imagePullPolicy: Always
+        ports:
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        env:
+        - name: TEMPORAL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: temporal-config
+              key: host
+        - name: TEMPORAL_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: temporal-config
+              key: namespace
+        - name: TASK_QUEUE
+          valueFrom:
+            configMapKeyRef:
+              name: temporal-config
+              key: task-queue
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9090
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 9090
+          initialDelaySeconds: 10
+          periodSeconds: 5
+

@@ -17,6 +17,7 @@ API Prefix: /api/v1
 ### Methods
 
 1. **JWT Bearer Token**
+
    ```
    Authorization: Bearer <access_token>
    ```
@@ -28,15 +29,15 @@ API Prefix: /api/v1
 
 ### Token Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/auth/token` | Obtain JWT token with credentials |
-| POST | `/auth/refresh` | Refresh access token |
-| POST | `/auth/github/login` | Initiate GitHub OAuth flow |
-| GET | `/auth/github/callback` | GitHub OAuth callback |
-| POST | `/auth/api-keys` | Create API key |
-| GET | `/auth/api-keys` | List API keys |
-| DELETE | `/auth/api-keys/{key_id}` | Revoke API key |
+| Method | Endpoint                  | Description                       |
+| ------ | ------------------------- | --------------------------------- |
+| POST   | `/auth/token`             | Obtain JWT token with credentials |
+| POST   | `/auth/refresh`           | Refresh access token              |
+| POST   | `/auth/github/login`      | Initiate GitHub OAuth flow        |
+| GET    | `/auth/github/callback`   | GitHub OAuth callback             |
+| POST   | `/auth/api-keys`          | Create API key                    |
+| GET    | `/auth/api-keys`          | List API keys                     |
+| DELETE | `/auth/api-keys/{key_id}` | Revoke API key                    |
 
 ## Core Endpoints
 
@@ -44,15 +45,16 @@ API Prefix: /api/v1
 
 Manage GitHub repositories and project configurations.
 
-| Method | Endpoint | Auth | Rate Limit | Description |
-|--------|----------|------|------------|-------------|
-| POST | `/projects` | Required | 10/min | Create new project |
-| GET | `/projects` | Required | 30/min | List all projects (paginated) |
-| GET | `/projects/{id}` | Required | 30/min | Get project by ID |
-| PATCH | `/projects/{id}` | Required | 10/min | Update project |
-| DELETE | `/projects/{id}` | Required | 5/min | Delete project |
+| Method | Endpoint         | Auth     | Rate Limit | Description                   |
+| ------ | ---------------- | -------- | ---------- | ----------------------------- |
+| POST   | `/projects`      | Required | 10/min     | Create new project            |
+| GET    | `/projects`      | Required | 30/min     | List all projects (paginated) |
+| GET    | `/projects/{id}` | Required | 30/min     | Get project by ID             |
+| PATCH  | `/projects/{id}` | Required | 10/min     | Update project                |
+| DELETE | `/projects/{id}` | Required | 5/min      | Delete project                |
 
 **Request Model (POST/PATCH)**:
+
 ```json
 {
   "name": "My Project",
@@ -64,6 +66,7 @@ Manage GitHub repositories and project configurations.
 ```
 
 **Response Model**:
+
 ```json
 {
   "id": "uuid",
@@ -82,24 +85,26 @@ Manage GitHub repositories and project configurations.
 
 Manage AI agent deployments and executions.
 
-| Method | Endpoint | Auth | Rate Limit | Description |
-|--------|----------|------|------------|-------------|
-| POST | `/agents` | Required | 10/min | Create and start agent |
-| GET | `/agents` | Required | 30/min | List agents (filtered) |
-| GET | `/agents/{id}` | Required | 30/min | Get agent by ID |
-| PATCH | `/agents/{id}` | Required | 10/min | Update agent config |
-| POST | `/agents/{id}/start` | Required | 10/min | Start agent execution |
-| POST | `/agents/{id}/cancel` | Required | 10/min | Cancel running agent |
-| GET | `/agents/{id}/logs` | Required | 30/min | Get agent execution logs |
-| DELETE | `/agents/{id}` | Required | 5/min | Delete agent |
+| Method | Endpoint              | Auth     | Rate Limit | Description              |
+| ------ | --------------------- | -------- | ---------- | ------------------------ |
+| POST   | `/agents`             | Required | 10/min     | Create and start agent   |
+| GET    | `/agents`             | Required | 30/min     | List agents (filtered)   |
+| GET    | `/agents/{id}`        | Required | 30/min     | Get agent by ID          |
+| PATCH  | `/agents/{id}`        | Required | 10/min     | Update agent config      |
+| POST   | `/agents/{id}/start`  | Required | 10/min     | Start agent execution    |
+| POST   | `/agents/{id}/cancel` | Required | 10/min     | Cancel running agent     |
+| GET    | `/agents/{id}/logs`   | Required | 30/min     | Get agent execution logs |
+| DELETE | `/agents/{id}`        | Required | 5/min      | Delete agent             |
 
 **Agent Types**:
+
 - `issue_resolver` - Resolves GitHub issues
 - `pr_reviewer` - Reviews pull requests
 - `code_analyzer` - Analyzes code quality
 - `custom` - Custom agent configuration
 
 **Agent Status**:
+
 - `pending` - Created but not started
 - `running` - Currently executing
 - `completed` - Successfully finished
@@ -107,6 +112,7 @@ Manage AI agent deployments and executions.
 - `cancelled` - Cancelled by user
 
 **Request Model (POST)**:
+
 ```json
 {
   "project_id": "uuid",
@@ -121,6 +127,7 @@ Manage AI agent deployments and executions.
 ```
 
 **Response Model**:
+
 ```json
 {
   "id": "uuid",
@@ -141,30 +148,33 @@ Manage AI agent deployments and executions.
 
 Manage issue tracking and resolution.
 
-| Method | Endpoint | Auth | Rate Limit | Description |
-|--------|----------|------|------------|-------------|
-| POST | `/issues` | Required | 10/min | Create issue |
-| GET | `/issues` | Required | 30/min | List issues (filtered) |
-| GET | `/issues/stats` | Required | 30/min | Get issue statistics |
-| GET | `/issues/{id}` | Required | 30/min | Get issue by ID |
-| PATCH | `/issues/{id}` | Required | 10/min | Update issue |
-| POST | `/issues/{id}/assign` | Required | 10/min | Assign agent to issue |
-| POST | `/issues/{id}/resolve` | Required | 10/min | Mark issue as resolved |
-| DELETE | `/issues/{id}` | Required | 5/min | Delete issue |
+| Method | Endpoint               | Auth     | Rate Limit | Description            |
+| ------ | ---------------------- | -------- | ---------- | ---------------------- |
+| POST   | `/issues`              | Required | 10/min     | Create issue           |
+| GET    | `/issues`              | Required | 30/min     | List issues (filtered) |
+| GET    | `/issues/stats`        | Required | 30/min     | Get issue statistics   |
+| GET    | `/issues/{id}`         | Required | 30/min     | Get issue by ID        |
+| PATCH  | `/issues/{id}`         | Required | 10/min     | Update issue           |
+| POST   | `/issues/{id}/assign`  | Required | 10/min     | Assign agent to issue  |
+| POST   | `/issues/{id}/resolve` | Required | 10/min     | Mark issue as resolved |
+| DELETE | `/issues/{id}`         | Required | 5/min      | Delete issue           |
 
 **Priority Levels**:
+
 - `low` - Low priority
 - `medium` - Medium priority (default)
 - `high` - High priority
 - `critical` - Critical priority
 
 **Status**:
+
 - `open` - New issue
 - `in_progress` - Being worked on
 - `resolved` - Fixed
 - `closed` - Closed without fix
 
 **Request Model (POST)**:
+
 ```json
 {
   "project_id": "uuid",
@@ -177,6 +187,7 @@ Manage issue tracking and resolution.
 ```
 
 **Response Model**:
+
 ```json
 {
   "id": "uuid",
@@ -200,24 +211,26 @@ Manage issue tracking and resolution.
 
 Track and review pull requests.
 
-| Method | Endpoint | Auth | Rate Limit | Description |
-|--------|----------|------|------------|-------------|
-| POST | `/prs` | Required | 10/min | Track new PR |
-| GET | `/prs` | Required | 30/min | List PRs (filtered) |
-| GET | `/prs/stats` | Required | 30/min | Get PR statistics |
-| GET | `/prs/{id}` | Required | 30/min | Get PR by ID |
-| PATCH | `/prs/{id}` | Required | 10/min | Update PR |
-| POST | `/prs/{id}/review` | Required | 5/min | Trigger automated review |
-| GET | `/prs/{id}/review` | Required | 30/min | Get review results |
-| POST | `/prs/{id}/sync` | Required | 10/min | Sync with GitHub |
-| DELETE | `/prs/{id}` | Required | 5/min | Stop tracking PR |
+| Method | Endpoint           | Auth     | Rate Limit | Description              |
+| ------ | ------------------ | -------- | ---------- | ------------------------ |
+| POST   | `/prs`             | Required | 10/min     | Track new PR             |
+| GET    | `/prs`             | Required | 30/min     | List PRs (filtered)      |
+| GET    | `/prs/stats`       | Required | 30/min     | Get PR statistics        |
+| GET    | `/prs/{id}`        | Required | 30/min     | Get PR by ID             |
+| PATCH  | `/prs/{id}`        | Required | 10/min     | Update PR                |
+| POST   | `/prs/{id}/review` | Required | 5/min      | Trigger automated review |
+| GET    | `/prs/{id}/review` | Required | 30/min     | Get review results       |
+| POST   | `/prs/{id}/sync`   | Required | 10/min     | Sync with GitHub         |
+| DELETE | `/prs/{id}`        | Required | 5/min      | Stop tracking PR         |
 
 **Review Levels**:
+
 - `quick` - Fast, high-level review
 - `standard` - Standard comprehensive review
 - `thorough` - Deep analysis with security checks
 
 **Request Model (POST)**:
+
 ```json
 {
   "project_id": "uuid",
@@ -228,6 +241,7 @@ Track and review pull requests.
 ```
 
 **Review Response**:
+
 ```json
 {
   "summary": "Overall review summary...",
@@ -250,17 +264,18 @@ Track and review pull requests.
 
 Retrieve metrics and performance data.
 
-| Method | Endpoint | Auth | Rate Limit | Description |
-|--------|----------|------|------------|-------------|
-| GET | `/analytics/dashboard` | Required | 30/min | Dashboard overview metrics |
-| GET | `/analytics/projects/{id}` | Required | 30/min | Project-specific metrics |
-| GET | `/analytics/agents/{id}` | Required | 30/min | Agent performance metrics |
-| GET | `/analytics/timeseries/{type}` | Required | 30/min | Time series data |
-| GET | `/analytics/performance` | Required | 30/min | System performance |
-| GET | `/analytics/export` | Required | 5/min | Export analytics data |
-| POST | `/analytics/events` | Required | 60/min | Record custom event |
+| Method | Endpoint                       | Auth     | Rate Limit | Description                |
+| ------ | ------------------------------ | -------- | ---------- | -------------------------- |
+| GET    | `/analytics/dashboard`         | Required | 30/min     | Dashboard overview metrics |
+| GET    | `/analytics/projects/{id}`     | Required | 30/min     | Project-specific metrics   |
+| GET    | `/analytics/agents/{id}`       | Required | 30/min     | Agent performance metrics  |
+| GET    | `/analytics/timeseries/{type}` | Required | 30/min     | Time series data           |
+| GET    | `/analytics/performance`       | Required | 30/min     | System performance         |
+| GET    | `/analytics/export`            | Required | 5/min      | Export analytics data      |
+| POST   | `/analytics/events`            | Required | 60/min     | Record custom event        |
 
 **Metric Types**:
+
 - `issues_resolved` - Issues resolved over time
 - `prs_reviewed` - PRs reviewed over time
 - `agent_executions` - Agent runs over time
@@ -268,6 +283,7 @@ Retrieve metrics and performance data.
 - `response_time` - API response times
 
 **Time Ranges**:
+
 - `day` - Last 24 hours
 - `week` - Last 7 days
 - `month` - Last 30 days
@@ -275,6 +291,7 @@ Retrieve metrics and performance data.
 - `year` - Last 365 days
 
 **Dashboard Response**:
+
 ```json
 {
   "total_projects": 10,
@@ -292,6 +309,7 @@ Retrieve metrics and performance data.
 ### Pagination
 
 All list endpoints support pagination:
+
 ```
 ?page=1&page_size=20
 ```
@@ -304,21 +322,25 @@ All list endpoints support pagination:
 Endpoints support various filters:
 
 **Projects**:
+
 ```
 ?enabled=true
 ```
 
 **Agents**:
+
 ```
 ?project_id=uuid&agent_type=issue_resolver&status=running
 ```
 
 **Issues**:
+
 ```
 ?project_id=uuid&status=open&priority=high&labels=bug,security
 ```
 
 **PRs**:
+
 ```
 ?project_id=uuid&status=pending
 ```
@@ -396,6 +418,7 @@ ws://localhost:8000/api/v1/ws/agents/{agent_id}
 ```
 
 Streams real-time agent execution updates:
+
 ```json
 {
   "type": "status_update",
@@ -423,6 +446,7 @@ GET /health
 ```
 
 Response:
+
 ```json
 {
   "status": "healthy",
@@ -442,6 +466,7 @@ GET /
 ```
 
 Response:
+
 ```json
 {
   "name": "SWE Agent API",
@@ -460,25 +485,26 @@ Response:
 
 ## HTTP Status Codes
 
-| Code | Meaning |
-|------|---------|
-| 200 | Success |
-| 201 | Created |
-| 204 | No Content |
-| 400 | Bad Request |
-| 401 | Unauthorized |
-| 403 | Forbidden |
-| 404 | Not Found |
-| 422 | Validation Error |
-| 429 | Rate Limit Exceeded |
-| 500 | Internal Server Error |
-| 501 | Not Implemented |
+| Code | Meaning               |
+| ---- | --------------------- |
+| 200  | Success               |
+| 201  | Created               |
+| 204  | No Content            |
+| 400  | Bad Request           |
+| 401  | Unauthorized          |
+| 403  | Forbidden             |
+| 404  | Not Found             |
+| 422  | Validation Error      |
+| 429  | Rate Limit Exceeded   |
+| 500  | Internal Server Error |
+| 501  | Not Implemented       |
 
 ## CORS
 
 Allowed origins configured via `CORS_ORIGINS` environment variable.
 
 Default development origins:
+
 - `http://localhost:3000`
 - `http://localhost:3001`
 

@@ -108,6 +108,7 @@ Orchestrates the complete development cycle from requirement to merged PR.
 ```
 
 **Key Features:**
+
 - Parallel code generation for multiple issues
 - Concurrent quality checks
 - Automatic fixes for linting and coverage issues
@@ -115,6 +116,7 @@ Orchestrates the complete development cycle from requirement to merged PR.
 - Saga pattern for rollback
 
 **Usage:**
+
 ```python
 from workflows.client import WorkflowClient
 
@@ -191,6 +193,7 @@ Coordinates multiple agents to diagnose and fix production incidents.
 ```
 
 **Key Features:**
+
 - Multiple diagnostic agents run in parallel
 - Consensus-based root cause analysis
 - Confidence-weighted decision making
@@ -199,6 +202,7 @@ Coordinates multiple agents to diagnose and fix production incidents.
 - Rollback capability via signals
 
 **Usage:**
+
 ```python
 alert = {
     'id': 'alert-123',
@@ -292,6 +296,7 @@ Manages large-scale code migrations with incremental steps and validation.
 ```
 
 **Key Features:**
+
 - Dependency-aware step execution
 - Validation at each step
 - Automatic rollback on failure
@@ -300,6 +305,7 @@ Manages large-scale code migrations with incremental steps and validation.
 - Detailed migration report
 
 **Usage:**
+
 ```python
 handle = await client.start_code_migration(
     migration_type="react-upgrade",
@@ -382,6 +388,7 @@ Runs comprehensive quality checks on PRs with automated fixes.
 ```
 
 **Key Features:**
+
 - 8 parallel quality checks
 - Automatic fixes for common issues
 - Weighted quality scoring
@@ -390,6 +397,7 @@ Runs comprehensive quality checks on PRs with automated fixes.
 - Auto-fix reporting
 
 **Usage:**
+
 ```python
 handle = await client.start_quality_gate(
     pr_number=123,
@@ -830,6 +838,7 @@ MIT
 ## Support
 
 For issues and questions:
+
 - GitHub Issues: [link]
 - Temporal Community: https://community.temporal.io
 - Documentation: https://docs.temporal.io

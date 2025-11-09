@@ -1,22 +1,22 @@
-'use client'
+"use client";
 
-import { Card, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { mockPRs } from '@/lib/api/mock-data'
-import { GitPullRequest } from 'lucide-react'
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { mockPRs } from "@/lib/api/mock-data";
+import { GitPullRequest } from "lucide-react";
 
 interface PRsViewProps {
-  projectId: string
+  projectId: string;
 }
 
 export default function PRsView({ projectId }: PRsViewProps) {
-  const prs = mockPRs.filter((pr) => pr.projectId === projectId)
+  const prs = mockPRs.filter((pr) => pr.projectId === projectId);
 
   const statusColors = {
-    open: 'success',
-    merged: 'info',
-    closed: 'secondary',
-  } as const
+    open: "success",
+    merged: "info",
+    closed: "secondary",
+  } as const;
 
   return (
     <div className="space-y-4">
@@ -26,7 +26,10 @@ export default function PRsView({ projectId }: PRsViewProps) {
         </div>
       ) : (
         prs.map((pr) => (
-          <Card key={pr.id} className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card
+            key={pr.id}
+            className="hover:shadow-md transition-shadow cursor-pointer"
+          >
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
@@ -42,14 +45,12 @@ export default function PRsView({ projectId }: PRsViewProps) {
                     </div>
                   </div>
                 </div>
-                <Badge variant={statusColors[pr.status]}>
-                  {pr.status}
-                </Badge>
+                <Badge variant={statusColors[pr.status]}>{pr.status}</Badge>
               </div>
             </CardHeader>
           </Card>
         ))
       )}
     </div>
-  )
+  );
 }

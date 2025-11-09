@@ -1,132 +1,132 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { ArrowLeft, Check, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select } from '@/components/ui/select'
-import Link from 'next/link'
-import { useCreateSkill } from '@/lib/hooks/use-skills'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Check, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
+import Link from "next/link";
+import { useCreateSkill } from "@/lib/hooks/use-skills";
 
 // Simple toast implementation (replace with proper toast library if available)
 const toast = {
   success: (message: string) => {
-    console.log('Success:', message)
+    console.log("Success:", message);
     // In production, use a proper toast library
   },
   error: (message: string) => {
-    console.error('Error:', message)
-    alert(`Error: ${message}`)
+    console.error("Error:", message);
+    alert(`Error: ${message}`);
   },
-}
+};
 
 const categories = [
-  'CODE_GENERATION',
-  'TESTING',
-  'CODE_REVIEW',
-  'DOCUMENTATION',
-  'ARCHITECTURE',
-]
+  "CODE_GENERATION",
+  "TESTING",
+  "CODE_REVIEW",
+  "DOCUMENTATION",
+  "ARCHITECTURE",
+];
 
 const visibilityOptions = [
-  { value: 'public', label: 'Public' },
-  { value: 'private', label: 'Private' },
-  { value: 'unlisted', label: 'Unlisted' },
-]
+  { value: "public", label: "Public" },
+  { value: "private", label: "Private" },
+  { value: "unlisted", label: "Unlisted" },
+];
 
 const licenseOptions = [
-  'MIT',
-  'Apache-2.0',
-  'GPL-3.0',
-  'BSD-3-Clause',
-  'Proprietary',
-]
+  "MIT",
+  "Apache-2.0",
+  "GPL-3.0",
+  "BSD-3-Clause",
+  "Proprietary",
+];
 
-type Step = 'basic' | 'prompt' | 'schema' | 'settings' | 'review'
+type Step = "basic" | "prompt" | "schema" | "settings" | "review";
 
 export default function CreateSkillPage() {
-  const router = useRouter()
-  const createSkill = useCreateSkill()
-  
-  const [currentStep, setCurrentStep] = useState<Step>('basic')
+  const router = useRouter();
+  const createSkill = useCreateSkill();
+
+  const [currentStep, setCurrentStep] = useState<Step>("basic");
   const [formData, setFormData] = useState({
     // Basic Info
-    name: '',
-    slug: '',
-    description: '',
-    detailed_description: '',
-    category: '',
+    name: "",
+    slug: "",
+    description: "",
+    detailed_description: "",
+    category: "",
     tags: [] as string[],
-    
+
     // Prompt
-    prompt_template: '',
-    
+    prompt_template: "",
+
     // Schemas
     input_schema: {} as Record<string, any>,
     output_schema: {} as Record<string, any>,
-    
+
     // Settings
-    visibility: 'public',
-    license: 'MIT',
-    pricing_model: 'free',
+    visibility: "public",
+    license: "MIT",
+    pricing_model: "free",
     model_preferences: {} as Record<string, any>,
     validation_rules: [] as any[],
-  })
-  
-  const [tagInput, setTagInput] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  });
+
+  const [tagInput, setTagInput] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const steps: { id: Step; label: string }[] = [
-    { id: 'basic', label: 'Basic Info' },
-    { id: 'prompt', label: 'Prompt Template' },
-    { id: 'schema', label: 'Input/Output Schema' },
-    { id: 'settings', label: 'Settings' },
-    { id: 'review', label: 'Review' },
-  ]
+    { id: "basic", label: "Basic Info" },
+    { id: "prompt", label: "Prompt Template" },
+    { id: "schema", label: "Input/Output Schema" },
+    { id: "settings", label: "Settings" },
+    { id: "review", label: "Review" },
+  ];
 
-  const currentStepIndex = steps.findIndex(s => s.id === currentStep)
-  const canGoNext = validateStep(currentStep)
-  const canGoPrev = currentStepIndex > 0
+  const currentStepIndex = steps.findIndex((s) => s.id === currentStep);
+  const canGoNext = validateStep(currentStep);
+  const canGoPrev = currentStepIndex > 0;
 
   function validateStep(step: Step): boolean {
     switch (step) {
-      case 'basic':
+      case "basic":
         return !!(
           formData.name &&
           formData.slug &&
           formData.description &&
           formData.category
-        )
-      case 'prompt':
-        return !!formData.prompt_template
-      case 'schema':
+        );
+      case "prompt":
+        return !!formData.prompt_template;
+      case "schema":
         return !!(
           formData.input_schema &&
           Object.keys(formData.input_schema).length > 0 &&
           formData.output_schema &&
           Object.keys(formData.output_schema).length > 0
-        )
-      case 'settings':
-        return true // All optional
-      case 'review':
-        return true
+        );
+      case "settings":
+        return true; // All optional
+      case "review":
+        return true;
       default:
-        return false
+        return false;
     }
   }
 
   function handleNext() {
     if (canGoNext && currentStepIndex < steps.length - 1) {
-      setCurrentStep(steps[currentStepIndex + 1].id)
+      setCurrentStep(steps[currentStepIndex + 1].id);
     }
   }
 
   function handlePrev() {
     if (canGoPrev) {
-      setCurrentStep(steps[currentStepIndex - 1].id)
+      setCurrentStep(steps[currentStepIndex - 1].id);
     }
   }
 
@@ -135,25 +135,25 @@ export default function CreateSkillPage() {
       setFormData({
         ...formData,
         tags: [...formData.tags, tagInput.trim()],
-      })
-      setTagInput('')
+      });
+      setTagInput("");
     }
   }
 
   function removeTag(tag: string) {
     setFormData({
       ...formData,
-      tags: formData.tags.filter(t => t !== tag),
-    })
+      tags: formData.tags.filter((t) => t !== tag),
+    });
   }
 
   async function handleSubmit() {
-    if (!validateStep('review')) {
-      toast.error('Please complete all required fields')
-      return
+    if (!validateStep("review")) {
+      toast.error("Please complete all required fields");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       await createSkill.mutateAsync({
         name: formData.name,
@@ -168,20 +168,22 @@ export default function CreateSkillPage() {
         visibility: formData.visibility,
         license: formData.license,
         pricing_model: formData.pricing_model,
-        model_preferences: Object.keys(formData.model_preferences).length > 0 
-          ? formData.model_preferences 
-          : undefined,
-        validation_rules: formData.validation_rules.length > 0 
-          ? formData.validation_rules 
-          : undefined,
-      })
-      
-      toast.success('Skill created successfully!')
-      router.push(`/skills`)
+        model_preferences:
+          Object.keys(formData.model_preferences).length > 0
+            ? formData.model_preferences
+            : undefined,
+        validation_rules:
+          formData.validation_rules.length > 0
+            ? formData.validation_rules
+            : undefined,
+      });
+
+      toast.success("Skill created successfully!");
+      router.push(`/skills`);
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create skill')
+      toast.error(error.message || "Failed to create skill");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -189,9 +191,9 @@ export default function CreateSkillPage() {
     if (formData.name) {
       const slug = formData.name
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '')
-      setFormData({ ...formData, slug })
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+      setFormData({ ...formData, slug });
     }
   }
 
@@ -222,8 +224,8 @@ export default function CreateSkillPage() {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
                     index <= currentStepIndex
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-muted border-muted-foreground/20'
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-muted border-muted-foreground/20"
                   }`}
                 >
                   {index < currentStepIndex ? (
@@ -239,9 +241,7 @@ export default function CreateSkillPage() {
               {index < steps.length - 1 && (
                 <div
                   className={`h-0.5 flex-1 mx-2 ${
-                    index < currentStepIndex
-                      ? 'bg-primary'
-                      : 'bg-muted'
+                    index < currentStepIndex ? "bg-primary" : "bg-muted"
                   }`}
                 />
               )}
@@ -252,7 +252,7 @@ export default function CreateSkillPage() {
 
       {/* Form Content */}
       <div className="bg-card border rounded-lg p-6 mb-6">
-        {currentStep === 'basic' && (
+        {currentStep === "basic" && (
           <div className="space-y-6">
             <div>
               <Label htmlFor="name">Skill Name *</Label>
@@ -260,7 +260,7 @@ export default function CreateSkillPage() {
                 id="name"
                 value={formData.name}
                 onChange={(e) => {
-                  setFormData({ ...formData, name: e.target.value })
+                  setFormData({ ...formData, name: e.target.value });
                 }}
                 placeholder="e.g., TypeScript API Generator"
               />
@@ -273,15 +273,11 @@ export default function CreateSkillPage() {
                   id="slug"
                   value={formData.slug}
                   onChange={(e) => {
-                    setFormData({ ...formData, slug: e.target.value })
+                    setFormData({ ...formData, slug: e.target.value });
                   }}
                   placeholder="typescript-api-generator"
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={generateSlug}
-                >
+                <Button type="button" variant="outline" onClick={generateSlug}>
                   Generate
                 </Button>
               </div>
@@ -296,7 +292,7 @@ export default function CreateSkillPage() {
                 id="description"
                 value={formData.description}
                 onChange={(e) => {
-                  setFormData({ ...formData, description: e.target.value })
+                  setFormData({ ...formData, description: e.target.value });
                 }}
                 placeholder="A brief description of what this Skill does"
                 rows={3}
@@ -312,7 +308,7 @@ export default function CreateSkillPage() {
                   setFormData({
                     ...formData,
                     detailed_description: e.target.value,
-                  })
+                  });
                 }}
                 placeholder="A comprehensive description with features, use cases, and examples"
                 rows={5}
@@ -325,13 +321,13 @@ export default function CreateSkillPage() {
                 id="category"
                 value={formData.category}
                 onChange={(e) => {
-                  setFormData({ ...formData, category: e.target.value })
+                  setFormData({ ...formData, category: e.target.value });
                 }}
               >
                 <option value="">Select a category</option>
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat.replace(/_/g, ' ')}
+                    {cat.replace(/_/g, " ")}
                   </option>
                 ))}
               </Select>
@@ -344,9 +340,9 @@ export default function CreateSkillPage() {
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      addTag()
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addTag();
                     }
                   }}
                   placeholder="Add a tag and press Enter"
@@ -376,18 +372,18 @@ export default function CreateSkillPage() {
           </div>
         )}
 
-        {currentStep === 'prompt' && (
+        {currentStep === "prompt" && (
           <div className="space-y-4">
             <div>
               <Label htmlFor="prompt_template">Prompt Template *</Label>
               <p className="text-sm text-muted-foreground mb-2">
-                Use Jinja2 syntax for variables: {'{{variable_name}}'}
+                Use Jinja2 syntax for variables: {"{{variable_name}}"}
               </p>
               <Textarea
                 id="prompt_template"
                 value={formData.prompt_template}
                 onChange={(e) => {
-                  setFormData({ ...formData, prompt_template: e.target.value })
+                  setFormData({ ...formData, prompt_template: e.target.value });
                 }}
                 placeholder="Generate a {{language}} function that {{task}}..."
                 rows={12}
@@ -397,15 +393,17 @@ export default function CreateSkillPage() {
             <div className="bg-muted p-4 rounded-md">
               <p className="text-sm font-semibold mb-2">Template Tips:</p>
               <ul className="text-sm space-y-1 list-disc list-inside">
-                <li>Use {'{{variable}}'} for user inputs</li>
-                <li>Use {'{% if condition %}...{% endif %}'} for conditionals</li>
-                <li>Use {'{% for item in list %}...{% endfor %}'} for loops</li>
+                <li>Use {"{{variable}}"} for user inputs</li>
+                <li>
+                  Use {"{% if condition %}...{% endif %}"} for conditionals
+                </li>
+                <li>Use {"{% for item in list %}...{% endfor %}"} for loops</li>
               </ul>
             </div>
           </div>
         )}
 
-        {currentStep === 'schema' && (
+        {currentStep === "schema" && (
           <div className="space-y-6">
             <div>
               <Label htmlFor="input_schema">Input Schema (JSON) *</Label>
@@ -417,8 +415,8 @@ export default function CreateSkillPage() {
                 value={JSON.stringify(formData.input_schema, null, 2)}
                 onChange={(e) => {
                   try {
-                    const schema = JSON.parse(e.target.value)
-                    setFormData({ ...formData, input_schema: schema })
+                    const schema = JSON.parse(e.target.value);
+                    setFormData({ ...formData, input_schema: schema });
                   } catch {
                     // Invalid JSON, keep as is
                   }
@@ -439,8 +437,8 @@ export default function CreateSkillPage() {
                 value={JSON.stringify(formData.output_schema, null, 2)}
                 onChange={(e) => {
                   try {
-                    const schema = JSON.parse(e.target.value)
-                    setFormData({ ...formData, output_schema: schema })
+                    const schema = JSON.parse(e.target.value);
+                    setFormData({ ...formData, output_schema: schema });
                   } catch {
                     // Invalid JSON, keep as is
                   }
@@ -453,7 +451,7 @@ export default function CreateSkillPage() {
           </div>
         )}
 
-        {currentStep === 'settings' && (
+        {currentStep === "settings" && (
           <div className="space-y-6">
             <div>
               <Label htmlFor="visibility">Visibility</Label>
@@ -461,7 +459,10 @@ export default function CreateSkillPage() {
                 id="visibility"
                 value={formData.visibility}
                 onChange={(e) => {
-                  setFormData({ ...formData, visibility: e.target.value as any })
+                  setFormData({
+                    ...formData,
+                    visibility: e.target.value as any,
+                  });
                 }}
               >
                 {visibilityOptions.map((opt) => (
@@ -478,7 +479,7 @@ export default function CreateSkillPage() {
                 id="license"
                 value={formData.license}
                 onChange={(e) => {
-                  setFormData({ ...formData, license: e.target.value })
+                  setFormData({ ...formData, license: e.target.value });
                 }}
               >
                 {licenseOptions.map((lic) => (
@@ -495,7 +496,10 @@ export default function CreateSkillPage() {
                 id="pricing_model"
                 value={formData.pricing_model}
                 onChange={(e) => {
-                  setFormData({ ...formData, pricing_model: e.target.value as any })
+                  setFormData({
+                    ...formData,
+                    pricing_model: e.target.value as any,
+                  });
                 }}
               >
                 <option value="free">Free</option>
@@ -506,7 +510,7 @@ export default function CreateSkillPage() {
           </div>
         )}
 
-        {currentStep === 'review' && (
+        {currentStep === "review" && (
           <div className="space-y-6">
             <div>
               <h3 className="font-semibold mb-4">Review Your Skill</h3>
@@ -548,11 +552,7 @@ export default function CreateSkillPage() {
 
       {/* Navigation Buttons */}
       <div className="flex justify-between">
-        <Button
-          variant="outline"
-          onClick={handlePrev}
-          disabled={!canGoPrev}
-        >
+        <Button variant="outline" onClick={handlePrev} disabled={!canGoPrev}>
           Previous
         </Button>
 
@@ -561,14 +561,11 @@ export default function CreateSkillPage() {
             Next
           </Button>
         ) : (
-          <Button
-            onClick={handleSubmit}
-            disabled={isSubmitting || !canGoNext}
-          >
-            {isSubmitting ? 'Creating...' : 'Create Skill'}
+          <Button onClick={handleSubmit} disabled={isSubmitting || !canGoNext}>
+            {isSubmitting ? "Creating..." : "Create Skill"}
           </Button>
         )}
       </div>
     </div>
-  )
+  );
 }

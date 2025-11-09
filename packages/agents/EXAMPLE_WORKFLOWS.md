@@ -3,6 +3,7 @@
 Complete workflow examples demonstrating agent orchestration for common scenarios.
 
 ## Table of Contents
+
 1. [New Feature Development](#new-feature-development)
 2. [System Refactoring](#system-refactoring)
 3. [Database Migration](#database-migration)
@@ -217,6 +218,7 @@ asyncio.run(new_feature_workflow())
 ```
 
 ### Expected Output Structure
+
 ```
 /path/to/project/
 ├── docs/
@@ -724,6 +726,7 @@ asyncio.run(emergency_bugfix_workflow())
 ## Workflow Best Practices
 
 ### 1. Always Use Evidence
+
 ```python
 # Review evidence trail
 for evidence in result.evidence:
@@ -731,6 +734,7 @@ for evidence in result.evidence:
 ```
 
 ### 2. Handle Failures Gracefully
+
 ```python
 if not result.success:
     print(f"Task failed: {result.error}")
@@ -739,12 +743,14 @@ if not result.success:
 ```
 
 ### 3. Track Costs
+
 ```python
 total_cost = sum(r.cost or 0 for r in results)
 print(f"Total workflow cost: ${total_cost:.4f}")
 ```
 
 ### 4. Use Dependencies
+
 ```python
 task2 = Task(
     id="task-002",
@@ -754,6 +760,7 @@ task2 = Task(
 ```
 
 ### 5. Parallel When Possible
+
 ```python
 # Independent tasks can run in parallel
 results = await registry.execute_workflow(
@@ -764,6 +771,7 @@ results = await registry.execute_workflow(
 ```
 
 ### 6. Monitor Progress
+
 ```python
 # Check agent status
 stats = registry.get_registry_stats()

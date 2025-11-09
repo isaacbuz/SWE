@@ -46,7 +46,9 @@ export default function AgentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-ink-primary">Agent Roster</h1>
-          <p className="mt-2 text-ink-secondary">Manage your AI agent workforce</p>
+          <p className="mt-2 text-ink-secondary">
+            Manage your AI agent workforce
+          </p>
         </div>
         <button className="flex items-center gap-2 rounded-md bg-brand-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover">
           <Sparkles className="h-4 w-4" />
@@ -77,15 +79,19 @@ export default function AgentsPage() {
         {agents.map((agent) => (
           <AgentCard key={agent.id} agent={agent} />
         ))}
-        
+
         {/* Add New Agent Card */}
         <button className="group flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-border-default bg-surface-secondary transition-all hover:border-brand-primary hover:bg-brand-primary/5">
           <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed border-border-default bg-surface-primary group-hover:border-brand-primary group-hover:bg-brand-primary/10">
             <Plus className="h-8 w-8 text-ink-tertiary group-hover:text-brand-primary" />
           </div>
           <div className="text-center">
-            <p className="text-sm font-medium text-ink-primary group-hover:text-brand-primary">Add New Agent</p>
-            <p className="mt-1 text-xs text-ink-tertiary">Configure a specialized agent</p>
+            <p className="text-sm font-medium text-ink-primary group-hover:text-brand-primary">
+              Add New Agent
+            </p>
+            <p className="mt-1 text-xs text-ink-tertiary">
+              Configure a specialized agent
+            </p>
           </div>
         </button>
       </div>
@@ -93,7 +99,7 @@ export default function AgentsPage() {
   );
 }
 
-function AgentCard({ agent }: { agent: typeof agents[0] }) {
+function AgentCard({ agent }: { agent: (typeof agents)[0] }) {
   const statusColors = {
     active: "bg-status-success/10 text-status-success border-status-success/20",
     idle: "bg-ink-disabled/10 text-ink-disabled border-ink-disabled/20",
@@ -106,17 +112,20 @@ function AgentCard({ agent }: { agent: typeof agents[0] }) {
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary/10">
           <Bot className="h-6 w-6 text-brand-primary" />
         </div>
-        <span className={"rounded-full border px-2 py-1 text-xs font-medium " + statusColors[agent.status as keyof typeof statusColors]}>
+        <span
+          className={
+            "rounded-full border px-2 py-1 text-xs font-medium " +
+            statusColors[agent.status as keyof typeof statusColors]
+          }
+        >
           {agent.status}
         </span>
       </div>
-      
+
       <h3 className="mt-4 text-lg font-semibold text-ink-primary">
         {agent.name}
       </h3>
-      <p className="mt-1 text-sm text-ink-secondary">
-        {agent.role}
-      </p>
+      <p className="mt-1 text-sm text-ink-secondary">{agent.role}</p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {agent.skills.slice(0, 3).map((skill) => (
@@ -132,11 +141,15 @@ function AgentCard({ agent }: { agent: typeof agents[0] }) {
       <div className="mt-6 grid grid-cols-2 gap-4 border-t border-border-subtle pt-4">
         <div>
           <p className="text-xs text-ink-tertiary">Tasks</p>
-          <p className="mt-1 text-lg font-semibold text-ink-primary">{agent.tasksCompleted}</p>
+          <p className="mt-1 text-lg font-semibold text-ink-primary">
+            {agent.tasksCompleted}
+          </p>
         </div>
         <div>
           <p className="text-xs text-ink-tertiary">Success Rate</p>
-          <p className="mt-1 text-lg font-semibold text-status-success">{agent.successRate}%</p>
+          <p className="mt-1 text-lg font-semibold text-status-success">
+            {agent.successRate}%
+          </p>
         </div>
       </div>
     </div>

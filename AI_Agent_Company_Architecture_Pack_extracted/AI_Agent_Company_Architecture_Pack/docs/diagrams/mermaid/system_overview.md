@@ -1,4 +1,3 @@
-
 ```mermaid
 flowchart TD
   Client([Clients]) --> CEO[CEO/Founder]

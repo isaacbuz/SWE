@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: piehr
+
+resources:
+  - namespace.yaml
+  - resource-quota.yaml
+  - service-accounts.yaml
+  - network-policy.yaml
+  - api/deployment.yaml
+  - api/service.yaml
+  - api/hpa.yaml
+  - api/pdb.yaml
+  - api/configmap.yaml
+  - web/deployment.yaml
+  - web/service.yaml
+  - web/hpa.yaml
+  - web/configmap.yaml
+  - postgresql/statefulset.yaml
+  - postgresql/service.yaml
+  - redis/deployment.yaml
+  - redis/service.yaml
+  - redis/pvc.yaml
+  - redis/configmap.yaml
+  - temporal/deployment.yaml
+  - temporal/service.yaml
+  - temporal/configmap.yaml
+  - ingress/ingress.yaml
+
+commonLabels:
+  managed-by: kustomize
+  environment: base
+

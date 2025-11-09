@@ -11,7 +11,7 @@
         "id": 1,
         "title": "Agent Execution Rate",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
         "targets": [
           {
             "expr": "rate(agent_executions_total[5m])",
@@ -20,15 +20,15 @@
           }
         ],
         "yaxes": [
-          {"format": "ops", "label": "Executions/sec"},
-          {"format": "short"}
+          { "format": "ops", "label": "Executions/sec" },
+          { "format": "short" }
         ]
       },
       {
         "id": 2,
         "title": "Agent Success Rate",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
         "targets": [
           {
             "expr": "rate(agent_executions_total{status=\"success\"}[5m]) / rate(agent_executions_total[5m])",
@@ -37,15 +37,20 @@
           }
         ],
         "yaxes": [
-          {"format": "percentunit", "label": "Success Rate", "max": 1, "min": 0},
-          {"format": "short"}
+          {
+            "format": "percentunit",
+            "label": "Success Rate",
+            "max": 1,
+            "min": 0
+          },
+          { "format": "short" }
         ]
       },
       {
         "id": 3,
         "title": "Agent Execution Duration (p50, p95, p99)",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
+        "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
         "targets": [
           {
             "expr": "histogram_quantile(0.50, rate(agent_execution_duration_seconds_bucket[5m]))",
@@ -63,16 +68,13 @@
             "refId": "C"
           }
         ],
-        "yaxes": [
-          {"format": "s", "label": "Duration"},
-          {"format": "short"}
-        ]
+        "yaxes": [{ "format": "s", "label": "Duration" }, { "format": "short" }]
       },
       {
         "id": 4,
         "title": "Active Agents by Type",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
         "targets": [
           {
             "expr": "active_agents",
@@ -81,15 +83,15 @@
           }
         ],
         "yaxes": [
-          {"format": "short", "label": "Active Agents"},
-          {"format": "short"}
+          { "format": "short", "label": "Active Agents" },
+          { "format": "short" }
         ]
       },
       {
         "id": 5,
         "title": "Agent Queue Depth",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
         "targets": [
           {
             "expr": "agent_queue_depth",
@@ -98,16 +100,16 @@
           }
         ],
         "yaxes": [
-          {"format": "short", "label": "Queue Depth"},
-          {"format": "short"}
+          { "format": "short", "label": "Queue Depth" },
+          { "format": "short" }
         ],
         "alert": {
           "conditions": [
             {
-              "evaluator": {"params": [100], "type": "gt"},
-              "operator": {"type": "and"},
-              "query": {"params": ["A", "5m", "now"]},
-              "reducer": {"params": [], "type": "avg"},
+              "evaluator": { "params": [100], "type": "gt" },
+              "operator": { "type": "and" },
+              "query": { "params": ["A", "5m", "now"] },
+              "reducer": { "params": [], "type": "avg" },
               "type": "query"
             }
           ],
@@ -123,7 +125,7 @@
         "id": 6,
         "title": "LLM Request Rate",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
         "targets": [
           {
             "expr": "rate(llm_requests_total[5m])",
@@ -132,15 +134,15 @@
           }
         ],
         "yaxes": [
-          {"format": "reqps", "label": "Requests/sec"},
-          {"format": "short"}
+          { "format": "reqps", "label": "Requests/sec" },
+          { "format": "short" }
         ]
       },
       {
         "id": 7,
         "title": "LLM Request Duration",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
         "targets": [
           {
             "expr": "histogram_quantile(0.95, rate(llm_request_duration_seconds_bucket[5m]))",
@@ -148,16 +150,13 @@
             "refId": "A"
           }
         ],
-        "yaxes": [
-          {"format": "s", "label": "Duration"},
-          {"format": "short"}
-        ]
+        "yaxes": [{ "format": "s", "label": "Duration" }, { "format": "short" }]
       },
       {
         "id": 8,
         "title": "Token Usage by Provider",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32},
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
         "targets": [
           {
             "expr": "rate(llm_tokens_total[5m])",
@@ -166,15 +165,15 @@
           }
         ],
         "yaxes": [
-          {"format": "short", "label": "Tokens/sec"},
-          {"format": "short"}
+          { "format": "short", "label": "Tokens/sec" },
+          { "format": "short" }
         ]
       },
       {
         "id": 9,
         "title": "Agent Error Distribution",
         "type": "piechart",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32},
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
         "targets": [
           {
             "expr": "sum by (agent_name) (agent_executions_total{status=\"error\"})",
@@ -189,7 +188,17 @@
       "to": "now"
     },
     "timepicker": {
-      "refresh_intervals": ["10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
+      "refresh_intervals": [
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ]
     }
   }
 }

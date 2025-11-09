@@ -1,10 +1,10 @@
-import { faker } from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
 export interface MockAgent {
   id: string;
   name: string;
-  type: 'developer' | 'qa' | 'devops' | 'architect' | 'pm';
-  status: 'available' | 'busy' | 'offline' | 'error';
+  type: "developer" | "qa" | "devops" | "architect" | "pm";
+  status: "available" | "busy" | "offline" | "error";
   capabilities: string[];
   currentTask: string | null;
   metrics: {
@@ -18,11 +18,17 @@ export const createMockAgent = (overrides?: Partial<MockAgent>): MockAgent => {
   return {
     id: faker.string.uuid(),
     name: faker.person.fullName(),
-    type: faker.helpers.arrayElement(['developer', 'qa', 'devops', 'architect', 'pm']),
-    status: faker.helpers.arrayElement(['available', 'busy', 'offline']),
+    type: faker.helpers.arrayElement([
+      "developer",
+      "qa",
+      "devops",
+      "architect",
+      "pm",
+    ]),
+    status: faker.helpers.arrayElement(["available", "busy", "offline"]),
     capabilities: faker.helpers.arrayElements(
-      ['code_generation', 'code_review', 'testing', 'deployment', 'monitoring'],
-      { min: 1, max: 3 }
+      ["code_generation", "code_review", "testing", "deployment", "monitoring"],
+      { min: 1, max: 3 },
     ),
     currentTask: faker.datatype.boolean() ? faker.string.uuid() : null,
     metrics: {

@@ -105,5 +105,4 @@ The following work has been completed and is included in PR #27:
 ---
 
 **Status**: Documentation updated  
-**Next**: Create GitHub issues or continue with remaining features  
-
+**Next**: Create GitHub issues or continue with remaining features

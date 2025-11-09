@@ -25,11 +25,13 @@ This document outlines the comprehensive security measures, best practices, and 
 #### Setup
 
 1. Copy `.env.example` to `.env`:
+
    ```bash
    cp .env.example .env
    ```
 
 2. Update with actual values:
+
    ```bash
    # Do NOT use placeholder values in production
    DATABASE_PASSWORD=your_secure_password_here
@@ -56,12 +58,12 @@ The application validates required environment variables on startup:
 ```javascript
 // Example validation in your application
 const requiredEnvVars = [
-  'DATABASE_URL',
-  'REDIS_URL',
-  'JWT_SECRET',
-  'ENCRYPTION_KEY',
-  'NODE_ENV',
-  'API_BASE_URL'
+  "DATABASE_URL",
+  "REDIS_URL",
+  "JWT_SECRET",
+  "ENCRYPTION_KEY",
+  "NODE_ENV",
+  "API_BASE_URL",
 ];
 
 for (const envVar of requiredEnvVars) {
@@ -91,6 +93,7 @@ openssl rand -hex 32     # For ENCRYPTION_KEY
 ```
 
 **Tools**:
+
 - `.env` files (local only)
 - Environment variables (local)
 - Password managers (LastPass, 1Password, Bitwarden)
@@ -145,6 +148,7 @@ aws secretsmanager create-secret \
 **Location**: Managed Secret Store
 
 Use one of:
+
 - **Google Secret Manager** (for GCP deployments)
 - **AWS Secrets Manager** (for AWS deployments)
 - **HashiCorp Vault** (for multi-cloud)
@@ -210,6 +214,7 @@ terraform {
 ```
 
 **Requirements**:
+
 - Enable versioning on state bucket
 - Enable encryption at rest
 - Restrict access with IAM roles
@@ -258,6 +263,7 @@ resource "google_sql_database_instance" "postgres" {
 ```
 
 **Best Practices**:
+
 - Use SSL/TLS for all connections
 - Use private networks when possible
 - Enable Cloud SQL Proxy for secure connections
@@ -288,6 +294,7 @@ spec:
 ```
 
 **Flow**:
+
 1. Secrets stored in Google Secret Manager (never in etcd)
 2. External Secrets Operator syncs to K8s Secrets
 3. Pods mount secrets from K8s
@@ -322,7 +329,7 @@ metadata:
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["get", "list", "watch"]  # Never "create", "delete", "update"
+    verbs: ["get", "list", "watch"] # Never "create", "delete", "update"
 ```
 
 ---
@@ -349,14 +356,14 @@ bash scripts/rotate-secrets.sh database
 
 ### Rotation Schedule
 
-| Secret Type | Rotation Frequency | Trigger |
-|-------------|-------------------|---------|
-| Database Credentials | 90 days | Scheduled + Employee Offboarding |
-| API Keys | 30 days | Scheduled + Suspected Compromise |
-| Encryption Keys | 180 days | Scheduled (plan key versioning) |
-| JWT Secret | 180 days | Scheduled + Suspected Compromise |
-| OAuth Tokens | 30 days | Scheduled + On Permission Changes |
-| TLS Certificates | 30 days before expiry | Automated |
+| Secret Type          | Rotation Frequency    | Trigger                           |
+| -------------------- | --------------------- | --------------------------------- |
+| Database Credentials | 90 days               | Scheduled + Employee Offboarding  |
+| API Keys             | 30 days               | Scheduled + Suspected Compromise  |
+| Encryption Keys      | 180 days              | Scheduled (plan key versioning)   |
+| JWT Secret           | 180 days              | Scheduled + Suspected Compromise  |
+| OAuth Tokens         | 30 days               | Scheduled + On Permission Changes |
+| TLS Certificates     | 30 days before expiry | Automated                         |
 
 ### Rotation Procedure
 
@@ -366,6 +373,7 @@ bash scripts/rotate-secrets.sh database
    - Ensure backup systems ready
 
 2. **Execution Phase**
+
    ```bash
    # Backup current secrets
    cp .env .env.backup.$(date +%Y%m%d_%H%M%S)
@@ -426,7 +434,7 @@ kubectl rollout restart deployment/app-name
 jobs:
   deploy:
     name: Deploy to Production
-    environment: production  # Requires approval
+    environment: production # Requires approval
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -437,6 +445,7 @@ jobs:
 ```
 
 **Configuration**:
+
 1. Create environment in GitHub Settings
 2. Enable required reviewers
 3. Restrict deployment branches
@@ -459,7 +468,7 @@ metadata:
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["get"]  # Minimal permissions
+    verbs: ["get"] # Minimal permissions
 ```
 
 ### Infrastructure Access
@@ -498,11 +507,11 @@ resource "google_sql_database_instance" "postgres" {
 
 ```javascript
 // Log all secret access attempts
-logger.info('Accessing secret', {
+logger.info("Accessing secret", {
   user: req.user.id,
-  secret: 'DATABASE_PASSWORD',
+  secret: "DATABASE_PASSWORD",
   timestamp: new Date().toISOString(),
-  ip: req.ip
+  ip: req.ip,
 });
 ```
 
@@ -517,12 +526,14 @@ logger.info('Accessing secret', {
 ### Regular Security Reviews
 
 **Quarterly**:
+
 - Review access logs
 - Check for unusual patterns
 - Audit secret usage
 - Verify rotation compliance
 
 **Annually**:
+
 - Full security assessment
 - Penetration testing
 - Compliance audit
@@ -535,12 +546,14 @@ logger.info('Accessing secret', {
 ### Suspected Secret Compromise
 
 **Immediate Actions**:
+
 1. Isolate affected systems
 2. Begin audit log review
 3. Notify security team
 4. Prepare rotation plan
 
 **Within 1 Hour**:
+
 ```bash
 # Rotate compromised secrets immediately
 bash scripts/rotate-secrets.sh all
@@ -553,12 +566,14 @@ gh secret set COMPROMISED_KEY --body "revoked"
 ```
 
 **Within 4 Hours**:
+
 - Complete audit of suspicious access
 - Notify affected customers if necessary
 - Update incident log
 - Begin root cause analysis
 
 **Within 24 Hours**:
+
 - Complete RCA document
 - Implement preventive measures
 - Brief stakeholders
@@ -645,6 +660,7 @@ env | grep -E "(SECRET|PASSWORD|KEY|TOKEN)"
 ## Support and Questions
 
 For security-related questions or to report vulnerabilities:
+
 - Create a confidential issue in GitHub
 - Contact security team: security@aicompany.com
 - Do NOT commit sensitive information to any repository

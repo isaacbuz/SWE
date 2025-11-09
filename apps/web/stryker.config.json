@@ -21,11 +21,5 @@
   "concurrency": 4,
   "tempDirName": ".stryker-tmp",
   "cleanTempDir": true,
-  "ignorePatterns": [
-    "node_modules",
-    ".next",
-    "out",
-    "coverage",
-    "e2e"
-  ]
+  "ignorePatterns": ["node_modules", ".next", "out", "coverage", "e2e"]
 }

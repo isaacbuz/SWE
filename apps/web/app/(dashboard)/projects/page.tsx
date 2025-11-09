@@ -38,7 +38,9 @@ export default function ProjectsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-ink-primary">Projects</h1>
-          <p className="mt-2 text-ink-secondary">Manage your AI-powered development projects</p>
+          <p className="mt-2 text-ink-secondary">
+            Manage your AI-powered development projects
+          </p>
         </div>
         <button className="flex items-center gap-2 rounded-md bg-brand-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover">
           <Plus className="h-4 w-4" />
@@ -74,10 +76,11 @@ export default function ProjectsPage() {
   );
 }
 
-function ProjectCard({ project }: { project: typeof projects[0] }) {
+function ProjectCard({ project }: { project: (typeof projects)[0] }) {
   const statusColors = {
     active: "bg-status-success/10 text-status-success border-status-success/20",
-    planning: "bg-status-warning/10 text-status-warning border-status-warning/20",
+    planning:
+      "bg-status-warning/10 text-status-warning border-status-warning/20",
     archived: "bg-ink-disabled/10 text-ink-disabled border-ink-disabled/20",
   };
 
@@ -88,11 +91,16 @@ function ProjectCard({ project }: { project: typeof projects[0] }) {
     >
       <div className="flex items-start justify-between">
         <FolderKanban className="h-8 w-8 text-brand-primary" />
-        <span className={"rounded-full border px-2 py-1 text-xs font-medium " + statusColors[project.status as keyof typeof statusColors]}>
+        <span
+          className={
+            "rounded-full border px-2 py-1 text-xs font-medium " +
+            statusColors[project.status as keyof typeof statusColors]
+          }
+        >
           {project.status}
         </span>
       </div>
-      
+
       <h3 className="mt-4 text-lg font-semibold text-ink-primary group-hover:text-brand-primary transition-colors">
         {project.name}
       </h3>

@@ -1,62 +1,73 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Select } from '@/components/ui/select'
-import { ArrowLeft, Check, X, AlertCircle, RefreshCw } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Select } from "@/components/ui/select";
+import { ArrowLeft, Check, X, AlertCircle, RefreshCw } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
 interface IntegrationDetailProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
 // Mock integration details
 const integrationDetails: Record<string, any> = {
   github: {
-    name: 'GitHub',
-    description: 'Connect your GitHub repositories for seamless code management',
-    status: 'connected',
+    name: "GitHub",
+    description:
+      "Connect your GitHub repositories for seamless code management",
+    status: "connected",
     config: {
-      organization: 'my-company',
-      repository: 'my-repo',
-      branch: 'main',
-      webhookUrl: 'https://api.example.com/webhooks/github',
+      organization: "my-company",
+      repository: "my-repo",
+      branch: "main",
+      webhookUrl: "https://api.example.com/webhooks/github",
     },
   },
   anthropic: {
-    name: 'Anthropic',
-    description: 'Access Claude AI models for code generation and analysis',
-    status: 'connected',
+    name: "Anthropic",
+    description: "Access Claude AI models for code generation and analysis",
+    status: "connected",
     config: {
-      apiKey: 'sk-ant-api03-***************',
-      model: 'claude-sonnet-4-5',
+      apiKey: "sk-ant-api03-***************",
+      model: "claude-sonnet-4-5",
       maxTokens: 4096,
     },
   },
   openai: {
-    name: 'OpenAI',
-    description: 'Integrate GPT models for AI assistance',
-    status: 'connected',
+    name: "OpenAI",
+    description: "Integrate GPT models for AI assistance",
+    status: "connected",
     config: {
-      apiKey: 'sk-***************',
-      model: 'gpt-5',
+      apiKey: "sk-***************",
+      model: "gpt-5",
       maxTokens: 4096,
       temperature: 0.7,
     },
   },
-}
+};
 
-export default function IntegrationDetailPage({ params }: IntegrationDetailProps) {
-  const integration = integrationDetails[params.id]
-  const [isEditing, setIsEditing] = useState(false)
-  const [isTesting, setIsTesting] = useState(false)
-  const [testResult, setTestResult] = useState<'success' | 'error' | null>(null)
+export default function IntegrationDetailPage({
+  params,
+}: IntegrationDetailProps) {
+  const integration = integrationDetails[params.id];
+  const [isEditing, setIsEditing] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState<"success" | "error" | null>(
+    null,
+  );
 
   if (!integration) {
     return (
@@ -71,24 +82,24 @@ export default function IntegrationDetailPage({ params }: IntegrationDetailProps
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
   const handleTestConnection = async () => {
-    setIsTesting(true)
-    setTestResult(null)
+    setIsTesting(true);
+    setTestResult(null);
 
     // Simulate API call
     setTimeout(() => {
-      setTestResult('success')
-      setIsTesting(false)
-    }, 2000)
-  }
+      setTestResult("success");
+      setIsTesting(false);
+    }, 2000);
+  };
 
   const handleSave = () => {
-    setIsEditing(false)
+    setIsEditing(false);
     // Save logic here
-  }
+  };
 
   return (
     <div className="space-y-8">
@@ -103,11 +114,13 @@ export default function IntegrationDetailPage({ params }: IntegrationDetailProps
         </Link>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{integration.name}</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {integration.name}
+            </h1>
             <p className="text-muted-foreground">{integration.description}</p>
           </div>
           <Badge
-            variant={integration.status === 'connected' ? 'success' : 'outline'}
+            variant={integration.status === "connected" ? "success" : "outline"}
           >
             {integration.status}
           </Badge>
@@ -119,9 +132,7 @@ export default function IntegrationDetailPage({ params }: IntegrationDetailProps
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Configuration</CardTitle>
-            <CardDescription>
-              Manage your integration settings
-            </CardDescription>
+            <CardDescription>Manage your integration settings</CardDescription>
           </div>
           {!isEditing ? (
             <Button onClick={() => setIsEditing(true)}>Edit</Button>
@@ -135,7 +146,7 @@ export default function IntegrationDetailPage({ params }: IntegrationDetailProps
           )}
         </CardHeader>
         <CardContent className="space-y-4">
-          {params.id === 'github' && (
+          {params.id === "github" && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="organization">Organization</Label>
@@ -172,7 +183,7 @@ export default function IntegrationDetailPage({ params }: IntegrationDetailProps
             </>
           )}
 
-          {params.id === 'anthropic' && (
+          {params.id === "anthropic" && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="apiKey">API Key</Label>
@@ -207,7 +218,7 @@ export default function IntegrationDetailPage({ params }: IntegrationDetailProps
             </>
           )}
 
-          {params.id === 'openai' && (
+          {params.id === "openai" && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="apiKey">API Key</Label>
@@ -280,14 +291,14 @@ export default function IntegrationDetailPage({ params }: IntegrationDetailProps
             )}
           </Button>
 
-          {testResult === 'success' && (
+          {testResult === "success" && (
             <div className="flex items-center gap-2 text-green-600">
               <Check className="h-5 w-5" />
               <span>Connection successful!</span>
             </div>
           )}
 
-          {testResult === 'error' && (
+          {testResult === "error" && (
             <div className="flex items-center gap-2 text-red-600">
               <X className="h-5 w-5" />
               <span>Connection failed. Please check your configuration.</span>
@@ -309,5 +320,5 @@ export default function IntegrationDetailPage({ params }: IntegrationDetailProps
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

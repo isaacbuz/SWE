@@ -1,16 +1,31 @@
-'use client'
+"use client";
 
-import { AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  AreaChart as RechartsAreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface AreaChartProps {
-  title?: string
-  description?: string
-  data: any[]
-  dataKeys: { key: string; color: string; label: string }[]
-  xAxisKey: string
-  height?: number
-  stacked?: boolean
+  title?: string;
+  description?: string;
+  data: any[];
+  dataKeys: { key: string; color: string; label: string }[];
+  xAxisKey: string;
+  height?: number;
+  stacked?: boolean;
 }
 
 export function AreaChart({
@@ -52,14 +67,14 @@ export function AreaChart({
             <XAxis
               dataKey={xAxisKey}
               className="text-xs"
-              tick={{ fill: 'currentColor' }}
+              tick={{ fill: "currentColor" }}
             />
-            <YAxis className="text-xs" tick={{ fill: 'currentColor' }} />
+            <YAxis className="text-xs" tick={{ fill: "currentColor" }} />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '0.5rem',
+                backgroundColor: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
+                borderRadius: "0.5rem",
               }}
             />
             <Legend />
@@ -72,12 +87,12 @@ export function AreaChart({
                 fillOpacity={1}
                 fill={`url(#color${index})`}
                 name={item.label}
-                stackId={stacked ? '1' : undefined}
+                stackId={stacked ? "1" : undefined}
               />
             ))}
           </RechartsAreaChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

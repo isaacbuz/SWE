@@ -1,80 +1,115 @@
-'use client'
+"use client";
 
-import { KPICard } from '@/components/analytics/kpi-card'
-import { LineChart } from '@/components/charts/line-chart'
-import { PieChart } from '@/components/charts/pie-chart'
-import { DataTable, Column } from '@/components/table/data-table'
-import { Button } from '@/components/ui/button'
-import { Select } from '@/components/ui/select'
-import { Download, DollarSign, TrendingDown, Calendar } from 'lucide-react'
-import { formatCurrency, downloadCSV } from '@/lib/utils'
+import { KPICard } from "@/components/analytics/kpi-card";
+import { LineChart } from "@/components/charts/line-chart";
+import { PieChart } from "@/components/charts/pie-chart";
+import { DataTable, Column } from "@/components/table/data-table";
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
+import { Download, DollarSign, TrendingDown, Calendar } from "lucide-react";
+import { formatCurrency, downloadCSV } from "@/lib/utils";
 
 interface CostEntry {
-  date: string
-  model: string
-  requests: number
-  tokens: number
-  cost: number
-  project: string
+  date: string;
+  model: string;
+  requests: number;
+  tokens: number;
+  cost: number;
+  project: string;
 }
 
 const costData: CostEntry[] = [
-  { date: '2024-02-12', model: 'Claude Sonnet 4.5', requests: 145, tokens: 52000, cost: 15.60, project: 'Project Alpha' },
-  { date: '2024-02-12', model: 'GPT-5', requests: 89, tokens: 38000, cost: 12.45, project: 'Project Beta' },
-  { date: '2024-02-12', model: 'Claude Haiku', requests: 423, tokens: 125000, cost: 8.75, project: 'Project Gamma' },
-  { date: '2024-02-11', model: 'Claude Sonnet 4.5', requests: 132, tokens: 48000, cost: 14.40, project: 'Project Alpha' },
-  { date: '2024-02-11', model: 'GPT-4o', requests: 67, tokens: 29000, cost: 9.85, project: 'Project Delta' },
-]
+  {
+    date: "2024-02-12",
+    model: "Claude Sonnet 4.5",
+    requests: 145,
+    tokens: 52000,
+    cost: 15.6,
+    project: "Project Alpha",
+  },
+  {
+    date: "2024-02-12",
+    model: "GPT-5",
+    requests: 89,
+    tokens: 38000,
+    cost: 12.45,
+    project: "Project Beta",
+  },
+  {
+    date: "2024-02-12",
+    model: "Claude Haiku",
+    requests: 423,
+    tokens: 125000,
+    cost: 8.75,
+    project: "Project Gamma",
+  },
+  {
+    date: "2024-02-11",
+    model: "Claude Sonnet 4.5",
+    requests: 132,
+    tokens: 48000,
+    cost: 14.4,
+    project: "Project Alpha",
+  },
+  {
+    date: "2024-02-11",
+    model: "GPT-4o",
+    requests: 67,
+    tokens: 29000,
+    cost: 9.85,
+    project: "Project Delta",
+  },
+];
 
 const dailyCostData = [
-  { date: 'Feb 5', cost: 55.3, budget: 60 },
-  { date: 'Feb 6', cost: 48.7, budget: 60 },
-  { date: 'Feb 7', cost: 52.4, budget: 60 },
-  { date: 'Feb 8', cost: 49.1, budget: 60 },
-  { date: 'Feb 9', cost: 53.8, budget: 60 },
-  { date: 'Feb 10', cost: 47.2, budget: 60 },
-  { date: 'Feb 11', cost: 51.5, budget: 60 },
-  { date: 'Feb 12', cost: 46.6, budget: 60 },
-]
+  { date: "Feb 5", cost: 55.3, budget: 60 },
+  { date: "Feb 6", cost: 48.7, budget: 60 },
+  { date: "Feb 7", cost: 52.4, budget: 60 },
+  { date: "Feb 8", cost: 49.1, budget: 60 },
+  { date: "Feb 9", cost: 53.8, budget: 60 },
+  { date: "Feb 10", cost: 47.2, budget: 60 },
+  { date: "Feb 11", cost: 51.5, budget: 60 },
+  { date: "Feb 12", cost: 46.6, budget: 60 },
+];
 
 const modelDistribution = [
-  { name: 'Claude Sonnet 4.5', value: 127.42 },
-  { name: 'GPT-5', value: 98.56 },
-  { name: 'Claude Haiku', value: 45.23 },
-  { name: 'GPT-4o', value: 76.89 },
-]
+  { name: "Claude Sonnet 4.5", value: 127.42 },
+  { name: "GPT-5", value: 98.56 },
+  { name: "Claude Haiku", value: 45.23 },
+  { name: "GPT-4o", value: 76.89 },
+];
 
 const columns: Column<CostEntry>[] = [
-  { key: 'date', header: 'Date', sortable: true },
-  { key: 'model', header: 'Model', sortable: true },
-  { key: 'project', header: 'Project', sortable: true },
-  { key: 'requests', header: 'Requests', sortable: true },
+  { key: "date", header: "Date", sortable: true },
+  { key: "model", header: "Model", sortable: true },
+  { key: "project", header: "Project", sortable: true },
+  { key: "requests", header: "Requests", sortable: true },
   {
-    key: 'tokens',
-    header: 'Tokens',
+    key: "tokens",
+    header: "Tokens",
     sortable: true,
     cell: (row) => row.tokens.toLocaleString(),
   },
   {
-    key: 'cost',
-    header: 'Cost',
+    key: "cost",
+    header: "Cost",
     sortable: true,
     cell: (row) => formatCurrency(row.cost),
   },
-]
+];
 
 export default function CostsPage() {
   const handleExport = () => {
-    const exportData = costData.map(item => ({
+    const exportData = costData.map((item) => ({
       Date: item.date,
       Model: item.model,
       Project: item.project,
       Requests: item.requests,
       Tokens: item.tokens,
-      'Cost ($)': item.cost,
-    }))
-    downloadCSV(exportData, 'cost-breakdown.csv')
-  }
+      "Cost ($)": item.cost,
+    }));
+    downloadCSV(exportData, "cost-breakdown.csv");
+  };
 
   return (
     <div className="space-y-8">
@@ -132,8 +167,8 @@ export default function CostsPage() {
           data={dailyCostData}
           xAxisKey="date"
           dataKeys={[
-            { key: 'cost', color: '#4F46E5', label: 'Actual Cost ($)' },
-            { key: 'budget', color: '#10B981', label: 'Budget ($)' },
+            { key: "cost", color: "#4F46E5", label: "Actual Cost ($)" },
+            { key: "budget", color: "#10B981", label: "Budget ($)" },
           ]}
         />
         <PieChart
@@ -151,5 +186,5 @@ export default function CostsPage() {
         <DataTable data={costData} columns={columns} />
       </div>
     </div>
-  )
+  );
 }

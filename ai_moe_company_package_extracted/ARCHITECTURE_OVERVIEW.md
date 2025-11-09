@@ -1,4 +1,5 @@
 # Architecture Overview (Layered)
+
 ```
 ┌───────────────────────────────────────────────────────────┐
 │  L1: Intake & Policy Router                               │

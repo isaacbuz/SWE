@@ -1,71 +1,93 @@
-'use client'
+"use client";
 
-import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
-import { KanbanColumn } from '@/components/board/kanban-column'
-import { IssueCard } from '@/components/board/issue-card'
-import { mockIssues } from '@/lib/api/mock-data'
-import { useState } from 'react'
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { KanbanColumn } from "@/components/board/kanban-column";
+import { IssueCard } from "@/components/board/issue-card";
+import { mockIssues } from "@/lib/api/mock-data";
+import { useState } from "react";
 
 interface BoardViewProps {
-  projectId: string
+  projectId: string;
 }
 
 export default function BoardView({ projectId }: BoardViewProps) {
-  const [issues, setIssues] = useState(mockIssues.filter((i) => i.projectId === projectId))
-  const [activeId, setActiveId] = useState<string | null>(null)
+  const [issues, setIssues] = useState(
+    mockIssues.filter((i) => i.projectId === projectId),
+  );
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
       },
-    })
-  )
+    }),
+  );
 
   const columns = {
-    todo: issues.filter((i) => i.status === 'todo'),
-    in_progress: issues.filter((i) => i.status === 'in_progress'),
-    review: issues.filter((i) => i.status === 'review'),
-    done: issues.filter((i) => i.status === 'done'),
-  }
+    todo: issues.filter((i) => i.status === "todo"),
+    in_progress: issues.filter((i) => i.status === "in_progress"),
+    review: issues.filter((i) => i.status === "review"),
+    done: issues.filter((i) => i.status === "done"),
+  };
 
   const handleDragStart = (event: { active: { id: string } }) => {
-    setActiveId(event.active.id)
-  }
+    setActiveId(event.active.id);
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
+    const { active, over } = event;
 
-    if (!over) return
+    if (!over) return;
 
-    const activeIssue = issues.find((i) => i.id === active.id)
-    if (!activeIssue) return
+    const activeIssue = issues.find((i) => i.id === active.id);
+    if (!activeIssue) return;
 
     // Determine new status based on drop target
-    let newStatus = activeIssue.status
-    if (over.id === 'todo' || columns.todo.some((i) => i.id === over.id)) {
-      newStatus = 'todo'
-    } else if (over.id === 'in_progress' || columns.in_progress.some((i) => i.id === over.id)) {
-      newStatus = 'in_progress'
-    } else if (over.id === 'review' || columns.review.some((i) => i.id === over.id)) {
-      newStatus = 'review'
-    } else if (over.id === 'done' || columns.done.some((i) => i.id === over.id)) {
-      newStatus = 'done'
+    let newStatus = activeIssue.status;
+    if (over.id === "todo" || columns.todo.some((i) => i.id === over.id)) {
+      newStatus = "todo";
+    } else if (
+      over.id === "in_progress" ||
+      columns.in_progress.some((i) => i.id === over.id)
+    ) {
+      newStatus = "in_progress";
+    } else if (
+      over.id === "review" ||
+      columns.review.some((i) => i.id === over.id)
+    ) {
+      newStatus = "review";
+    } else if (
+      over.id === "done" ||
+      columns.done.some((i) => i.id === over.id)
+    ) {
+      newStatus = "done";
     }
 
     setIssues((prevIssues) =>
       prevIssues.map((issue) =>
-        issue.id === active.id ? { ...issue, status: newStatus as any } : issue
-      )
-    )
+        issue.id === active.id ? { ...issue, status: newStatus as any } : issue,
+      ),
+    );
 
-    setActiveId(null)
-  }
+    setActiveId(null);
+  };
 
-  const activeIssue = activeId ? issues.find((i) => i.id === activeId) : null
+  const activeIssue = activeId ? issues.find((i) => i.id === activeId) : null;
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <div className="flex gap-4 overflow-x-auto pb-4">
         <KanbanColumn
           id="todo"
@@ -157,5 +179,5 @@ export default function BoardView({ projectId }: BoardViewProps) {
         )}
       </DragOverlay>
     </DndContext>
-  )
+  );
 }

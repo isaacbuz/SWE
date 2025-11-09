@@ -1,1 +1,1 @@
-export * from './data-factory';
+export * from "./data-factory";

@@ -64,6 +64,7 @@ terraform output
 ### 1. PostgreSQL Database (Cloud SQL)
 
 **Local Development**:
+
 ```bash
 # Connection
 psql -h localhost -U postgres -d ai_company_db
@@ -76,6 +77,7 @@ docker-compose exec -T postgres psql -U postgres ai_company_db < backup.sql
 ```
 
 **Production (GCP Cloud SQL)**:
+
 - Automatic backups with point-in-time recovery
 - SSL/TLS encryption in transit
 - Private network access via VPC
@@ -85,6 +87,7 @@ docker-compose exec -T postgres psql -U postgres ai_company_db < backup.sql
 ### 2. Redis Cache
 
 **Local Development**:
+
 ```bash
 # Connect to Redis
 redis-cli -h localhost -p 6379 -a redis_password
@@ -97,6 +100,7 @@ INFO memory
 ```
 
 **Production (GCP Memorystore)**:
+
 - High availability with replication
 - Automatic failover
 - Persistence options (RDB, AOF)
@@ -106,6 +110,7 @@ INFO memory
 ### 3. Cloud Storage (GCS)
 
 **Bucket Management**:
+
 ```bash
 # Create bucket
 gsutil mb -c STANDARD gs://ai-company-bucket-prod
@@ -123,6 +128,7 @@ gsutil encryption set <key-name> gs://ai-company-bucket-prod
 ### 4. Kubernetes Cluster (GKE)
 
 **Cluster Management**:
+
 ```bash
 # Get cluster credentials
 gcloud container clusters get-credentials ai-company-gke-prod --region us-central1
@@ -138,6 +144,7 @@ kubectl get nodes -o wide
 ```
 
 **Deployment**:
+
 ```bash
 # Apply all manifests
 kubectl apply -f infrastructure/kubernetes/
@@ -167,6 +174,7 @@ nano .env
 ```
 
 Key variables:
+
 - `DATABASE_URL` - PostgreSQL connection string
 - `REDIS_URL` - Redis connection string
 - `JWT_SECRET` - JWT signing secret
@@ -193,6 +201,7 @@ terraform plan \
 See `/docs/SECURITY.md` for comprehensive security guidelines.
 
 **Quick Reference**:
+
 1. Never commit `.env` files to git
 2. Use `.env.example` as template
 3. For CI/CD: Use GitHub Secrets
@@ -202,6 +211,7 @@ See `/docs/SECURITY.md` for comprehensive security guidelines.
 ### Access Control
 
 **Kubernetes RBAC**:
+
 ```yaml
 # Example role for application
 kind: Role
@@ -214,6 +224,7 @@ rules:
 ```
 
 **Workload Identity** (for GKE):
+
 ```bash
 # Bind Kubernetes SA to GCP SA
 gcloud iam service-accounts add-iam-policy-binding \
@@ -475,6 +486,7 @@ kubectl exec -it <pod-name> -n production -- /bin/bash
 ## Support
 
 For infrastructure-related questions:
+
 1. Check the troubleshooting section above
 2. Review logs and error messages
 3. Consult the documentation for the specific service

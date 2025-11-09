@@ -9,9 +9,11 @@ Successfully implemented a complete Temporal workflow orchestration system for a
 ### 1. Core Workflows (4 workflows)
 
 #### A. Plan-Patch-PR Workflow (`workflows/plan_patch_pr.py`)
+
 **Purpose:** Orchestrate complete development cycle from requirement to merged PR
 
 **Features:**
+
 - Chief Architect creates design document
 - Planner breaks down into development issues
 - Parallel code generation by multiple agents
@@ -21,10 +23,12 @@ Successfully implemented a complete Temporal workflow orchestration system for a
 - Full saga pattern support for rollbacks
 
 **Key Classes:**
+
 - `PlanPatchPRWorkflow` - Main orchestrator (12-45 min execution)
 - `IncrementalPatchWorkflow` - Simplified workflow for patches (5-15 min)
 
 **Data Models:**
+
 - `PRResult` - Final PR outcome
 - `Design` - Architecture document
 - `Issue` - Development task
@@ -32,9 +36,11 @@ Successfully implemented a complete Temporal workflow orchestration system for a
 - `QAResult` - Quality assurance results
 
 #### B. Incident Swarm Workflow (`workflows/incident_swarm.py`)
+
 **Purpose:** Coordinate multiple agents for incident diagnosis and resolution
 
 **Features:**
+
 - Parallel context gathering (metrics + logs)
 - Multiple diagnostic agents (swarm intelligence)
 - Consensus-based root cause determination
@@ -45,24 +51,29 @@ Successfully implemented a complete Temporal workflow orchestration system for a
 - Rollback capability via signals
 
 **Key Classes:**
+
 - `IncidentSwarmWorkflow` - Main incident responder (4-30 min)
 - `ContinuousMonitoringWorkflow` - Long-running monitor
 
 **Data Models:**
+
 - `Alert` - Production alert
 - `Diagnosis` - Agent diagnosis
 - `ConsensusResult` - Agreed root cause
 - `IncidentResult` - Resolution outcome
 
 **Consensus Algorithm:**
+
 - Groups similar diagnoses
 - Weights by confidence and agreement
 - Requires 70% confidence for auto-fix
 
 #### C. Code Migration Workflow (`workflows/migration.py`)
+
 **Purpose:** Manage large-scale code migrations with validation
 
 **Features:**
+
 - Comprehensive codebase analysis
 - Dependency-aware migration planning
 - Incremental step execution
@@ -73,22 +84,27 @@ Successfully implemented a complete Temporal workflow orchestration system for a
 - Detailed migration reporting
 
 **Key Classes:**
+
 - `CodeMigrationWorkflow` - Migration orchestrator (20 min - 4 hours)
 
 **Data Models:**
+
 - `MigrationPlan` - Complete migration strategy
 - `MigrationStep` - Individual migration step
 - `StepResult` - Step execution outcome
 - `MigrationResult` - Final migration result
 
 **Execution Modes:**
+
 - Incremental: Validates each step, stops on failure
 - Batch: Executes all steps in parallel (faster but riskier)
 
 #### D. Quality Gate Workflow (`workflows/quality_gate.py`)
+
 **Purpose:** Run comprehensive quality checks on PRs
 
 **Features:**
+
 - 8 parallel quality checks:
   - Unit tests
   - Integration tests
@@ -105,55 +121,67 @@ Successfully implemented a complete Temporal workflow orchestration system for a
 - Blocking issue identification
 
 **Key Classes:**
+
 - `QualityGateWorkflow` - Quality checker (3-20 min)
 - `ContinuousQualityWorkflow` - Long-running monitor
 
 **Data Models:**
+
 - `QualityCheck` - Individual check result
 - `QualityGateResult` - Overall quality result
 
 **Scoring:**
+
 - Overall score = average of all check scores
 - Can merge = all required checks pass AND score ≥ threshold
 
 ### 2. Activity Implementations (3 categories, 30+ activities)
 
 #### A. Agent Activities (`activities/agent_activities.py`)
+
 Interface between workflows and AI agents:
 
 **Design & Planning:**
+
 - `create_design(requirement)` - Chief Architect creates architecture
 - `create_issues(design)` - Planner creates development tasks
 
 **Code Generation:**
+
 - `generate_code(issue)` - Coder implements features
 - `review_code(patches, qa_result)` - Reviewer fixes issues
 
 **Incident Response:**
+
 - `analyze_logs(service, timestamp)` - Log analysis
 - `diagnose_issue(alert, agent_id)` - Single agent diagnosis
 - `generate_fix(consensus)` - Fix generation
 - `create_postmortem(incident_data)` - Post-mortem docs
 
 **Migration:**
+
 - `analyze_codebase(migration_type, source)` - Code analysis
 - `create_migration_plan(analysis, source, target)` - Plan generation
 - `generate_migration_step(step)` - Step implementation
 - `validate_migration_step(step, changes)` - Step validation
 
 **Quality Improvements:**
+
 - `fix_linting_issues(branch, issues)` - Auto-fix linting
 - `improve_coverage(branch, data)` - Generate tests
 
 #### B. GitHub Activities (`activities/github_activities.py`)
+
 GitHub API operations:
 
 **Branch Management:**
+
 - `create_branch(name, base)` - Create Git branch
 - `sync_branch(branch, base)` - Sync with base
 - `push_branch(branch, force)` - Push to remote
 
 **PR Operations:**
+
 - `create_pull_request(data)` - Create PR
 - `merge_pull_request(pr_number)` - Merge PR
 - `update_pr_status(pr_number, state, desc)` - Update status
@@ -163,54 +191,66 @@ GitHub API operations:
 - `request_pr_review(pr_number, reviewers)` - Request review
 
 **Issue Operations:**
+
 - `create_issue(data)` - Create issue
 - `close_issue(issue_number, comment)` - Close issue
 - `add_issue_comment(issue_number, comment)` - Add comment
 
 **Commit Operations:**
+
 - `create_commit(branch, files, message)` - Create commit
 - `get_commit_status(sha)` - Get commit status
 
 **Release Operations:**
+
 - `create_release(tag, name, body)` - Create release
 
 #### C. Tool Activities (`activities/tool_activities.py`)
+
 Development tool executions:
 
 **Testing:**
+
 - `run_tests(target, type)` - Unit/integration/all tests
 - `run_performance_tests(branch)` - Performance tests
 - `run_e2e_tests(branch)` - End-to-end tests
 - `run_smoke_tests(environment)` - Smoke tests
 
 **Code Quality:**
+
 - `run_linters(target)` - Linting (pylint, flake8, mypy, black)
 - `run_static_analysis(branch)` - Static analysis
 - `check_code_coverage(branch)` - Coverage check
 
 **Security:**
+
 - `run_security_scan(target)` - Security scanning (bandit, safety, semgrep)
 - `check_dependencies(branch)` - Dependency vulnerabilities
 
 **Operations:**
+
 - `fetch_metrics(service, timestamp)` - Service metrics
 - `fetch_logs(service, timestamp)` - Service logs
 - `deploy_to_staging(branch)` - Deploy to staging
 - `rollback_deployment(deployment_id)` - Rollback
 
 **Documentation:**
+
 - `generate_changelog(from_version, to_version)` - Changelog
 - `update_documentation(changes)` - Update docs
 
 **Notifications:**
+
 - `notify_team(channel, message, severity)` - Team notifications
 
 ### 3. Worker and Client
 
 #### A. Worker (`worker.py`)
+
 Temporal worker that executes workflows and activities:
 
 **Features:**
+
 - Auto-discovers and registers all workflows and activities
 - Supports single or multi-worker deployment
 - Configurable concurrency limits
@@ -218,6 +258,7 @@ Temporal worker that executes workflows and activities:
 - Comprehensive logging
 
 **Usage:**
+
 ```bash
 # Single worker
 python worker.py --host localhost:7233
@@ -227,14 +268,17 @@ python worker.py --workers 3
 ```
 
 **Configuration:**
+
 - Max concurrent activities: 10
 - Max concurrent workflow tasks: 10
 - Default task queue: "autonomous-coding-task-queue"
 
 #### B. Client (`client.py`)
+
 High-level interface for starting and managing workflows:
 
 **WorkflowClient Class:**
+
 - `start_plan_patch_pr()` - Start development workflow
 - `start_incremental_patch()` - Start patch workflow
 - `start_incident_response()` - Start incident workflow
@@ -246,6 +290,7 @@ High-level interface for starting and managing workflows:
 - `signal_workflow()` - Send signal to workflow
 
 **Example Functions:**
+
 - `example_plan_patch_pr()` - Complete example
 - `example_incident_response()` - Incident example
 - `example_migration()` - Migration example
@@ -255,26 +300,31 @@ High-level interface for starting and managing workflows:
 Centralized configuration for all workflow settings:
 
 **Timeout Configurations:**
+
 - `WorkflowTimeouts` - Workflow execution timeouts
 - `ActivityTimeouts` - Activity execution timeouts
 - `ActivityHeartbeats` - Heartbeat timeouts
 
 **Retry Policies:**
+
 - `RetryPolicies.default()` - Standard retry (3 attempts)
 - `RetryPolicies.aggressive()` - Aggressive retry (5 attempts)
 - `RetryPolicies.no_retry()` - No retry
 - `RetryPolicies.github_api()` - GitHub-specific retry
 
 **Quality Thresholds:**
+
 - Min coverage: 80%
 - Min quality score: 85%
 - Max critical vulnerabilities: 0
 
 **Incident Configuration:**
+
 - Default diagnostic agents: 3
 - Auto-fix confidence threshold: 70%
 
 **Feature Flags:**
+
 - Enable auto-merge: False (default)
 - Enable auto-fix: True
 - Enable auto-rollback: True
@@ -282,7 +332,9 @@ Centralized configuration for all workflow settings:
 ### 5. Documentation
 
 #### A. README.md
+
 Comprehensive documentation including:
+
 - Architecture overview with diagrams
 - Workflow descriptions with ASCII flow diagrams
 - Activity catalog
@@ -293,7 +345,9 @@ Comprehensive documentation including:
 - Production considerations
 
 #### B. WORKFLOW_EXAMPLES.md
+
 Detailed execution examples:
+
 - Plan-Patch-PR examples (simple feature, bug fix)
 - Incident response examples (high/low confidence)
 - Migration examples (successful, with rollback)
@@ -329,16 +383,19 @@ Result
 ### Error Handling
 
 **Activity Level:**
+
 - Automatic retries with exponential backoff
 - Configurable retry policies per activity
 - Heartbeat monitoring for long tasks
 
 **Workflow Level:**
+
 - Saga pattern for compensations
 - Rollback capabilities
 - Error aggregation and reporting
 
 **System Level:**
+
 - Durable execution (survives crashes)
 - Event sourcing (complete audit trail)
 - Replay determinism
@@ -454,12 +511,14 @@ Duration: 36.5 minutes
 ### 1. Signals and Queries
 
 **Signals** (modify workflow state):
+
 - `cancel_workflow()` - Cancel execution
 - `pause_migration()` - Pause migration
 - `resume_migration()` - Resume migration
 - `rollback()` - Trigger rollback
 
 **Queries** (read workflow state):
+
 - `get_status()` - Current workflow status
 - `get_progress()` - Migration progress
 - `get_stats()` - Monitoring statistics
@@ -510,16 +569,19 @@ else:
 ## Testing Strategy
 
 ### Unit Testing
+
 - Mock activities for workflow tests
 - Test activity implementations independently
 - Use Temporal test framework
 
 ### Integration Testing
+
 - Test against Temporal test server
 - Validate end-to-end workflows
 - Test error scenarios
 
 ### Example Test:
+
 ```python
 async def test_plan_patch_pr():
     async with await WorkflowEnvironment.start_time_skipping() as env:
@@ -536,6 +598,7 @@ async def test_plan_patch_pr():
 ## Production Deployment
 
 ### Prerequisites
+
 1. Temporal Server (self-hosted or Temporal Cloud)
 2. Python 3.11+
 3. Network access to GitHub
@@ -585,6 +648,7 @@ open http://temporal.example.com:8233
 ### Logging
 
 All components emit structured logs:
+
 - Workflow start/completion
 - Activity execution
 - Errors and retries
@@ -593,6 +657,7 @@ All components emit structured logs:
 ### Alerting
 
 Set up alerts for:
+
 - Workflow failures
 - Activity timeouts
 - Queue backlogs

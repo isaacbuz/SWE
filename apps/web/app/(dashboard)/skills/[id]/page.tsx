@@ -1,36 +1,50 @@
-'use client'
+"use client";
 
-import { use } from 'react'
-import Link from 'next/link'
-import { ArrowLeft, Star, Download, Zap, Code, Play, Install, Trash2 } from 'lucide-react'
-import { useSkill, useInstallSkill, useUninstallSkill, useInstalledSkills } from '@/lib/hooks/use-skills'
-import { SkillPlayground } from '@/components/skills/skill-playground'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { cn } from '@/lib/utils/cn'
+import { use } from "react";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  Star,
+  Download,
+  Zap,
+  Code,
+  Play,
+  Install,
+  Trash2,
+} from "lucide-react";
+import {
+  useSkill,
+  useInstallSkill,
+  useUninstallSkill,
+  useInstalledSkills,
+} from "@/lib/hooks/use-skills";
+import { SkillPlayground } from "@/components/skills/skill-playground";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils/cn";
 
 interface SkillDetailPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
 export default function SkillDetailPage({ params }: SkillDetailPageProps) {
-  const { id } = use(params)
-  const { data: skill, isLoading, error } = useSkill(id)
-  const { data: installedSkills } = useInstalledSkills()
-  const isInstalled = installedSkills?.some(s => s.skill_id === id)
+  const { id } = use(params);
+  const { data: skill, isLoading, error } = useSkill(id);
+  const { data: installedSkills } = useInstalledSkills();
+  const isInstalled = installedSkills?.some((s) => s.skill_id === id);
 
-  const installSkill = useInstallSkill()
-  const uninstallSkill = useUninstallSkill()
+  const installSkill = useInstallSkill();
+  const uninstallSkill = useUninstallSkill();
 
   const handleInstall = () => {
-    installSkill.mutate({ skillId: id })
-  }
+    installSkill.mutate({ skillId: id });
+  };
 
   const handleUninstall = () => {
-    uninstallSkill.mutate(id)
-  }
+    uninstallSkill.mutate(id);
+  };
 
   if (isLoading) {
     return (
@@ -38,7 +52,7 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
         <div className="h-8 w-64 animate-pulse rounded bg-surface-secondary" />
         <div className="h-96 animate-pulse rounded-lg bg-surface-secondary" />
       </div>
-    )
+    );
   }
 
   if (error || !skill) {
@@ -52,11 +66,11 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
         </Link>
         <Card className="p-6">
           <p className="text-status-error">
-            {error?.message || 'Skill not found'}
+            {error?.message || "Skill not found"}
           </p>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -73,9 +87,11 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold text-ink-primary">{skill.name}</h1>
+              <h1 className="text-3xl font-bold text-ink-primary">
+                {skill.name}
+              </h1>
               <Badge variant="outline">{skill.version}</Badge>
-              {skill.status === 'active' && (
+              {skill.status === "active" && (
                 <Badge className="bg-status-success/10 text-status-success border-status-success/20">
                   Active
                 </Badge>
@@ -100,9 +116,7 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
                 <Zap className="h-4 w-4" />
                 <span>{skill.execution_count} executions</span>
               </div>
-              {skill.author_name && (
-                <span>by {skill.author_name}</span>
-              )}
+              {skill.author_name && <span>by {skill.author_name}</span>}
             </div>
 
             {/* Tags */}
@@ -129,10 +143,7 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
                 Uninstall
               </Button>
             ) : (
-              <Button
-                onClick={handleInstall}
-                disabled={installSkill.isPending}
-              >
+              <Button onClick={handleInstall} disabled={installSkill.isPending}>
                 <Install className="mr-2 h-4 w-4" />
                 Install
               </Button>
@@ -155,7 +166,9 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
           {/* Detailed Description */}
           {skill.detailed_description && (
             <Card className="p-6">
-              <h2 className="mb-4 text-xl font-semibold text-ink-primary">Description</h2>
+              <h2 className="mb-4 text-xl font-semibold text-ink-primary">
+                Description
+              </h2>
               <div
                 className="prose prose-sm max-w-none text-ink-secondary"
                 dangerouslySetInnerHTML={{ __html: skill.detailed_description }}
@@ -166,10 +179,15 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
           {/* Examples */}
           {skill.examples && skill.examples.length > 0 && (
             <Card className="p-6">
-              <h2 className="mb-4 text-xl font-semibold text-ink-primary">Examples</h2>
+              <h2 className="mb-4 text-xl font-semibold text-ink-primary">
+                Examples
+              </h2>
               <div className="space-y-4">
                 {skill.examples.map((example, i) => (
-                  <div key={i} className="rounded-md border border-border-default bg-surface-secondary p-4">
+                  <div
+                    key={i}
+                    className="rounded-md border border-border-default bg-surface-secondary p-4"
+                  >
                     <h3 className="mb-2 font-medium text-ink-primary">
                       Example {i + 1}
                     </h3>
@@ -185,13 +203,17 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
           {/* Schema Info */}
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="p-6">
-              <h2 className="mb-4 text-xl font-semibold text-ink-primary">Input Schema</h2>
+              <h2 className="mb-4 text-xl font-semibold text-ink-primary">
+                Input Schema
+              </h2>
               <pre className="overflow-auto rounded-md border border-border-default bg-surface-secondary p-4 text-sm">
                 {JSON.stringify(skill.input_schema, null, 2)}
               </pre>
             </Card>
             <Card className="p-6">
-              <h2 className="mb-4 text-xl font-semibold text-ink-primary">Output Schema</h2>
+              <h2 className="mb-4 text-xl font-semibold text-ink-primary">
+                Output Schema
+              </h2>
               <pre className="overflow-auto rounded-md border border-border-default bg-surface-secondary p-4 text-sm">
                 {JSON.stringify(skill.output_schema, null, 2)}
               </pre>
@@ -207,7 +229,9 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
         {/* Documentation Tab */}
         <TabsContent value="documentation" className="space-y-6">
           <Card className="p-6">
-            <h2 className="mb-4 text-xl font-semibold text-ink-primary">Model Preferences</h2>
+            <h2 className="mb-4 text-xl font-semibold text-ink-primary">
+              Model Preferences
+            </h2>
             <pre className="overflow-auto rounded-md border border-border-default bg-surface-secondary p-4 text-sm">
               {JSON.stringify(skill.model_preferences, null, 2)}
             </pre>
@@ -215,7 +239,9 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
 
           {skill.validation_rules && skill.validation_rules.length > 0 && (
             <Card className="p-6">
-              <h2 className="mb-4 text-xl font-semibold text-ink-primary">Validation Rules</h2>
+              <h2 className="mb-4 text-xl font-semibold text-ink-primary">
+                Validation Rules
+              </h2>
               <pre className="overflow-auto rounded-md border border-border-default bg-surface-secondary p-4 text-sm">
                 {JSON.stringify(skill.validation_rules, null, 2)}
               </pre>
@@ -231,6 +257,5 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
-

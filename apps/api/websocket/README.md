@@ -50,6 +50,7 @@ pip install -r requirements.txt
 ```
 
 Required packages:
+
 - `python-socketio==5.10.0`
 - `python-engineio==4.8.0`
 - `aioredis==2.0.1`
@@ -62,6 +63,7 @@ python main.py
 ```
 
 The WebSocket server will be available at:
+
 ```
 ws://localhost:8000/ws
 ```
@@ -73,8 +75,8 @@ import io from "socket.io-client";
 
 const socket = io("http://localhost:8000/ws", {
   auth: {
-    token: "your-jwt-token"
-  }
+    token: "your-jwt-token",
+  },
 });
 
 socket.on("connection_established", (event) => {
@@ -113,13 +115,17 @@ Clients subscribe to rooms to receive updates:
 
 ```javascript
 // Subscribe to project updates
-socket.emit("subscribe", {
-  room: "project:550e8400-e29b-41d4-a716-446655440000"
-}, (response) => {
-  if (response.status === "success") {
-    console.log("Subscribed to project");
-  }
-});
+socket.emit(
+  "subscribe",
+  {
+    room: "project:550e8400-e29b-41d4-a716-446655440000",
+  },
+  (response) => {
+    if (response.status === "success") {
+      console.log("Subscribed to project");
+    }
+  },
+);
 
 // Listen for updates
 socket.on("project.updated", (event) => {
@@ -130,35 +136,42 @@ socket.on("project.updated", (event) => {
 ## Event Types
 
 ### Project Events
+
 - `project.updated` - Project metadata changed
 - `project.deleted` - Project deleted
 
 ### Agent Events
+
 - `agent.status_changed` - Agent status/availability changed
 - `agent.connected` - Agent came online
 - `agent.disconnected` - Agent went offline
 
 ### Workflow Events
+
 - `workflow.started` - Workflow started
 - `workflow.progress` - Progress update (real-time)
 - `workflow.completed` - Workflow completed
 - `workflow.failed` - Workflow failed
 
 ### PR Events
+
 - `pr.created` - New PR created
 - `pr.updated` - PR metadata updated
 - `pr.closed` - PR closed/merged
 
 ### Issue Events
+
 - `issue.created` - New issue created
 - `issue.updated` - Issue metadata updated
 - `issue.closed` - Issue closed
 
 ### AI Events
+
 - `ai.suggestion` - AI suggestion generated
 - `ai.analysis_complete` - Analysis finished
 
 ### Connection Events
+
 - `connection.established` - Connection successful
 - `connection.error` - Connection failed
 
@@ -167,10 +180,12 @@ See `/WEBSOCKET_API.md` for detailed event payloads.
 ## Room Structure
 
 ### Auto-subscribed Rooms
+
 - `user:<user_id>` - User-specific updates
 - `global` - System-wide announcements
 
 ### Manual Subscription Rooms
+
 - `project:<project_id>` - Project-specific updates
 - `agent:<agent_id>` - Agent-specific events
 
@@ -181,13 +196,15 @@ See `/WEBSOCKET_API.md` for detailed event payloads.
 All WebSocket connections require a valid JWT token.
 
 **Method 1: Auth Header (Recommended)**
+
 ```javascript
 const socket = io("http://localhost:8000/ws", {
-  auth: { token: "eyJhbGc..." }
+  auth: { token: "eyJhbGc..." },
 });
 ```
 
 **Method 2: Query Parameter (Fallback)**
+
 ```javascript
 const socket = io("http://localhost:8000/ws?token=eyJhbGc...");
 ```
@@ -240,6 +257,7 @@ pytest /apps/api/websocket/tests.py -v
 ```
 
 Tests cover:
+
 - Event models and validation
 - Room management
 - Subscription tracking
@@ -361,12 +379,14 @@ AsyncServer(
 ## Performance
 
 ### Single Instance
+
 - Max connections: 10,000
 - Messages/sec per connection: 5,000+
 - Latency: < 50ms (local)
 - Memory per connection: ~5KB
 
 ### Horizontal Scaling
+
 - Redis adapter for message queue
 - Unlimited connections (infrastructure limited)
 - Sub-second sync across instances
@@ -389,6 +409,7 @@ logger.error("Error handling connection", exc_info=True)
 ```
 
 Check logs:
+
 ```bash
 grep -i websocket logs/app.log
 ```
@@ -422,6 +443,7 @@ logging.basicConfig(level=logging.DEBUG)
 **Problem:** WebSocket connection refused
 
 **Solutions:**
+
 1. Check API server is running: `curl http://localhost:8000/health`
 2. Verify JWT token is valid: Check token claims
 3. Check CORS configuration in `config.py`
@@ -436,14 +458,18 @@ logging.basicConfig(level=logging.DEBUG)
 ```javascript
 // Refresh token 5 minutes before expiry
 const timeUntilExpiry = getTokenExpiryTime();
-setTimeout(() => {
-  refreshToken();
-}, timeUntilExpiry - 5 * 60 * 1000);
+setTimeout(
+  () => {
+    refreshToken();
+  },
+  timeUntilExpiry - 5 * 60 * 1000,
+);
 ```
 
 ### Events Not Received
 
 **Debugging:**
+
 1. Verify subscription: `socket.emit("debug:rooms", {}, console.log)`
 2. Check event type names match exactly
 3. Check browser console for JavaScript errors
@@ -454,23 +480,23 @@ setTimeout(() => {
 
 ### Core Module Files
 
-| File | Purpose | Lines |
-|------|---------|-------|
-| `server.py` | Socket.IO server and ASGI app | 400+ |
-| `auth.py` | JWT authentication | 200+ |
-| `rooms.py` | Room and subscription management | 350+ |
-| `events.py` | Event handlers | 250+ |
-| `models.py` | Pydantic event models | 300+ |
-| `tests.py` | Unit tests | 400+ |
+| File        | Purpose                          | Lines |
+| ----------- | -------------------------------- | ----- |
+| `server.py` | Socket.IO server and ASGI app    | 400+  |
+| `auth.py`   | JWT authentication               | 200+  |
+| `rooms.py`  | Room and subscription management | 350+  |
+| `events.py` | Event handlers                   | 250+  |
+| `models.py` | Pydantic event models            | 300+  |
+| `tests.py`  | Unit tests                       | 400+  |
 
 ### Related Files
 
-| File | Purpose |
-|------|---------|
+| File                              | Purpose                      |
+| --------------------------------- | ---------------------------- |
 | `/apps/api/events/broadcaster.py` | Event broadcasting utilities |
-| `/apps/api/main.py` | FastAPI app integration |
-| `/WEBSOCKET_API.md` | Complete API documentation |
-| `/WEBSOCKET_INTEGRATION_GUIDE.md` | Integration examples |
+| `/apps/api/main.py`               | FastAPI app integration      |
+| `/WEBSOCKET_API.md`               | Complete API documentation   |
+| `/WEBSOCKET_INTEGRATION_GUIDE.md` | Integration examples         |
 
 ## Examples
 
@@ -485,6 +511,7 @@ See `/apps/api/events/example_usage.py` for complete integration examples:
 ## API Reference
 
 See `/WEBSOCKET_API.md` for:
+
 - Complete event payload specifications
 - Client command definitions
 - Error codes and messages
@@ -507,6 +534,7 @@ Same as main project
 ## Support
 
 For questions or issues:
+
 1. Check `/WEBSOCKET_API.md` for API reference
 2. Check `/WEBSOCKET_INTEGRATION_GUIDE.md` for examples
 3. Review `/apps/api/events/example_usage.py` for code samples

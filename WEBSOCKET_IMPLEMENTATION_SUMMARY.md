@@ -128,6 +128,7 @@ aioredis==2.0.1
 #### Comprehensive API Documentation
 
 **`/WEBSOCKET_API.md`** - Complete WebSocket API reference
+
 - Connection authentication (2 methods)
 - Connection lifecycle
 - 14 event type definitions with payloads
@@ -146,6 +147,7 @@ aioredis==2.0.1
 #### Integration Guide
 
 **`/WEBSOCKET_INTEGRATION_GUIDE.md`** - Step-by-step integration
+
 - Quick start instructions
 - Integration points for:
   - Project updates
@@ -221,35 +223,42 @@ Send connection_established event
 ## Event Types Implemented
 
 ### Project Events (2)
+
 - `project.updated` - Project metadata or status changed
 - `project.deleted` - Project was deleted
 
 ### Agent Events (3)
+
 - `agent.status_changed` - Agent availability changed
 - `agent.connected` - Agent came online
 - `agent.disconnected` - Agent went offline
 
 ### Workflow Events (4)
+
 - `workflow.started` - Workflow execution started
 - `workflow.progress` - Progress update during execution
 - `workflow.completed` - Workflow completed successfully
 - `workflow.failed` - Workflow failed
 
 ### Pull Request Events (3)
+
 - `pr.created` - New PR created
 - `pr.updated` - PR was updated
 - `pr.closed` - PR was closed/merged
 
 ### Issue Events (3)
+
 - `issue.created` - New issue created
 - `issue.updated` - Issue was updated
 - `issue.closed` - Issue was closed
 
 ### AI Events (2)
+
 - `ai.suggestion` - AI suggestion/recommendation
 - `ai.analysis_complete` - Analysis finished
 
 ### Connection Events (2)
+
 - `connection.established` - Connection successful
 - `connection.error` - Connection failed
 
@@ -258,12 +267,14 @@ Send connection_established event
 ## Room Management Features
 
 ### Automatic Operations
+
 - User auto-subscribed to personal room
 - User auto-subscribed to global room
 - Auto-removal from all rooms on disconnect
 - Automatic room cleanup when empty
 
 ### Manual Operations
+
 - Subscribe to project rooms
 - Subscribe to agent rooms
 - Unsubscribe from rooms
@@ -290,6 +301,7 @@ Send connection_established event
 ## Testing Coverage
 
 ### Unit Tests (25+ tests)
+
 - Event model creation and validation
 - Room manager operations
 - Subscription management
@@ -298,6 +310,7 @@ Send connection_established event
 - Error event creation
 
 **Run tests:**
+
 ```bash
 pytest /apps/api/websocket/tests.py -v
 ```
@@ -353,6 +366,7 @@ Documentation:
 ## Performance Metrics
 
 ### Estimated Capacity (Single Instance)
+
 - Concurrent Connections: 10,000
 - Messages/Second: 5,000+ per connection
 - Latency: < 50ms (local network)
@@ -360,6 +374,7 @@ Documentation:
 - CPU Usage: ~1% per 1000 connections
 
 ### With Redis Adapter (Horizontal Scaling)
+
 - Unlimited connections (limited by infrastructure)
 - Sub-second synchronization across instances
 - Automatic failover support
@@ -367,11 +382,13 @@ Documentation:
 ## Deployment Requirements
 
 ### Minimum
+
 - Python 3.8+
 - FastAPI 0.109.0+
 - Socket.IO 5.10.0+
 
 ### Recommended (Production)
+
 - Python 3.11
 - Redis 7.0+
 - Multiple app instances behind load balancer
@@ -403,20 +420,23 @@ Documentation:
 ## Getting Started
 
 ### 1. Install Dependencies
+
 ```bash
 cd /apps/api
 pip install -r requirements.txt
 ```
 
 ### 2. Start Server
+
 ```bash
 python main.py
 ```
 
 ### 3. Connect Client
+
 ```javascript
 const socket = io("http://localhost:8000/ws", {
-  auth: { token: "your-jwt-token" }
+  auth: { token: "your-jwt-token" },
 });
 
 socket.on("connection_established", (event) => {
@@ -425,6 +445,7 @@ socket.on("connection_established", (event) => {
 ```
 
 ### 4. Subscribe to Updates
+
 ```javascript
 socket.emit("subscribe", { room: "project:123" });
 
@@ -434,6 +455,7 @@ socket.on("project.updated", (event) => {
 ```
 
 ### 5. Broadcast from Backend
+
 ```python
 from events.broadcaster import get_broadcaster
 from uuid import UUID
@@ -452,12 +474,14 @@ await broadcaster.broadcast_project_updated(
 ## Support Resources
 
 ### Documentation
+
 - `/WEBSOCKET_API.md` - API reference
 - `/WEBSOCKET_INTEGRATION_GUIDE.md` - Integration examples
 - `/apps/api/events/example_usage.py` - Code examples
 - `/apps/api/websocket/tests.py` - Test examples
 
 ### External References
+
 - [Socket.IO Documentation](https://socket.io/docs/)
 - [Socket.IO Python Documentation](https://python-socketio.readthedocs.io/)
 - [FastAPI WebSocket Guide](https://fastapi.tiangolo.com/advanced/websockets/)
@@ -479,6 +503,7 @@ A complete, production-ready WebSocket server has been implemented with:
 ✓ Logging and monitoring hooks
 
 The implementation is ready for integration with:
+
 - Project management endpoints
 - Workflow execution engines
 - GitHub webhooks

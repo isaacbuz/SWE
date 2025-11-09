@@ -1,7 +1,7 @@
-
 # System Architecture
 
 Layers:
+
 1. UI (Streamlit)
 2. Orchestration (Router + Workflow)
 3. Agents (Role-specialized)

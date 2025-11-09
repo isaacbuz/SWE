@@ -1,4 +1,3 @@
-
 # Mixture of Experts (MoE) Design
 
 - Declarative registry maps **roles → preferred models + fallbacks**.
@@ -7,6 +6,7 @@
 - Add dynamic signals later (latency, recent failures, budget left).
 
 MoE signals (initial):
+
 - Cost cap check
 - Context window requirement estimate
 - Vendor diversity toggle

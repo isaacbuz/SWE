@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from auth import get_current_active_user, require_user, CurrentUser
 from middleware import limiter
+from services.prs import pr_service
 
 
 router = APIRouter(prefix="/prs", tags=["pull-requests"])
@@ -128,15 +129,14 @@ async def create_pr(
     - **auto_review**: Whether to automatically trigger review
     - **review_level**: Review detail level
     """
-    # TODO: Verify project exists and user has access
-    # TODO: Fetch PR details from GitHub API
-    # TODO: Create PR record in database
-    # TODO: If auto_review, trigger review agent
-
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="PR tracking not yet implemented"
+    pr_data = await pr_service.create_pr(
+        project_id=pr.project_id,
+        github_pr_url=pr.github_pr_url,
+        user_id=current_user.id,
+        auto_review=pr.auto_review,
+        review_level=pr.review_level.value
     )
+    return PR(**pr_data)
 
 
 @router.get(
@@ -157,11 +157,19 @@ async def list_prs(
 
     Supports filtering by project and status.
     """
-    # TODO: Query PRs from database with filters
-    # TODO: Apply pagination
-    # TODO: Return PR list
-
-    return PRList(items=[], total=0, page=page, page_size=page_size)
+    result = await pr_service.list_prs(
+        user_id=current_user.id,
+        project_id=project_id,
+        status_filter=status.value if status else None,
+        page=page,
+        page_size=page_size
+    )
+    return PRList(
+        items=[PR(**item) for item in result["items"]],
+        total=result["total"],
+        page=result["page"],
+        page_size=result["page_size"]
+    )
 
 
 @router.get(
@@ -179,20 +187,11 @@ async def get_pr_stats(
 
     - **project_id**: Optional project filter
     """
-    # TODO: Query PR statistics from database
-    # TODO: Calculate counts by status
-    # TODO: Calculate average review time
-    # TODO: Return statistics
-
-    return PRStats(
-        total=0,
-        pending=0,
-        approved=0,
-        changes_requested=0,
-        merged=0,
-        closed=0,
-        avg_review_time_hours=None
+    stats = await pr_service.get_pr_stats(
+        user_id=current_user.id,
+        project_id=project_id
     )
+    return PRStats(**stats)
 
 
 @router.get(
@@ -210,14 +209,8 @@ async def get_pr(
 
     - **pr_id**: PR UUID
     """
-    # TODO: Load PR from database
-    # TODO: Verify user has access to PR's project
-    # TODO: Return PR details with review
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"PR {pr_id} not found"
-    )
+    pr_data = await pr_service.get_pr(pr_id, current_user.id)
+    return PR(**pr_data)
 
 
 @router.patch(
@@ -236,16 +229,17 @@ async def update_pr(
 
     Only provided fields will be updated.
     """
-    # TODO: Load PR from database
-    # TODO: Verify user has access to PR's project
-    # TODO: Validate updates
-    # TODO: Update PR in database
-    # TODO: Return updated PR
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"PR {pr_id} not found"
+    updates = update.dict(exclude_unset=True)
+    if "status" in updates:
+        updates["status"] = updates["status"].value if updates["status"] else None
+    if "review_level" in updates:
+        updates["review_level"] = updates["review_level"].value if updates["review_level"] else None
+    pr_data = await pr_service.update_pr(
+        pr_id=pr_id,
+        user_id=current_user.id,
+        updates=updates
     )
+    return PR(**pr_data)
 
 
 @router.post(
@@ -265,16 +259,12 @@ async def trigger_pr_review(
     - **pr_id**: PR UUID
     - **review_level**: Detail level for the review
     """
-    # TODO: Load PR from database
-    # TODO: Verify user has access to PR's project
-    # TODO: Create and start review agent
-    # TODO: Update PR with assigned agent
-    # TODO: Return PR
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"PR {pr_id} not found"
+    pr_data = await pr_service.trigger_review(
+        pr_id=pr_id,
+        user_id=current_user.id,
+        review_level=review_level.value
     )
+    return PR(**pr_data)
 
 
 @router.get(
@@ -292,14 +282,8 @@ async def get_pr_review(
 
     - **pr_id**: PR UUID
     """
-    # TODO: Load PR from database
-    # TODO: Verify user has access to PR's project
-    # TODO: Return review details
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Review for PR {pr_id} not found"
-    )
+    review_data = await pr_service.get_pr_review(pr_id, current_user.id)
+    return PRReview(**review_data)
 
 
 @router.post(
@@ -317,16 +301,8 @@ async def sync_pr(
 
     Fetches latest PR state from GitHub API.
     """
-    # TODO: Load PR from database
-    # TODO: Verify user has access to PR's project
-    # TODO: Fetch latest PR data from GitHub
-    # TODO: Update PR in database
-    # TODO: Return updated PR
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"PR {pr_id} not found"
-    )
+    pr_data = await pr_service.sync_pr(pr_id, current_user.id)
+    return PR(**pr_data)
 
 
 @router.delete(
@@ -344,12 +320,4 @@ async def delete_pr(
 
     This will also cancel any assigned review agents.
     """
-    # TODO: Load PR from database
-    # TODO: Verify user has access to PR's project
-    # TODO: Cancel any assigned agents
-    # TODO: Delete PR
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"PR {pr_id} not found"
-    )
+    await pr_service.delete_pr(pr_id, current_user.id)

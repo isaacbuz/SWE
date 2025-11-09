@@ -1,11 +1,11 @@
 // Mock data generators for testing
 
 export const mockAgent = (overrides = {}) => ({
-  id: 'agent-1',
-  name: 'Test Agent',
-  type: 'developer',
-  status: 'available',
-  capabilities: ['code_generation', 'code_review'],
+  id: "agent-1",
+  name: "Test Agent",
+  type: "developer",
+  status: "available",
+  capabilities: ["code_generation", "code_review"],
   currentTask: null,
   metrics: {
     tasksCompleted: 10,
@@ -16,24 +16,24 @@ export const mockAgent = (overrides = {}) => ({
 });
 
 export const mockTask = (overrides = {}) => ({
-  id: 'task-1',
-  title: 'Test Task',
-  description: 'This is a test task',
-  status: 'pending',
-  priority: 'medium',
+  id: "task-1",
+  title: "Test Task",
+  description: "This is a test task",
+  status: "pending",
+  priority: "medium",
   assignedAgent: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   estimatedDuration: 3600,
-  tags: ['test', 'development'],
+  tags: ["test", "development"],
   ...overrides,
 });
 
 export const mockProject = (overrides = {}) => ({
-  id: 'project-1',
-  name: 'Test Project',
-  description: 'This is a test project',
-  status: 'active',
+  id: "project-1",
+  name: "Test Project",
+  description: "This is a test project",
+  status: "active",
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   tasks: [],
@@ -42,18 +42,18 @@ export const mockProject = (overrides = {}) => ({
 });
 
 export const mockUser = (overrides = {}) => ({
-  id: 'user-1',
-  email: 'test@example.com',
-  name: 'Test User',
-  role: 'admin',
+  id: "user-1",
+  email: "test@example.com",
+  name: "Test User",
+  role: "admin",
   createdAt: new Date().toISOString(),
   ...overrides,
 });
 
 export const mockWorkflowExecution = (overrides = {}) => ({
-  id: 'exec-1',
-  workflowId: 'workflow-1',
-  status: 'running',
+  id: "exec-1",
+  workflowId: "workflow-1",
+  status: "running",
   startedAt: new Date().toISOString(),
   steps: [],
   context: {},

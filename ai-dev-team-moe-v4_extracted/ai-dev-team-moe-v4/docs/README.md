@@ -1,5 +1,5 @@
-
 # Docs Index
+
 - ARCHITECTURE.md — multi-layer architecture
 - MOE_DESIGN.md — mixture-of-experts routing
 - MCP_INTEGRATION.md — tool chest via MCP servers

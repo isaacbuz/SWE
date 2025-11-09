@@ -7,6 +7,7 @@ This document describes the integration of [Claude Skills](https://www.claude.co
 ## What are Claude Skills?
 
 Claude Skills are specialized, reusable prompt templates that:
+
 - Encapsulate best practices for specific tasks
 - Provide consistent, high-quality outputs
 - Can be shared across teams and projects
@@ -52,67 +53,67 @@ Claude Skills are specialized, reusable prompt templates that:
 
 ```typescript
 interface Skill {
-  id: string;                    // Unique identifier
-  name: string;                  // Human-readable name
-  description: string;           // What this Skill does
-  version: string;               // Semantic versioning
+  id: string; // Unique identifier
+  name: string; // Human-readable name
+  description: string; // What this Skill does
+  version: string; // Semantic versioning
   author: {
     name: string;
     email: string;
     organization?: string;
   };
-  category: SkillCategory;       // CODE, DESIGN, TESTING, etc.
-  tags: string[];                // Searchable tags
+  category: SkillCategory; // CODE, DESIGN, TESTING, etc.
+  tags: string[]; // Searchable tags
 
   // Execution
-  prompt: string;                // Base prompt template
-  inputs: InputSchema[];         // Required inputs
-  outputs: OutputSchema[];       // Expected outputs
-  examples: Example[];           // Usage examples
+  prompt: string; // Base prompt template
+  inputs: InputSchema[]; // Required inputs
+  outputs: OutputSchema[]; // Expected outputs
+  examples: Example[]; // Usage examples
 
   // Configuration
   model_preferences: {
-    preferred: string[];         // Preferred models
-    min_quality: number;         // Minimum quality score
-    max_cost?: number;           // Cost budget
+    preferred: string[]; // Preferred models
+    min_quality: number; // Minimum quality score
+    max_cost?: number; // Cost budget
   };
 
   // Dependencies
   dependencies: {
-    skills?: string[];           // Other Skills
-    tools?: string[];            // Required tools
-    integrations?: string[];     // Required integrations
+    skills?: string[]; // Other Skills
+    tools?: string[]; // Required tools
+    integrations?: string[]; // Required integrations
   };
 
   // Quality
-  validation: ValidationRule[];  // Output validation
-  test_cases: TestCase[];        // Test scenarios
+  validation: ValidationRule[]; // Output validation
+  test_cases: TestCase[]; // Test scenarios
 
   // Metadata
-  license: string;               // MIT, Apache, etc.
-  popularity: number;            // Download count
-  rating: number;                // User rating
-  usage_count: number;           // Execution count
+  license: string; // MIT, Apache, etc.
+  popularity: number; // Download count
+  rating: number; // User rating
+  usage_count: number; // Execution count
 
   created_at: string;
   updated_at: string;
 }
 
 enum SkillCategory {
-  CODE_GENERATION = 'code_generation',
-  CODE_REVIEW = 'code_review',
-  TESTING = 'testing',
-  DOCUMENTATION = 'documentation',
-  DESIGN = 'design',
-  ARCHITECTURE = 'architecture',
-  REFACTORING = 'refactoring',
-  DEBUGGING = 'debugging',
-  SECURITY = 'security',
-  PERFORMANCE = 'performance',
-  API_DESIGN = 'api_design',
-  DATABASE = 'database',
-  DEVOPS = 'devops',
-  ANALYTICS = 'analytics',
+  CODE_GENERATION = "code_generation",
+  CODE_REVIEW = "code_review",
+  TESTING = "testing",
+  DOCUMENTATION = "documentation",
+  DESIGN = "design",
+  ARCHITECTURE = "architecture",
+  REFACTORING = "refactoring",
+  DEBUGGING = "debugging",
+  SECURITY = "security",
+  PERFORMANCE = "performance",
+  API_DESIGN = "api_design",
+  DATABASE = "database",
+  DEVOPS = "devops",
+  ANALYTICS = "analytics",
 }
 ```
 
@@ -121,6 +122,7 @@ enum SkillCategory {
 #### Code Generation Skills
 
 **Skill: `typescript-api-endpoint`**
+
 ```yaml
 name: TypeScript API Endpoint Generator
 description: Generate a complete Express.js API endpoint with validation, error handling, and tests
@@ -167,6 +169,7 @@ examples:
 ```
 
 **Skill: `react-component-generator`**
+
 ```yaml
 name: React Component with TypeScript
 description: Generate a fully-typed React component with props, state, and tests
@@ -191,6 +194,7 @@ outputs:
 #### Code Review Skills
 
 **Skill: `security-code-review`**
+
 ```yaml
 name: Security-Focused Code Review
 description: Review code for security vulnerabilities (OWASP Top 10, CWE)
@@ -223,6 +227,7 @@ validation:
 ```
 
 **Skill: `performance-code-review`**
+
 ```yaml
 name: Performance Code Review
 description: Identify performance bottlenecks and optimization opportunities
@@ -247,6 +252,7 @@ outputs:
 #### Testing Skills
 
 **Skill: `unit-test-generator`**
+
 ```yaml
 name: Comprehensive Unit Test Generator
 description: Generate unit tests with edge cases, mocks, and assertions
@@ -272,6 +278,7 @@ outputs:
 #### Documentation Skills
 
 **Skill: `api-documentation-generator`**
+
 ```yaml
 name: OpenAPI/Swagger Documentation
 description: Generate OpenAPI 3.1 specification from code
@@ -293,6 +300,7 @@ outputs:
 #### Architecture Skills
 
 **Skill: `architecture-decision-record`**
+
 ```yaml
 name: ADR Generator
 description: Create an Architecture Decision Record following best practices
@@ -316,6 +324,7 @@ outputs:
 ```
 
 **Skill: `system-design-diagram`**
+
 ```yaml
 name: System Architecture Diagram
 description: Generate Mermaid/PlantUML diagrams from architecture description
@@ -344,11 +353,12 @@ outputs:
 #### Pages:
 
 **Browse Skills** (`/skills`)
+
 ```tsx
 <SkillsMarketplace>
   <SearchBar placeholder="Search 500+ Skills..." />
   <CategoryFilter categories={SKILL_CATEGORIES} />
-  <SortFilter options={['Popular', 'Recent', 'Rating', 'Trending']} />
+  <SortFilter options={["Popular", "Recent", "Rating", "Trending"]} />
 
   <SkillGrid>
     <SkillCard>
@@ -376,6 +386,7 @@ outputs:
 ```
 
 **Skill Detail** (`/skills/:id`)
+
 ```tsx
 <SkillDetail>
   <Header>
@@ -431,6 +442,7 @@ outputs:
 ```
 
 **My Skills** (`/skills/installed`)
+
 ```tsx
 <MySkills>
   <Tabs>
@@ -463,6 +475,7 @@ outputs:
 ```
 
 **Skill Creator** (`/skills/create`)
+
 ```tsx
 <SkillCreator>
   <WizardSteps>
@@ -752,11 +765,13 @@ execution:
 ### 10. Skills Marketplace Business Model
 
 **Free Tier**:
+
 - Access to 100+ core Skills (open source)
 - Unlimited executions of free Skills
 - Create and publish public Skills
 
 **Pro Tier** ($49/month):
+
 - Access to 500+ premium Skills
 - Private Skill creation and hosting
 - Advanced analytics and insights
@@ -764,6 +779,7 @@ execution:
 - Team collaboration features
 
 **Enterprise Tier** (Custom pricing):
+
 - Custom Skill development
 - On-premise Skill hosting
 - SLA guarantees
@@ -773,6 +789,7 @@ execution:
 ### 11. Skills Security & Compliance
 
 **Security Measures**:
+
 - Skill code review before publication
 - Automated security scanning
 - Sandboxed execution environment
@@ -781,6 +798,7 @@ execution:
 - Secrets management (no hardcoded credentials)
 
 **Compliance**:
+
 - GDPR compliance (data privacy)
 - SOC 2 Type II certification
 - HIPAA-ready for healthcare Skills
@@ -789,6 +807,7 @@ execution:
 ## Benefits of Skills Integration
 
 ### For Users:
+
 - **Consistency**: Same quality output every time
 - **Speed**: Pre-built Solutions for common tasks
 - **Learning**: Examples and best practices
@@ -796,6 +815,7 @@ execution:
 - **Collaboration**: Share Skills across teams
 
 ### For the Platform:
+
 - **Differentiation**: Unique marketplace feature
 - **Monetization**: Premium Skills revenue
 - **Community**: User-contributed Skills
@@ -803,6 +823,7 @@ execution:
 - **Scaling**: Reusable components reduce costs
 
 ### For Agents:
+
 - **Capabilities**: Extended functionality
 - **Reliability**: Tested, validated logic
 - **Efficiency**: No need to re-prompt
@@ -812,24 +833,28 @@ execution:
 ## Implementation Roadmap
 
 **Phase 1: Foundation** (Week 1-2)
+
 - Skills database schema
 - Skills execution engine
 - Basic Skills library (10 core Skills)
 - API endpoints
 
 **Phase 2: Frontend** (Week 3-4)
+
 - Skills marketplace UI
 - Skill detail pages
 - Playground for testing
 - Installation/management
 
 **Phase 3: Advanced** (Week 5-6)
+
 - Skill creator wizard
 - Versioning system
 - Analytics dashboard
 - Agent integration
 
 **Phase 4: Ecosystem** (Week 7-8)
+
 - Public marketplace launch
 - Community contributions
 - Premium Skills

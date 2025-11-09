@@ -22,6 +22,7 @@ Implement OpenAPI as the universal contract for exposing tools to agents and wra
 Create the foundational infrastructure for managing OpenAPI tool specifications that will be used by all LLM providers in the MoE system.
 
 **Acceptance Criteria:**
+
 - [ ] Create `packages/openapi-tools` package in the monorepo
 - [ ] Implement OpenAPI schema loader that can read and parse OpenAPI 3.1.0 specs
 - [ ] Create a tool registry that maintains all available tools from OpenAPI specs
@@ -39,12 +40,13 @@ Create the foundational infrastructure for managing OpenAPI tool specifications 
   ```
 
 **Technical Details:**
+
 ```typescript
 // packages/openapi-tools/src/registry/ToolRegistry.ts
 export class ToolRegistry {
-  async loadSpecs(paths: string[]): Promise<void>
-  getToolSpecs(): ToolSpec[]
-  getToolByName(name: string): ToolSpec | undefined
+  async loadSpecs(paths: string[]): Promise<void>;
+  getToolSpecs(): ToolSpec[];
+  getToolByName(name: string): ToolSpec | undefined;
 }
 ```
 
@@ -65,6 +67,7 @@ export class ToolRegistry {
 Create a converter that transforms OpenAPI operation definitions into tool specifications compatible with OpenAI, Anthropic, and other LLM providers.
 
 **Acceptance Criteria:**
+
 - [ ] Implement `openApiToToolSpecs()` function that converts OpenAPI paths to tool specs
 - [ ] Extract operation metadata (operationId, summary, description)
 - [ ] Convert requestBody schemas to JSON Schema format for tool parameters
@@ -74,6 +77,7 @@ Create a converter that transforms OpenAPI operation definitions into tool speci
 - [ ] Add comprehensive unit tests with sample OpenAPI specs
 
 **Technical Details:**
+
 ```typescript
 // packages/openapi-tools/src/converters/openApiToToolSpecs.ts
 export function openApiToToolSpecs(doc: OpenAPIObject): ToolSpec[] {
@@ -100,6 +104,7 @@ export function openApiToToolSpecs(doc: OpenAPIObject): ToolSpec[] {
 Build a secure tool executor that validates inputs against JSON Schema before execution and routes to registered tool implementations.
 
 **Acceptance Criteria:**
+
 - [ ] Create `ToolExecutor` class that manages tool execution
 - [ ] Integrate Ajv or Zod for runtime JSON Schema validation
 - [ ] Implement tool registration system with type-safe handlers
@@ -110,18 +115,19 @@ Build a secure tool executor that validates inputs against JSON Schema before ex
 - [ ] Add rate limiting per tool
 
 **Technical Details:**
+
 ```typescript
 // packages/openapi-tools/src/executor/ToolExecutor.ts
 export class ToolExecutor {
   constructor(
     private registry: Map<string, ToolHandler>,
-    private validator: SchemaValidator
+    private validator: SchemaValidator,
   ) {}
 
   async execute(
     toolName: string,
     args: unknown,
-    schema: object
+    schema: object,
   ): Promise<ToolResult> {
     // 1. Validate args against JSON Schema
     // 2. Rate limit check
@@ -133,6 +139,7 @@ export class ToolExecutor {
 ```
 
 **Security Considerations:**
+
 - Never expose internal credentials to LLMs
 - Validate all inputs against strict schemas
 - Implement allowlist for permitted operations
@@ -155,6 +162,7 @@ export class ToolExecutor {
 Create comprehensive OpenAPI specification for internal tools that agents can use (GitHub operations, code analysis, testing, etc.).
 
 **Acceptance Criteria:**
+
 - [ ] Create `tools/openapi/ai-dev-tools.yaml` with OpenAPI 3.1.0 spec
 - [ ] Define GitHub operations:
   - `createIssues` - Create multiple issues from spec
@@ -173,6 +181,7 @@ Create comprehensive OpenAPI specification for internal tools that agents can us
 - [ ] Add JSON Schema validation rules for all inputs
 
 **Example Structure:**
+
 ```yaml
 openapi: 3.1.0
 info:
@@ -224,6 +233,7 @@ paths:
 Build secure wrappers around external APIs (GitHub, Open GSA, etc.) that expose them as OpenAPI tools with credential management and rate limiting.
 
 **Acceptance Criteria:**
+
 - [ ] Create `packages/external-api-tools` package
 - [ ] Implement GitHub API wrapper:
   - Issues CRUD operations
@@ -241,12 +251,13 @@ Build secure wrappers around external APIs (GitHub, Open GSA, etc.) that expose 
 - [ ] Generate OpenAPI specs for each wrapper
 
 **Technical Details:**
+
 ```typescript
 // packages/external-api-tools/src/github/GitHubToolWrapper.ts
 export class GitHubToolWrapper {
   constructor(
     private credentials: CredentialVault,
-    private rateLimiter: RateLimiter
+    private rateLimiter: RateLimiter,
   ) {}
 
   async createIssues(args: CreateIssuesArgs): Promise<CreateIssuesResult> {
@@ -261,6 +272,7 @@ export class GitHubToolWrapper {
 ```
 
 **Security Requirements:**
+
 - Credentials stored in environment variables or secret manager
 - No credentials in logs or responses
 - Input sanitization for all user-provided data
@@ -290,6 +302,7 @@ Add OpenAI as a first-class LLM provider in the MoE router, enabling access to G
 Define a provider-agnostic interface that all LLM providers (OpenAI, Anthropic, etc.) must implement, enabling the MoE router to work with any provider.
 
 **Acceptance Criteria:**
+
 - [ ] Create `packages/llm-providers` package
 - [ ] Define `LLMProvider` interface with standard methods
 - [ ] Support streaming and non-streaming completions
@@ -300,6 +313,7 @@ Define a provider-agnostic interface that all LLM providers (OpenAI, Anthropic, 
 - [ ] Add provider capability flags (supports tools, supports vision, etc.)
 
 **Technical Details:**
+
 ```typescript
 // packages/llm-providers/src/domain/LLMProvider.ts
 export interface LLMProvider {
@@ -351,6 +365,7 @@ export interface Message {
 Create a concrete implementation of the LLMProvider interface for OpenAI's API, supporting GPT-4 and future models.
 
 **Acceptance Criteria:**
+
 - [ ] Implement `OpenAIProvider` class conforming to `LLMProvider` interface
 - [ ] Support GPT-4, GPT-4 Turbo, and configurable model selection
 - [ ] Implement tool/function calling with OpenAI's format
@@ -362,10 +377,15 @@ Create a concrete implementation of the LLMProvider interface for OpenAI's API, 
 - [ ] Add comprehensive tests with mocked API responses
 
 **Technical Details:**
+
 ```typescript
 // packages/llm-providers/src/providers/openai/OpenAIProvider.ts
 import OpenAI from "openai";
-import { LLMProvider, CompletionOptions, CompletionResult } from "../../domain/LLMProvider";
+import {
+  LLMProvider,
+  CompletionOptions,
+  CompletionResult,
+} from "../../domain/LLMProvider";
 
 export class OpenAIProvider implements LLMProvider {
   name = "openai:gpt-4";
@@ -376,7 +396,7 @@ export class OpenAIProvider implements LLMProvider {
     tools: true,
     vision: true,
     streaming: true,
-    jsonMode: true
+    jsonMode: true,
   };
 
   private client: OpenAI;
@@ -394,7 +414,9 @@ export class OpenAIProvider implements LLMProvider {
     // Return normalized result
   }
 
-  async *streamCompletion(opts: CompletionOptions): AsyncIterable<CompletionChunk> {
+  async *streamCompletion(
+    opts: CompletionOptions,
+  ): AsyncIterable<CompletionChunk> {
     // Streaming implementation
   }
 }
@@ -417,6 +439,7 @@ export class OpenAIProvider implements LLMProvider {
 Create Anthropic/Claude provider implementation for comparison and fallback in the MoE system.
 
 **Acceptance Criteria:**
+
 - [ ] Implement `AnthropicProvider` class conforming to `LLMProvider` interface
 - [ ] Support Claude 3 models (Opus, Sonnet, Haiku)
 - [ ] Implement tool use with Anthropic's format
@@ -445,6 +468,7 @@ Similar structure to OpenAI provider but using Anthropic's SDK and message forma
 Create an intelligent router that selects the best LLM provider for each task based on cost, latency, capabilities, and historical performance.
 
 **Acceptance Criteria:**
+
 - [ ] Create `packages/moe_router` package
 - [ ] Implement scoring algorithm for provider selection
 - [ ] Add task classification (code generation, analysis, planning, etc.)
@@ -457,6 +481,7 @@ Create an intelligent router that selects the best LLM provider for each task ba
 - [ ] Support manual provider override
 
 **Routing Logic:**
+
 ```typescript
 // packages/moe_router/src/Router.ts
 export interface RoutingPolicy {
@@ -471,7 +496,7 @@ export interface RoutingPolicy {
 export class MoERouter {
   async selectProvider(
     task: Task,
-    availableProviders: LLMProvider[]
+    availableProviders: LLMProvider[],
   ): Promise<LLMProvider> {
     // 1. Classify task type
     // 2. Score each provider
@@ -483,6 +508,7 @@ export class MoERouter {
 ```
 
 **Scoring Factors:**
+
 - Task type match (e.g., code tasks → prefer models strong at coding)
 - Cost per token
 - Expected latency
@@ -508,6 +534,7 @@ export class MoERouter {
 Build comprehensive observability for tracking LLM provider performance, costs, and quality metrics.
 
 **Acceptance Criteria:**
+
 - [ ] Extend `packages/observability` with provider-specific metrics
 - [ ] Track per-provider metrics:
   - Token usage (input/output)
@@ -523,6 +550,7 @@ Build comprehensive observability for tracking LLM provider performance, costs, 
 - [ ] Support export to external monitoring (Prometheus, Datadog)
 
 **Technical Details:**
+
 ```typescript
 // packages/observability/src/providers/ProviderMetrics.ts
 export interface ProviderExecutionMetric {
@@ -538,9 +566,9 @@ export interface ProviderExecutionMetric {
 }
 
 export class ProviderMetricsCollector {
-  recordExecution(metric: ProviderExecutionMetric): void
-  getProviderStats(providerId: string, timeRange: TimeRange): ProviderStats
-  getWinRates(taskType: string): Map<string, number>
+  recordExecution(metric: ProviderExecutionMetric): void;
+  getProviderStats(providerId: string, timeRange: TimeRange): ProviderStats;
+  getWinRates(taskType: string): Map<string, number>;
 }
 ```
 
@@ -568,6 +596,7 @@ Integrate OpenAPI tools with LLM providers to enable agents to call internal and
 Create the complete pipeline for LLMs to discover, call, and execute tools defined in OpenAPI specifications.
 
 **Acceptance Criteria:**
+
 - [ ] Create `packages/tool-pipeline` package
 - [ ] Implement tool discovery from OpenAPI registry
 - [ ] Convert tool specs to provider-specific formats (OpenAI vs Anthropic)
@@ -580,19 +609,20 @@ Create the complete pipeline for LLMs to discover, call, and execute tools defin
 - [ ] Add comprehensive logging and tracing
 
 **Technical Details:**
+
 ```typescript
 // packages/tool-pipeline/src/ToolCallingPipeline.ts
 export class ToolCallingPipeline {
   constructor(
     private toolRegistry: ToolRegistry,
     private toolExecutor: ToolExecutor,
-    private provider: LLMProvider
+    private provider: LLMProvider,
   ) {}
 
   async executeWithTools(
     prompt: string,
     availableTools: string[],
-    maxTurns = 5
+    maxTurns = 5,
   ): Promise<PipelineResult> {
     // 1. Get tool specs from registry
     // 2. Send to LLM with tools
@@ -622,6 +652,7 @@ export class ToolCallingPipeline {
 Create a complete example pipeline that demonstrates the full system: taking a specification document and using LLM + tools to create structured GitHub issues.
 
 **Acceptance Criteria:**
+
 - [ ] Create `apps/cli-tools` or extend existing CLI
 - [ ] Implement `spec-to-github` command
 - [ ] Parse input specification (markdown, text)
@@ -635,6 +666,7 @@ Create a complete example pipeline that demonstrates the full system: taking a s
 - [ ] Write documentation and tutorial
 
 **Example Usage:**
+
 ```bash
 pnpm run spec-to-github \
   --spec ./examples/feature-spec.md \
@@ -644,6 +676,7 @@ pnpm run spec-to-github \
 ```
 
 **Technical Details:**
+
 ```typescript
 // apps/cli-tools/src/commands/specToGithub.ts
 export async function specToGithub(options: SpecToGithubOptions) {
@@ -680,6 +713,7 @@ Integrate OpenAPI tools and multiple LLM providers into the frontend UI, giving 
 Enhance the command palette in the web UI to dynamically display all available tools from the OpenAPI registry as executable actions.
 
 **Acceptance Criteria:**
+
 - [ ] Extend `apps/web` command palette component
 - [ ] Load available tools from OpenAPI registry
 - [ ] Display tools grouped by category (GitHub, Code, CI/CD, External)
@@ -691,6 +725,7 @@ Enhance the command palette in the web UI to dynamically display all available t
 - [ ] Include search/filter by tool name and description
 
 **UI Design:**
+
 ```
 Command Palette:
   > /create-issues
@@ -718,6 +753,7 @@ Command Palette:
 Create a new "AI Dock" UI component that shows which provider handled each request, tool calls made, and allows provider switching.
 
 **Acceptance Criteria:**
+
 - [ ] Create new dock component in `apps/web`
 - [ ] Display current/last provider used
 - [ ] Show provider selection UI (manual override)
@@ -733,6 +769,7 @@ Create a new "AI Dock" UI component that shows which provider handled each reque
 - [ ] Support dark/light themes
 
 **UI Layout:**
+
 ```
 AI Dock:
 ┌─────────────────────────────────┐
@@ -770,6 +807,7 @@ AI Dock:
 Build a settings page where users can manage API credentials, view tool health, and configure tool permissions.
 
 **Acceptance Criteria:**
+
 - [ ] Create integrations page in `apps/web`
 - [ ] Add credential management UI (encrypted storage)
 - [ ] Show health status for each external API
@@ -803,6 +841,7 @@ Implement security controls, audit logging, and compliance features for safe LLM
 Create detailed audit logging for every tool execution to support compliance, debugging, and security analysis.
 
 **Acceptance Criteria:**
+
 - [ ] Extend `packages/observability` with audit logging
 - [ ] Log all tool executions with:
   - Timestamp
@@ -821,6 +860,7 @@ Create detailed audit logging for every tool execution to support compliance, de
 - [ ] Ensure logs are tamper-evident
 
 **Technical Details:**
+
 ```typescript
 // packages/observability/src/audit/AuditLogger.ts
 export interface AuditLogEntry {
@@ -840,9 +880,9 @@ export interface AuditLogEntry {
 }
 
 export class AuditLogger {
-  logToolExecution(entry: AuditLogEntry): Promise<void>
-  query(filter: AuditFilter): Promise<AuditLogEntry[]>
-  export(format: "json" | "csv", filter: AuditFilter): Promise<Buffer>
+  logToolExecution(entry: AuditLogEntry): Promise<void>;
+  query(filter: AuditFilter): Promise<AuditLogEntry[]>;
+  export(format: "json" | "csv", filter: AuditFilter): Promise<Buffer>;
 }
 ```
 
@@ -863,6 +903,7 @@ export class AuditLogger {
 Create a permission system that controls which users/agents can execute which tools, with role-based access control.
 
 **Acceptance Criteria:**
+
 - [ ] Define permission model (roles, users, tools)
 - [ ] Implement permission checking in ToolExecutor
 - [ ] Add role definitions (admin, developer, agent, readonly)
@@ -874,6 +915,7 @@ Create a permission system that controls which users/agents can execute which to
 - [ ] Add permission testing utilities
 
 **Permission Examples:**
+
 - Admin: Can execute all tools
 - Developer: Can execute code and GitHub tools, but not deployment tools
 - Agent: Limited to read-only tools and approved write operations
@@ -896,6 +938,7 @@ Create a permission system that controls which users/agents can execute which to
 Implement rate limiting to prevent abuse and cost quotas to control LLM spending.
 
 **Acceptance Criteria:**
+
 - [ ] Create rate limiting middleware for tool execution
 - [ ] Implement per-user rate limits
 - [ ] Add per-tool rate limits (respect external API quotas)
@@ -907,6 +950,7 @@ Implement rate limiting to prevent abuse and cost quotas to control LLM spending
 - [ ] Add override capabilities for admins
 
 **Technical Details:**
+
 ```typescript
 // packages/openapi-tools/src/ratelimit/RateLimiter.ts
 export interface RateLimit {
@@ -922,8 +966,8 @@ export interface CostQuota {
 }
 
 export class RateLimiter {
-  checkLimit(userId: string, toolName: string): Promise<boolean>
-  checkQuota(userId: string, estimatedCost: number): Promise<boolean>
+  checkLimit(userId: string, toolName: string): Promise<boolean>;
+  checkQuota(userId: string, estimatedCost: number): Promise<boolean>;
 }
 ```
 
@@ -951,6 +995,7 @@ Comprehensive testing and documentation for the OpenAPI and OpenAI integration.
 Build comprehensive integration tests that verify the complete tool calling flow from LLM to tool execution.
 
 **Acceptance Criteria:**
+
 - [ ] Create integration test suite in `packages/tool-pipeline/tests`
 - [ ] Test complete flow: LLM → tool call → execution → response
 - [ ] Mock external APIs (GitHub, GSA) for testing
@@ -979,6 +1024,7 @@ Build comprehensive integration tests that verify the complete tool calling flow
 Create detailed documentation for developers to understand, use, and extend the OpenAPI and LLM provider system.
 
 **Acceptance Criteria:**
+
 - [ ] Create `docs/openapi-tools/` directory
 - [ ] Write architecture overview
 - [ ] Document how to add new tools to OpenAPI specs
@@ -992,6 +1038,7 @@ Create detailed documentation for developers to understand, use, and extend the 
 - [ ] Add diagrams (architecture, flow)
 
 **Documentation Structure:**
+
 ```
 docs/openapi-tools/
   ├── README.md                    # Overview
@@ -1014,34 +1061,40 @@ docs/openapi-tools/
 ## Implementation Roadmap
 
 ### Phase 1: Foundation (Weeks 1-3)
+
 - Issue #1: OpenAPI Tool Registry
 - Issue #2: OpenAPI to Tool Spec Converter
 - Issue #3: Tool Executor
 - Issue #6: LLM Provider Interface
 
 ### Phase 2: Providers & Tools (Weeks 4-6)
+
 - Issue #4: Internal Tools OpenAPI Spec
 - Issue #7: OpenAI Provider
 - Issue #8: Anthropic Provider
 - Issue #5: External API Wrappers
 
 ### Phase 3: Intelligence & Integration (Weeks 7-9)
+
 - Issue #9: MoE Router
 - Issue #10: Provider Performance Tracking
 - Issue #11: Tool Calling Pipeline
 - Issue #12: Example Pipeline
 
 ### Phase 4: Frontend & UX (Weeks 10-11)
+
 - Issue #13: Command Palette
 - Issue #14: AI Dock
 - Issue #15: Integrations Page
 
 ### Phase 5: Security & Compliance (Weeks 12-13)
+
 - Issue #16: Audit Logging
 - Issue #17: Permission System
 - Issue #18: Rate Limiting & Quotas
 
 ### Phase 6: Quality & Documentation (Week 14)
+
 - Issue #19: Integration Tests
 - Issue #20: Developer Documentation
 
@@ -1075,16 +1128,18 @@ All Issues
 ```
 
 ## Estimated Timeline
+
 - **Total Effort:** ~80-95 developer-days
 - **With 2-3 developers:** 14-16 weeks
 - **With 4-5 developers:** 8-10 weeks
 
 ## Success Metrics
+
 - [ ] All internal tools available via OpenAPI
 - [ ] At least 2 LLM providers integrated (OpenAI, Anthropic)
 - [ ] MoE router selecting providers based on task type
 - [ ] <200ms overhead for tool calling pipeline
-- [ ] >99% tool execution success rate
+- [ ] > 99% tool execution success rate
 - [ ] Complete audit trail for all tool executions
-- [ ] >80% test coverage
+- [ ] > 80% test coverage
 - [ ] Full documentation published

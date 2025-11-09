@@ -1,92 +1,98 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { DataTable, Column } from '@/components/table/data-table'
-import { Badge } from '@/components/ui/badge'
-import { Select } from '@/components/ui/select'
-import { UserPlus, Mail, MoreVertical, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { DataTable, Column } from "@/components/table/data-table";
+import { Badge } from "@/components/ui/badge";
+import { Select } from "@/components/ui/select";
+import { UserPlus, Mail, MoreVertical, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 interface TeamMember {
-  id: string
-  name: string
-  email: string
-  role: 'owner' | 'admin' | 'member' | 'viewer'
-  status: 'active' | 'invited' | 'inactive'
-  joinedDate: string
+  id: string;
+  name: string;
+  email: string;
+  role: "owner" | "admin" | "member" | "viewer";
+  status: "active" | "invited" | "inactive";
+  joinedDate: string;
 }
 
 const teamMembers: TeamMember[] = [
   {
-    id: '1',
-    name: 'Isaac Buz',
-    email: 'isaac@example.com',
-    role: 'owner',
-    status: 'active',
-    joinedDate: '2024-01-15',
+    id: "1",
+    name: "Isaac Buz",
+    email: "isaac@example.com",
+    role: "owner",
+    status: "active",
+    joinedDate: "2024-01-15",
   },
   {
-    id: '2',
-    name: 'Sarah Chen',
-    email: 'sarah@example.com',
-    role: 'admin',
-    status: 'active',
-    joinedDate: '2024-01-20',
+    id: "2",
+    name: "Sarah Chen",
+    email: "sarah@example.com",
+    role: "admin",
+    status: "active",
+    joinedDate: "2024-01-20",
   },
   {
-    id: '3',
-    name: 'Mike Johnson',
-    email: 'mike@example.com',
-    role: 'member',
-    status: 'active',
-    joinedDate: '2024-02-01',
+    id: "3",
+    name: "Mike Johnson",
+    email: "mike@example.com",
+    role: "member",
+    status: "active",
+    joinedDate: "2024-02-01",
   },
   {
-    id: '4',
-    name: 'Emily Davis',
-    email: 'emily@example.com',
-    role: 'member',
-    status: 'invited',
-    joinedDate: '2024-02-10',
+    id: "4",
+    name: "Emily Davis",
+    email: "emily@example.com",
+    role: "member",
+    status: "invited",
+    joinedDate: "2024-02-10",
   },
   {
-    id: '5',
-    name: 'Alex Kumar',
-    email: 'alex@example.com',
-    role: 'viewer',
-    status: 'active',
-    joinedDate: '2024-02-05',
+    id: "5",
+    name: "Alex Kumar",
+    email: "alex@example.com",
+    role: "viewer",
+    status: "active",
+    joinedDate: "2024-02-05",
   },
-]
+];
 
 export default function TeamSettingsPage() {
-  const [showInviteForm, setShowInviteForm] = useState(false)
+  const [showInviteForm, setShowInviteForm] = useState(false);
 
   const columns: Column<TeamMember>[] = [
     {
-      key: 'name',
-      header: 'Name',
+      key: "name",
+      header: "Name",
       sortable: true,
     },
     {
-      key: 'email',
-      header: 'Email',
+      key: "email",
+      header: "Email",
       sortable: true,
     },
     {
-      key: 'role',
-      header: 'Role',
+      key: "role",
+      header: "Role",
       sortable: true,
       cell: (row) => (
         <Badge
           variant={
-            row.role === 'owner'
-              ? 'default'
-              : row.role === 'admin'
-              ? 'info'
-              : 'outline'
+            row.role === "owner"
+              ? "default"
+              : row.role === "admin"
+                ? "info"
+                : "outline"
           }
         >
           {row.role}
@@ -94,17 +100,17 @@ export default function TeamSettingsPage() {
       ),
     },
     {
-      key: 'status',
-      header: 'Status',
+      key: "status",
+      header: "Status",
       sortable: true,
       cell: (row) => (
         <Badge
           variant={
-            row.status === 'active'
-              ? 'success'
-              : row.status === 'invited'
-              ? 'warning'
-              : 'outline'
+            row.status === "active"
+              ? "success"
+              : row.status === "invited"
+                ? "warning"
+                : "outline"
           }
         >
           {row.status}
@@ -112,17 +118,17 @@ export default function TeamSettingsPage() {
       ),
     },
     {
-      key: 'joinedDate',
-      header: 'Joined',
+      key: "joinedDate",
+      header: "Joined",
       sortable: true,
       cell: (row) => new Date(row.joinedDate).toLocaleDateString(),
     },
     {
-      key: 'actions',
-      header: '',
+      key: "actions",
+      header: "",
       cell: (row) => (
         <div className="flex justify-end gap-2">
-          {row.role !== 'owner' && (
+          {row.role !== "owner" && (
             <>
               <Button variant="ghost" size="icon">
                 <MoreVertical className="h-4 w-4" />
@@ -135,7 +141,7 @@ export default function TeamSettingsPage() {
         </div>
       ),
     },
-  ]
+  ];
 
   return (
     <div className="space-y-8 max-w-6xl">
@@ -190,7 +196,10 @@ export default function TeamSettingsPage() {
             </div>
             <div className="flex gap-2">
               <Button>Send Invitation</Button>
-              <Button variant="outline" onClick={() => setShowInviteForm(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowInviteForm(false)}
+              >
                 Cancel
               </Button>
             </div>
@@ -202,9 +211,7 @@ export default function TeamSettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Team Members ({teamMembers.length})</CardTitle>
-          <CardDescription>
-            View and manage all team members
-          </CardDescription>
+          <CardDescription>View and manage all team members</CardDescription>
         </CardHeader>
         <CardContent>
           <DataTable data={teamMembers} columns={columns} />
@@ -215,9 +222,7 @@ export default function TeamSettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Role Permissions</CardTitle>
-          <CardDescription>
-            Understand what each role can do
-          </CardDescription>
+          <CardDescription>Understand what each role can do</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -261,5 +266,5 @@ export default function TeamSettingsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,4 +1,3 @@
-
 ```mermaid
 graph TD
   L7[L7 Business/Client] --> L6[L6 Governance/Policy]

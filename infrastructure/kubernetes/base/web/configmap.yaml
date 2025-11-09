@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-config
+  namespace: piehr
+data:
+  api-url: "http://api.piehr.svc.cluster.local"
+  ws-url: "ws://api.piehr.svc.cluster.local"
+  node-env: "production"
+

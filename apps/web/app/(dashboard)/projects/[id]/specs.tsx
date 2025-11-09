@@ -1,22 +1,22 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { mockSpecs } from '@/lib/api/mock-data'
-import { FileText } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { mockSpecs } from "@/lib/api/mock-data";
+import { FileText } from "lucide-react";
 
 interface SpecsViewProps {
-  projectId: string
+  projectId: string;
 }
 
 export default function SpecsView({ projectId }: SpecsViewProps) {
-  const specs = mockSpecs.filter((s) => s.projectId === projectId)
+  const specs = mockSpecs.filter((s) => s.projectId === projectId);
 
   const statusColors = {
-    draft: 'secondary',
-    approved: 'success',
-    implemented: 'info',
-  } as const
+    draft: "secondary",
+    approved: "success",
+    implemented: "info",
+  } as const;
 
   return (
     <div className="space-y-4">
@@ -26,7 +26,10 @@ export default function SpecsView({ projectId }: SpecsViewProps) {
         </div>
       ) : (
         specs.map((spec) => (
-          <Card key={spec.id} className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card
+            key={spec.id}
+            className="hover:shadow-md transition-shadow cursor-pointer"
+          >
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
@@ -36,18 +39,18 @@ export default function SpecsView({ projectId }: SpecsViewProps) {
                     <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
                       <span>by {spec.author}</span>
                       <span>•</span>
-                      <span>{new Date(spec.createdAt).toLocaleDateString()}</span>
+                      <span>
+                        {new Date(spec.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
                 </div>
-                <Badge variant={statusColors[spec.status]}>
-                  {spec.status}
-                </Badge>
+                <Badge variant={statusColors[spec.status]}>{spec.status}</Badge>
               </div>
             </CardHeader>
           </Card>
         ))
       )}
     </div>
-  )
+  );
 }

@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: piehr
+  labels:
+    name: piehr
+    environment: production
+  annotations:
+    description: "PieHr AI-First Software Engineering Platform"
+    managed-by: terraform
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: piehr-staging
+  labels:
+    name: piehr-staging
+    environment: staging
+  annotations:
+    description: "PieHr Staging Environment"
+    managed-by: terraform
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: piehr-dev
+  labels:
+    name: piehr-dev
+    environment: development
+  annotations:
+    description: "PieHr Development Environment"
+    managed-by: terraform
+

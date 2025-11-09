@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { GripVertical } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { GripVertical } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface IssueCardProps {
-  id: string
-  title: string
-  number: number
-  assignee?: string
-  priority?: 'high' | 'medium' | 'low'
-  labels?: string[]
-  className?: string
+  id: string;
+  title: string;
+  number: number;
+  assignee?: string;
+  priority?: "high" | "medium" | "low";
+  labels?: string[];
+  className?: string;
 }
 
 export function IssueCard({
@@ -33,27 +33,27 @@ export function IssueCard({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id })
+  } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-  }
+  };
 
   const priorityColors = {
-    high: 'destructive',
-    medium: 'warning',
-    low: 'secondary',
-  } as const
+    high: "destructive",
+    medium: "warning",
+    low: "secondary",
+  } as const;
 
   return (
     <Card
       ref={setNodeRef}
       style={style}
       className={cn(
-        'cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow',
-        isDragging && 'opacity-50',
-        className
+        "cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow",
+        isDragging && "opacity-50",
+        className,
       )}
     >
       <CardContent className="p-4">
@@ -71,7 +71,10 @@ export function IssueCard({
                 #{number} {title}
               </h4>
               {priority && (
-                <Badge variant={priorityColors[priority]} className="shrink-0 text-xs">
+                <Badge
+                  variant={priorityColors[priority]}
+                  className="shrink-0 text-xs"
+                >
                   {priority}
                 </Badge>
               )}
@@ -94,5 +97,5 @@ export function IssueCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -16,7 +16,7 @@ Server runs at: `ws://localhost:8000/ws`
 import io from "socket.io-client";
 
 const socket = io("http://localhost:8000/ws", {
-  auth: { token: "your-jwt-token" }
+  auth: { token: "your-jwt-token" },
 });
 
 // Listen for connection
@@ -34,11 +34,15 @@ socket.on("disconnect", () => {
 
 ```javascript
 // Subscribe to room
-socket.emit("subscribe", {
-  room: "project:550e8400-e29b-41d4-a716-446655440000"
-}, (response) => {
-  console.log(response); // {status: "success", ...}
-});
+socket.emit(
+  "subscribe",
+  {
+    room: "project:550e8400-e29b-41d4-a716-446655440000",
+  },
+  (response) => {
+    console.log(response); // {status: "success", ...}
+  },
+);
 
 // Listen for project updates
 socket.on("project.updated", (event) => {
@@ -47,47 +51,53 @@ socket.on("project.updated", (event) => {
 
 // Unsubscribe
 socket.emit("unsubscribe", {
-  room: "project:550e8400-e29b-41d4-a716-446655440000"
+  room: "project:550e8400-e29b-41d4-a716-446655440000",
 });
 ```
 
 ## Available Rooms
 
-| Room | Format | Auto-Sub | Purpose |
-|------|--------|----------|---------|
-| User | `user:<user_id>` | Yes | User notifications |
-| Project | `project:<project_id>` | No | Project updates |
-| Agent | `agent:<agent_id>` | No | Agent status |
-| Global | `global` | Yes | System-wide |
+| Room    | Format                 | Auto-Sub | Purpose            |
+| ------- | ---------------------- | -------- | ------------------ |
+| User    | `user:<user_id>`       | Yes      | User notifications |
+| Project | `project:<project_id>` | No       | Project updates    |
+| Agent   | `agent:<agent_id>`     | No       | Agent status       |
+| Global  | `global`               | Yes      | System-wide        |
 
 ## Event Types
 
 ### Project Events
+
 - `project.updated` - Project changed
 - `project.deleted` - Project removed
 
 ### Agent Events
+
 - `agent.status_changed` - Status changed
 - `agent.connected` - Agent online
 - `agent.disconnected` - Agent offline
 
 ### Workflow Events
+
 - `workflow.started` - Execution started
 - `workflow.progress` - Progress update
 - `workflow.completed` - Success
 - `workflow.failed` - Failed
 
 ### PR Events
+
 - `pr.created` - New PR
 - `pr.updated` - PR changed
 - `pr.closed` - PR closed
 
 ### Issue Events
+
 - `issue.created` - New issue
 - `issue.updated` - Issue changed
 - `issue.closed` - Issue closed
 
 ### AI Events
+
 - `ai.suggestion` - AI recommendation
 - `ai.analysis_complete` - Analysis done
 
@@ -197,12 +207,12 @@ export const useProjectUpdates = (projectId: string) => {
 
   useEffect(() => {
     const socket = io("http://localhost:8000/ws", {
-      auth: { token: localStorage.getItem("jwt_token") }
+      auth: { token: localStorage.getItem("jwt_token") },
     });
 
     socket.on("connect", () => {
       socket.emit("subscribe", {
-        room: `project:${projectId}`
+        room: `project:${projectId}`,
       });
     });
 
@@ -220,11 +230,13 @@ export const useProjectUpdates = (projectId: string) => {
 ## API Endpoints
 
 ### Health Check
+
 ```bash
 GET /health
 ```
 
 ### API Endpoints (with WebSocket)
+
 ```bash
 GET /api/v1/projects
 PUT /api/v1/projects/{id}  # Broadcasts project.updated
@@ -242,15 +254,15 @@ websocat ws://localhost:8000/ws
 
 ## Files
 
-| File | Purpose |
-|------|---------|
-| `/apps/api/websocket/server.py` | Socket.IO server |
-| `/apps/api/websocket/auth.py` | JWT authentication |
-| `/apps/api/websocket/rooms.py` | Room management |
-| `/apps/api/websocket/events.py` | Event handlers |
-| `/apps/api/websocket/models.py` | Event models |
-| `/apps/api/events/broadcaster.py` | Event broadcasting |
-| `/WEBSOCKET_API.md` | Full API reference |
+| File                              | Purpose              |
+| --------------------------------- | -------------------- |
+| `/apps/api/websocket/server.py`   | Socket.IO server     |
+| `/apps/api/websocket/auth.py`     | JWT authentication   |
+| `/apps/api/websocket/rooms.py`    | Room management      |
+| `/apps/api/websocket/events.py`   | Event handlers       |
+| `/apps/api/websocket/models.py`   | Event models         |
+| `/apps/api/events/broadcaster.py` | Event broadcasting   |
+| `/WEBSOCKET_API.md`               | Full API reference   |
 | `/WEBSOCKET_INTEGRATION_GUIDE.md` | Integration examples |
 
 ## Common Patterns
@@ -258,13 +270,9 @@ websocat ws://localhost:8000/ws
 ### Listen for Multiple Events
 
 ```javascript
-const events = [
-  "project.updated",
-  "agent.status_changed",
-  "workflow.progress"
-];
+const events = ["project.updated", "agent.status_changed", "workflow.progress"];
 
-events.forEach(event => {
+events.forEach((event) => {
   socket.on(event, (data) => {
     console.log(`${event}:`, data);
   });
@@ -342,18 +350,21 @@ kubectl apply -f websocket-deployment.yaml
 ## Troubleshooting
 
 ### Connection Fails
+
 1. Check server running: `curl http://localhost:8000/health`
 2. Check JWT token validity
 3. Check CORS configuration
 4. Check logs: `grep websocket logs/app.log`
 
 ### Events Not Received
+
 1. Check subscription: `socket.emit("debug:rooms", {}, console.log)`
 2. Check event type names match
 3. Check browser console for errors
 4. Verify CORS headers
 
 ### Token Expired
+
 1. Implement token refresh
 2. Reconnect with new token
 3. Or redirect to login

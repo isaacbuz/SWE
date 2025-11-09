@@ -1,18 +1,25 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowDown, ArrowUp } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowDown, ArrowUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface KPICardProps {
-  title: string
-  value: string | number
-  change?: number
-  trend?: 'up' | 'down'
-  positive?: boolean
-  icon?: React.ReactNode
+  title: string;
+  value: string | number;
+  change?: number;
+  trend?: "up" | "down";
+  positive?: boolean;
+  icon?: React.ReactNode;
 }
 
-export function KPICard({ title, value, change, trend, positive, icon }: KPICardProps) {
-  const isPositiveChange = positive !== undefined ? positive : (trend === 'up')
+export function KPICard({
+  title,
+  value,
+  change,
+  trend,
+  positive,
+  icon,
+}: KPICardProps) {
+  const isPositiveChange = positive !== undefined ? positive : trend === "up";
 
   return (
     <Card>
@@ -24,28 +31,28 @@ export function KPICard({ title, value, change, trend, positive, icon }: KPICard
         <div className="text-2xl font-bold">{value}</div>
         {change !== undefined && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-            {trend === 'up' && (
+            {trend === "up" && (
               <ArrowUp
                 className={cn(
-                  'h-4 w-4',
-                  isPositiveChange ? 'text-green-600' : 'text-red-600'
+                  "h-4 w-4",
+                  isPositiveChange ? "text-green-600" : "text-red-600",
                 )}
               />
             )}
-            {trend === 'down' && (
+            {trend === "down" && (
               <ArrowDown
                 className={cn(
-                  'h-4 w-4',
-                  isPositiveChange ? 'text-green-600' : 'text-red-600'
+                  "h-4 w-4",
+                  isPositiveChange ? "text-green-600" : "text-red-600",
                 )}
               />
             )}
             <span
               className={cn(
-                isPositiveChange ? 'text-green-600' : 'text-red-600'
+                isPositiveChange ? "text-green-600" : "text-red-600",
               )}
             >
-              {change > 0 ? '+' : ''}
+              {change > 0 ? "+" : ""}
               {change}%
             </span>
             <span>from last period</span>
@@ -53,5 +60,5 @@ export function KPICard({ title, value, change, trend, positive, icon }: KPICard
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

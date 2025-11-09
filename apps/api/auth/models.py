@@ -135,9 +135,11 @@ class GitHubUser(BaseModel):
 
 class CurrentUser(BaseModel):
     """Current authenticated user."""
-    id: UUID
+    id: int  # Database user ID (integer)
     email: EmailStr
+    username: Optional[str] = None
     role: UserRole
+    is_active: bool = True
     scopes: List[str] = Field(default_factory=list)
 
     class Config:

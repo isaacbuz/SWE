@@ -1,0 +1,70 @@
+# Alertmanager Configuration
+# Routes alerts to appropriate channels
+
+global:
+  resolve_timeout: 5m
+  slack_api_url: ${SLACK_WEBHOOK_URL:-}
+
+# Route tree
+route:
+  receiver: 'default'
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  routes:
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      continue: true
+    
+    - match:
+        component: cost
+      receiver: 'cost-alerts'
+    
+    - match:
+        component: quality
+      receiver: 'quality-alerts'
+
+# Receivers
+receivers:
+  - name: 'default'
+    webhook_configs:
+      - url: 'http://api:8000/webhooks/alerts'
+        send_resolved: true
+
+  - name: 'critical-alerts'
+    slack_configs:
+      - channel: '#alerts-critical'
+        title: '🚨 Critical Alert: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+        send_resolved: true
+    webhook_configs:
+      - url: 'http://api:8000/webhooks/alerts/critical'
+        send_resolved: true
+
+  - name: 'cost-alerts'
+    slack_configs:
+      - channel: '#alerts-cost'
+        title: '💰 Cost Alert: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+    email_configs:
+      - to: '${ALERT_EMAIL:-alerts@example.com}'
+        from: 'alerts@swe-platform.com'
+        headers:
+          Subject: 'Cost Alert: {{ .GroupLabels.alertname }}'
+
+  - name: 'quality-alerts'
+    slack_configs:
+      - channel: '#alerts-quality'
+        title: '✅ Quality Alert: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+
+# Inhibition rules
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'cluster', 'service']
+

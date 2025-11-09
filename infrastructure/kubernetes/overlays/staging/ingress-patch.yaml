@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: piehr-ingress
+  namespace: piehr-staging
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+spec:
+  tls:
+  - hosts:
+    - api-staging.piehr.example.com
+    - staging.piehr.example.com
+    secretName: piehr-staging-tls-secret
+  rules:
+  - host: api-staging.piehr.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api
+            port:
+              number: 80
+  - host: staging.piehr.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web
+            port:
+              number: 80
+

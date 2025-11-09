@@ -1,4 +1,3 @@
-
 ```mermaid
 sequenceDiagram
   participant Issue as GitHub Issue

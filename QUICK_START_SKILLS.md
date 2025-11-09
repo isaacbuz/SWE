@@ -28,6 +28,7 @@ python seed_skills.py
 ```
 
 **Expected Output**:
+
 ```
 Found 16 skill definitions
   ✅ Inserted typescript-api-endpoint
@@ -99,27 +100,32 @@ curl -X POST http://localhost:8000/api/v1/skills/{skill_id}/execute \
 ## Available Skills
 
 ### Code Generation (4)
+
 - `typescript-api-endpoint` - Generate Express.js API endpoints
 - `react-component-generator` - Generate React components
 - `python-class-generator` - Generate Python classes
 - `sql-query-generator` - Generate SQL queries
 
 ### Testing (3)
+
 - `unit-test-generator` - Generate unit tests
 - `integration-test-generator` - Generate integration tests
 - `e2e-test-generator` - Generate E2E tests
 
 ### Code Review (3)
+
 - `security-code-review` - Security-focused code review
 - `performance-code-review` - Performance optimization review
 - `best-practices-review` - Best practices review
 
 ### Documentation (3)
+
 - `api-documentation-generator` - Generate OpenAPI docs
 - `readme-generator` - Generate README files
 - `code-comments-generator` - Add code comments
 
 ### Architecture (3)
+
 - `architecture-decision-record` - Generate ADRs
 - `system-design-diagram` - Generate diagrams
 - `database-schema-designer` - Design database schemas
@@ -127,6 +133,7 @@ curl -X POST http://localhost:8000/api/v1/skills/{skill_id}/execute \
 ## Troubleshooting
 
 ### Database Connection Issues
+
 ```bash
 # Check PostgreSQL is running
 pg_isready
@@ -136,6 +143,7 @@ psql -h localhost -U postgres -d swe_agent -c "SELECT 1"
 ```
 
 ### Redis Connection Issues
+
 ```bash
 # Check Redis is running
 redis-cli ping
@@ -144,6 +152,7 @@ redis-cli ping
 ```
 
 ### API Not Responding
+
 ```bash
 # Check if API is running
 curl http://localhost:8000/health
@@ -153,6 +162,7 @@ tail -f apps/api/logs/app.log
 ```
 
 ### Frontend Not Loading
+
 ```bash
 # Check if dev server is running
 curl http://localhost:3000
@@ -178,6 +188,7 @@ curl http://localhost:3000
 ## Support
 
 For issues or questions:
+
 - Check [Troubleshooting](#troubleshooting) section
 - Review [Implementation Status](./IMPLEMENTATION_STATUS.md)
 - See [GitHub Issues](./GITHUB_ISSUES.md)
@@ -185,4 +196,3 @@ For issues or questions:
 ---
 
 **Happy Skill Building! 🚀**
-

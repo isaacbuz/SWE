@@ -13,6 +13,7 @@
 Create a provider-agnostic interface that works with OpenAI, Anthropic, and other LLM providers.
 
 ### Dependencies
+
 **NONE** - Can start immediately!
 
 ---
@@ -20,6 +21,7 @@ Create a provider-agnostic interface that works with OpenAI, Anthropic, and othe
 ## IMPLEMENTATION
 
 ### Package Structure
+
 ```
 packages/llm-providers/
 ├── src/
@@ -36,6 +38,7 @@ packages/llm-providers/
 ```
 
 ### package.json
+
 ```json
 {
   "name": "@ai-company/llm-providers",
@@ -60,37 +63,38 @@ packages/llm-providers/
 ```
 
 ### src/types.ts
+
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Message roles
  */
-export type MessageRole = 'system' | 'user' | 'assistant' | 'tool';
+export type MessageRole = "system" | "user" | "assistant" | "tool";
 
 /**
  * Message content types
  */
 export const TextContentSchema = z.object({
-  type: z.literal('text'),
+  type: z.literal("text"),
   text: z.string(),
 });
 
 export const ImageContentSchema = z.object({
-  type: z.literal('image'),
+  type: z.literal("image"),
   url: z.string(),
-  detail: z.enum(['low', 'high', 'auto']).optional(),
+  detail: z.enum(["low", "high", "auto"]).optional(),
 });
 
 export const ToolCallContentSchema = z.object({
-  type: z.literal('tool_call'),
+  type: z.literal("tool_call"),
   id: z.string(),
   name: z.string(),
   arguments: z.record(z.any()),
 });
 
 export const ToolResultContentSchema = z.object({
-  type: z.literal('tool_result'),
+  type: z.literal("tool_result"),
   tool_call_id: z.string(),
   content: z.string(),
   is_error: z.boolean().optional(),
@@ -109,7 +113,7 @@ export type MessageContent = z.infer<typeof MessageContentSchema>;
  * Chat message
  */
 export const ChatMessageSchema = z.object({
-  role: z.enum(['system', 'user', 'assistant', 'tool']),
+  role: z.enum(["system", "user", "assistant", "tool"]),
   content: z.union([z.string(), z.array(MessageContentSchema)]),
   name: z.string().optional(),
   tool_calls: z.array(ToolCallContentSchema).optional(),
@@ -152,7 +156,7 @@ export interface ModelInfo {
   provider: string;
   capabilities: ModelCapabilities;
   pricing: {
-    inputTokens: number;  // Cost per 1K tokens
+    inputTokens: number; // Cost per 1K tokens
     outputTokens: number; // Cost per 1K tokens
   };
   deprecated?: boolean;
@@ -171,7 +175,7 @@ export interface CompletionOptions {
   presencePenalty?: number;
   stop?: string[];
   tools?: ToolDefinition[];
-  toolChoice?: 'auto' | 'none' | { type: 'tool'; name: string };
+  toolChoice?: "auto" | "none" | { type: "tool"; name: string };
   stream?: boolean;
   user?: string;
   metadata?: Record<string, any>;
@@ -195,7 +199,7 @@ export interface CompletionResponse {
   created: number;
   message: ChatMessage;
   usage: TokenUsage;
-  finishReason: 'stop' | 'length' | 'tool_calls' | 'content_filter' | 'error';
+  finishReason: "stop" | "length" | "tool_calls" | "content_filter" | "error";
   metadata?: Record<string, any>;
 }
 
@@ -210,7 +214,7 @@ export interface StreamChunk {
     content?: string;
     tool_calls?: Partial<ToolCallContentSchema>[];
   };
-  finishReason?: CompletionResponse['finishReason'];
+  finishReason?: CompletionResponse["finishReason"];
 }
 
 /**
@@ -241,13 +245,21 @@ export interface ProviderMetadata {
 ```
 
 ### src/base-provider.ts
+
 ```typescript
-import { CompletionOptions, CompletionResponse, StreamChunk, ModelInfo, ProviderConfig, ProviderMetadata } from './types';
-import { ProviderError, RateLimitError, AuthenticationError } from './errors';
+import {
+  CompletionOptions,
+  CompletionResponse,
+  StreamChunk,
+  ModelInfo,
+  ProviderConfig,
+  ProviderMetadata,
+} from "./types";
+import { ProviderError, RateLimitError, AuthenticationError } from "./errors";
 
 /**
  * Abstract base class for LLM providers
- * 
+ *
  * All provider implementations must extend this class and implement
  * the required abstract methods.
  */
@@ -266,7 +278,7 @@ export abstract class BaseLLMProvider {
    */
   protected validateConfig(config: ProviderConfig): void {
     if (!config.apiKey) {
-      throw new AuthenticationError('API key is required');
+      throw new AuthenticationError("API key is required");
     }
   }
 
@@ -295,21 +307,24 @@ export abstract class BaseLLMProvider {
   /**
    * Create a streaming completion
    */
-  abstract stream(options: CompletionOptions): AsyncGenerator<StreamChunk, void, unknown>;
+  abstract stream(
+    options: CompletionOptions,
+  ): AsyncGenerator<StreamChunk, void, unknown>;
 
   /**
    * Estimate cost for a completion
    */
   async estimateCost(options: CompletionOptions): Promise<number> {
     const model = await this.getModel(options.model);
-    
+
     // Rough token estimation (4 chars = 1 token)
     const promptTokens = JSON.stringify(options.messages).length / 4;
-    const completionTokens = options.maxTokens || model.capabilities.maxOutputTokens || 1000;
-    
+    const completionTokens =
+      options.maxTokens || model.capabilities.maxOutputTokens || 1000;
+
     const inputCost = (promptTokens / 1000) * model.pricing.inputTokens;
     const outputCost = (completionTokens / 1000) * model.pricing.outputTokens;
-    
+
     return inputCost + outputCost;
   }
 
@@ -342,19 +357,22 @@ export abstract class BaseLLMProvider {
    */
   protected handleError(error: any): never {
     if (error.status === 401) {
-      throw new AuthenticationError('Invalid API key');
+      throw new AuthenticationError("Invalid API key");
     }
-    
+
     if (error.status === 429) {
-      const retryAfter = error.headers?.['retry-after'];
-      throw new RateLimitError('Rate limit exceeded', retryAfter ? parseInt(retryAfter) : undefined);
+      const retryAfter = error.headers?.["retry-after"];
+      throw new RateLimitError(
+        "Rate limit exceeded",
+        retryAfter ? parseInt(retryAfter) : undefined,
+      );
     }
-    
+
     if (error.status >= 500) {
       throw new ProviderError(`Provider error: ${error.message}`, error.status);
     }
-    
-    throw new ProviderError(error.message || 'Unknown error', error.status);
+
+    throw new ProviderError(error.message || "Unknown error", error.status);
   }
 
   /**
@@ -362,29 +380,29 @@ export abstract class BaseLLMProvider {
    */
   protected async withRetry<T>(
     fn: () => Promise<T>,
-    maxRetries: number = this.config.maxRetries || 3
+    maxRetries: number = this.config.maxRetries || 3,
   ): Promise<T> {
     let lastError: Error;
-    
+
     for (let i = 0; i < maxRetries; i++) {
       try {
         return await fn();
       } catch (error) {
         lastError = error as Error;
-        
+
         // Don't retry on authentication errors
         if (error instanceof AuthenticationError) {
           throw error;
         }
-        
+
         // Wait before retry (exponential backoff)
         if (i < maxRetries - 1) {
           const delay = Math.pow(2, i) * 1000;
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
     }
-    
+
     throw lastError!;
   }
 }
@@ -428,18 +446,19 @@ export class ProviderRegistry {
    */
   async listAllModels(): Promise<Array<ModelInfo & { provider: string }>> {
     const allModels: Array<ModelInfo & { provider: string }> = [];
-    
+
     for (const [name, provider] of this.providers) {
       const models = await provider.listModels();
-      allModels.push(...models.map(m => ({ ...m, provider: name })));
+      allModels.push(...models.map((m) => ({ ...m, provider: name })));
     }
-    
+
     return allModels;
   }
 }
 ```
 
 ### src/errors.ts
+
 ```typescript
 /**
  * Base provider error
@@ -448,10 +467,10 @@ export class ProviderError extends Error {
   constructor(
     message: string,
     public statusCode?: number,
-    public provider?: string
+    public provider?: string,
   ) {
     super(message);
-    this.name = 'ProviderError';
+    this.name = "ProviderError";
   }
 }
 
@@ -459,9 +478,9 @@ export class ProviderError extends Error {
  * Authentication/API key error
  */
 export class AuthenticationError extends ProviderError {
-  constructor(message: string = 'Authentication failed') {
+  constructor(message: string = "Authentication failed") {
     super(message, 401);
-    this.name = 'AuthenticationError';
+    this.name = "AuthenticationError";
   }
 }
 
@@ -470,11 +489,11 @@ export class AuthenticationError extends ProviderError {
  */
 export class RateLimitError extends ProviderError {
   constructor(
-    message: string = 'Rate limit exceeded',
-    public retryAfter?: number
+    message: string = "Rate limit exceeded",
+    public retryAfter?: number,
   ) {
     super(message, 429);
-    this.name = 'RateLimitError';
+    this.name = "RateLimitError";
   }
 }
 
@@ -482,9 +501,12 @@ export class RateLimitError extends ProviderError {
  * Invalid request error
  */
 export class InvalidRequestError extends ProviderError {
-  constructor(message: string, public details?: any) {
+  constructor(
+    message: string,
+    public details?: any,
+  ) {
     super(message, 400);
-    this.name = 'InvalidRequestError';
+    this.name = "InvalidRequestError";
   }
 }
 
@@ -494,7 +516,7 @@ export class InvalidRequestError extends ProviderError {
 export class ModelNotFoundError extends ProviderError {
   constructor(public modelId: string) {
     super(`Model not found: ${modelId}`, 404);
-    this.name = 'ModelNotFoundError';
+    this.name = "ModelNotFoundError";
   }
 }
 
@@ -502,16 +524,17 @@ export class ModelNotFoundError extends ProviderError {
  * Content filter error
  */
 export class ContentFilterError extends ProviderError {
-  constructor(message: string = 'Content was filtered') {
+  constructor(message: string = "Content was filtered") {
     super(message, 400);
-    this.name = 'ContentFilterError';
+    this.name = "ContentFilterError";
   }
 }
 ```
 
 ### src/utils.ts
+
 ```typescript
-import { ChatMessage, MessageContent } from './types';
+import { ChatMessage, MessageContent } from "./types";
 
 /**
  * Count tokens in text (rough estimation)
@@ -526,22 +549,22 @@ export function estimateTokens(text: string): number {
  */
 export function estimateMessageTokens(messages: ChatMessage[]): number {
   let total = 0;
-  
+
   for (const message of messages) {
-    if (typeof message.content === 'string') {
+    if (typeof message.content === "string") {
       total += estimateTokens(message.content);
     } else if (Array.isArray(message.content)) {
       for (const content of message.content) {
-        if (content.type === 'text') {
+        if (content.type === "text") {
           total += estimateTokens(content.text);
         }
       }
     }
-    
+
     // Add overhead for message structure
     total += 4;
   }
-  
+
   return total;
 }
 
@@ -549,28 +572,33 @@ export function estimateMessageTokens(messages: ChatMessage[]): number {
  * Extract text content from message
  */
 export function extractTextContent(message: ChatMessage): string {
-  if (typeof message.content === 'string') {
+  if (typeof message.content === "string") {
     return message.content;
   }
-  
+
   if (Array.isArray(message.content)) {
     return message.content
-      .filter((c): c is Extract<MessageContent, { type: 'text' }> => c.type === 'text')
-      .map(c => c.text)
-      .join('\n');
+      .filter(
+        (c): c is Extract<MessageContent, { type: "text" }> =>
+          c.type === "text",
+      )
+      .map((c) => c.text)
+      .join("\n");
   }
-  
-  return '';
+
+  return "";
 }
 
 /**
  * Format messages for display
  */
 export function formatMessagesForDisplay(messages: ChatMessage[]): string {
-  return messages.map(msg => {
-    const content = extractTextContent(msg);
-    return `[${msg.role}]: ${content}`;
-  }).join('\n\n');
+  return messages
+    .map((msg) => {
+      const content = extractTextContent(msg);
+      return `[${msg.role}]: ${content}`;
+    })
+    .join("\n\n");
 }
 
 /**
@@ -579,17 +607,18 @@ export function formatMessagesForDisplay(messages: ChatMessage[]): string {
 export function validateToolDefinition(tool: any): boolean {
   return !!(
     tool &&
-    typeof tool.name === 'string' &&
-    typeof tool.description === 'string' &&
+    typeof tool.name === "string" &&
+    typeof tool.description === "string" &&
     tool.parameters &&
-    typeof tool.parameters === 'object'
+    typeof tool.parameters === "object"
   );
 }
 ```
 
 ### src/index.ts
+
 ```typescript
-export { BaseLLMProvider, ProviderRegistry } from './base-provider';
+export { BaseLLMProvider, ProviderRegistry } from "./base-provider";
 export {
   ProviderError,
   AuthenticationError,
@@ -597,14 +626,14 @@ export {
   InvalidRequestError,
   ModelNotFoundError,
   ContentFilterError,
-} from './errors';
+} from "./errors";
 export {
   estimateTokens,
   estimateMessageTokens,
   extractTextContent,
   formatMessagesForDisplay,
   validateToolDefinition,
-} from './utils';
+} from "./utils";
 
 export type {
   MessageRole,
@@ -619,29 +648,36 @@ export type {
   StreamChunk,
   ProviderConfig,
   ProviderMetadata,
-} from './types';
+} from "./types";
 
 export {
   ChatMessageSchema,
   ToolDefinitionSchema,
   MessageContentSchema,
-} from './types';
+} from "./types";
 ```
 
 ### tests/base-provider.test.ts
+
 ```typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { BaseLLMProvider, ProviderRegistry } from '../src/base-provider';
-import { CompletionOptions, CompletionResponse, StreamChunk, ModelInfo, ProviderConfig } from '../src/types';
+import { describe, it, expect, beforeEach } from "vitest";
+import { BaseLLMProvider, ProviderRegistry } from "../src/base-provider";
+import {
+  CompletionOptions,
+  CompletionResponse,
+  StreamChunk,
+  ModelInfo,
+  ProviderConfig,
+} from "../src/types";
 
 // Mock provider for testing
 class MockProvider extends BaseLLMProvider {
   async listModels(): Promise<ModelInfo[]> {
     return [
       {
-        id: 'mock-model-1',
-        name: 'Mock Model 1',
-        provider: 'mock',
+        id: "mock-model-1",
+        name: "Mock Model 1",
+        provider: "mock",
         capabilities: {
           supportsTools: true,
           supportsVision: false,
@@ -659,55 +695,55 @@ class MockProvider extends BaseLLMProvider {
 
   async getModel(modelId: string): Promise<ModelInfo> {
     const models = await this.listModels();
-    const model = models.find(m => m.id === modelId);
-    if (!model) throw new Error('Model not found');
+    const model = models.find((m) => m.id === modelId);
+    if (!model) throw new Error("Model not found");
     return model;
   }
 
   async complete(options: CompletionOptions): Promise<CompletionResponse> {
     return {
-      id: 'mock-completion-1',
+      id: "mock-completion-1",
       model: options.model,
       created: Date.now(),
       message: {
-        role: 'assistant',
-        content: 'Mock response',
+        role: "assistant",
+        content: "Mock response",
       },
       usage: {
         promptTokens: 10,
         completionTokens: 5,
         totalTokens: 15,
       },
-      finishReason: 'stop',
+      finishReason: "stop",
     };
   }
 
   async *stream(options: CompletionOptions): AsyncGenerator<StreamChunk> {
     yield {
-      id: 'mock-stream-1',
+      id: "mock-stream-1",
       model: options.model,
-      delta: { content: 'Mock ' },
+      delta: { content: "Mock " },
     };
     yield {
-      id: 'mock-stream-1',
+      id: "mock-stream-1",
       model: options.model,
-      delta: { content: 'stream' },
-      finishReason: 'stop',
+      delta: { content: "stream" },
+      finishReason: "stop",
     };
   }
 }
 
-describe('BaseLLMProvider', () => {
+describe("BaseLLMProvider", () => {
   let provider: MockProvider;
   const config: ProviderConfig = {
-    apiKey: 'test-key',
+    apiKey: "test-key",
   };
 
   beforeEach(() => {
     provider = new MockProvider(config, {
-      name: 'mock',
-      version: '1.0.0',
-      supportedModels: ['mock-model-1'],
+      name: "mock",
+      version: "1.0.0",
+      supportedModels: ["mock-model-1"],
       capabilities: {
         tools: true,
         vision: false,
@@ -716,61 +752,62 @@ describe('BaseLLMProvider', () => {
     });
   });
 
-  describe('initialization', () => {
-    it('should create provider with valid config', () => {
+  describe("initialization", () => {
+    it("should create provider with valid config", () => {
       expect(provider).toBeDefined();
-      expect(provider.getMetadata().name).toBe('mock');
+      expect(provider.getMetadata().name).toBe("mock");
     });
 
-    it('should throw on missing API key', () => {
-      expect(() => new MockProvider({ apiKey: '' } as any, {} as any))
-        .toThrow('API key is required');
+    it("should throw on missing API key", () => {
+      expect(() => new MockProvider({ apiKey: "" } as any, {} as any)).toThrow(
+        "API key is required",
+      );
     });
   });
 
-  describe('model operations', () => {
-    it('should list models', async () => {
+  describe("model operations", () => {
+    it("should list models", async () => {
       const models = await provider.listModels();
       expect(models).toHaveLength(1);
-      expect(models[0].id).toBe('mock-model-1');
+      expect(models[0].id).toBe("mock-model-1");
     });
 
-    it('should get specific model', async () => {
-      const model = await provider.getModel('mock-model-1');
-      expect(model.id).toBe('mock-model-1');
+    it("should get specific model", async () => {
+      const model = await provider.getModel("mock-model-1");
+      expect(model.id).toBe("mock-model-1");
     });
 
-    it('should check tool support', async () => {
-      const supports = await provider.supportsTools('mock-model-1');
+    it("should check tool support", async () => {
+      const supports = await provider.supportsTools("mock-model-1");
       expect(supports).toBe(true);
     });
 
-    it('should check vision support', async () => {
-      const supports = await provider.supportsVision('mock-model-1');
+    it("should check vision support", async () => {
+      const supports = await provider.supportsVision("mock-model-1");
       expect(supports).toBe(false);
     });
 
-    it('should check streaming support', async () => {
-      const supports = await provider.supportsStreaming('mock-model-1');
+    it("should check streaming support", async () => {
+      const supports = await provider.supportsStreaming("mock-model-1");
       expect(supports).toBe(true);
     });
   });
 
-  describe('completion', () => {
-    it('should create completion', async () => {
+  describe("completion", () => {
+    it("should create completion", async () => {
       const response = await provider.complete({
-        model: 'mock-model-1',
-        messages: [{ role: 'user', content: 'Hello' }],
+        model: "mock-model-1",
+        messages: [{ role: "user", content: "Hello" }],
       });
 
-      expect(response.message.role).toBe('assistant');
+      expect(response.message.role).toBe("assistant");
       expect(response.usage.totalTokens).toBe(15);
     });
 
-    it('should estimate cost', async () => {
+    it("should estimate cost", async () => {
       const cost = await provider.estimateCost({
-        model: 'mock-model-1',
-        messages: [{ role: 'user', content: 'Hello' }],
+        model: "mock-model-1",
+        messages: [{ role: "user", content: "Hello" }],
         maxTokens: 100,
       });
 
@@ -778,69 +815,75 @@ describe('BaseLLMProvider', () => {
     });
   });
 
-  describe('streaming', () => {
-    it('should stream completion', async () => {
+  describe("streaming", () => {
+    it("should stream completion", async () => {
       const chunks: StreamChunk[] = [];
-      
+
       for await (const chunk of provider.stream({
-        model: 'mock-model-1',
-        messages: [{ role: 'user', content: 'Hello' }],
+        model: "mock-model-1",
+        messages: [{ role: "user", content: "Hello" }],
       })) {
         chunks.push(chunk);
       }
 
       expect(chunks).toHaveLength(2);
-      expect(chunks[1].finishReason).toBe('stop');
+      expect(chunks[1].finishReason).toBe("stop");
     });
   });
 });
 
-describe('ProviderRegistry', () => {
+describe("ProviderRegistry", () => {
   let registry: ProviderRegistry;
   let provider1: MockProvider;
   let provider2: MockProvider;
 
   beforeEach(() => {
     registry = new ProviderRegistry();
-    provider1 = new MockProvider({ apiKey: 'key1' }, {
-      name: 'provider1',
-      version: '1.0.0',
-      supportedModels: ['model1'],
-      capabilities: { tools: true, vision: false, streaming: true },
-    });
-    provider2 = new MockProvider({ apiKey: 'key2' }, {
-      name: 'provider2',
-      version: '1.0.0',
-      supportedModels: ['model2'],
-      capabilities: { tools: true, vision: false, streaming: true },
-    });
+    provider1 = new MockProvider(
+      { apiKey: "key1" },
+      {
+        name: "provider1",
+        version: "1.0.0",
+        supportedModels: ["model1"],
+        capabilities: { tools: true, vision: false, streaming: true },
+      },
+    );
+    provider2 = new MockProvider(
+      { apiKey: "key2" },
+      {
+        name: "provider2",
+        version: "1.0.0",
+        supportedModels: ["model2"],
+        capabilities: { tools: true, vision: false, streaming: true },
+      },
+    );
   });
 
-  it('should register providers', () => {
-    registry.register('provider1', provider1);
-    registry.register('provider2', provider2);
+  it("should register providers", () => {
+    registry.register("provider1", provider1);
+    registry.register("provider2", provider2);
 
     expect(registry.list()).toHaveLength(2);
   });
 
-  it('should get provider by name', () => {
-    registry.register('provider1', provider1);
-    
-    const retrieved = registry.get('provider1');
+  it("should get provider by name", () => {
+    registry.register("provider1", provider1);
+
+    const retrieved = registry.get("provider1");
     expect(retrieved).toBe(provider1);
   });
 
-  it('should unregister provider', () => {
-    registry.register('provider1', provider1);
-    const removed = registry.unregister('provider1');
-    
+  it("should unregister provider", () => {
+    registry.register("provider1", provider1);
+    const removed = registry.unregister("provider1");
+
     expect(removed).toBe(true);
     expect(registry.list()).toHaveLength(0);
   });
 
-  it('should list all models from all providers', async () => {
-    registry.register('provider1', provider1);
-    registry.register('provider2', provider2);
+  it("should list all models from all providers", async () => {
+    registry.register("provider1", provider1);
+    registry.register("provider2", provider2);
 
     const models = await registry.listAllModels();
     expect(models).toHaveLength(2);
@@ -849,6 +892,7 @@ describe('ProviderRegistry', () => {
 ```
 
 ### README.md
+
 ```markdown
 # @ai-company/llm-providers
 
@@ -875,8 +919,8 @@ registry.register('anthropic', anthropicProvider);
 // Use a provider
 const provider = registry.get('openai');
 const response = await provider.complete({
-  model: 'gpt-4',
-  messages: [{ role: 'user', content: 'Hello!' }],
+model: 'gpt-4',
+messages: [{ role: 'user', content: 'Hello!' }],
 });
 \`\`\`
 
@@ -886,21 +930,21 @@ const response = await provider.complete({
 import { BaseLLMProvider } from '@ai-company/llm-providers';
 
 class CustomProvider extends BaseLLMProvider {
-  async listModels() {
-    // Implementation
-  }
+async listModels() {
+// Implementation
+}
 
-  async getModel(modelId: string) {
-    // Implementation
-  }
+async getModel(modelId: string) {
+// Implementation
+}
 
-  async complete(options: CompletionOptions) {
-    // Implementation
-  }
+async complete(options: CompletionOptions) {
+// Implementation
+}
 
-  async *stream(options: CompletionOptions) {
-    // Implementation
-  }
+async \*stream(options: CompletionOptions) {
+// Implementation
+}
 }
 \`\`\`
 
@@ -925,3 +969,4 @@ MIT
 **Coverage**: 89%  
 **Dependencies**: None  
 **Blocks**: Issues #13, #14 (OpenAI, Anthropic providers)
+```

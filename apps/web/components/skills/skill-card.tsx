@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { Star, Download, Code, Zap, Clock } from 'lucide-react'
-import { Skill } from '@/lib/api/types'
-import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
-import { cn } from '@/lib/utils/cn'
+import Link from "next/link";
+import { Star, Download, Code, Zap, Clock } from "lucide-react";
+import { Skill } from "@/lib/api/types";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils/cn";
 
 interface SkillCardProps {
-  skill: Skill
-  installed?: boolean
-  onInstall?: (skillId: string) => void
-  onUninstall?: (skillId: string) => void
+  skill: Skill;
+  installed?: boolean;
+  onInstall?: (skillId: string) => void;
+  onUninstall?: (skillId: string) => void;
 }
 
 const categoryIcons: Record<string, any> = {
@@ -20,19 +20,26 @@ const categoryIcons: Record<string, any> = {
   SECURITY: Code,
   DOCUMENTATION: Code,
   CODE_REVIEW: Code,
-}
+};
 
 const categoryColors: Record<string, string> = {
-  CODE_GENERATION: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-  TESTING: 'bg-green-500/10 text-green-500 border-green-500/20',
-  SECURITY: 'bg-red-500/10 text-red-500 border-red-500/20',
-  DOCUMENTATION: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-  CODE_REVIEW: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
-}
+  CODE_GENERATION: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+  TESTING: "bg-green-500/10 text-green-500 border-green-500/20",
+  SECURITY: "bg-red-500/10 text-red-500 border-red-500/20",
+  DOCUMENTATION: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+  CODE_REVIEW: "bg-orange-500/10 text-orange-500 border-orange-500/20",
+};
 
-export function SkillCard({ skill, installed, onInstall, onUninstall }: SkillCardProps) {
-  const CategoryIcon = categoryIcons[skill.category] || Code
-  const categoryColor = categoryColors[skill.category] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'
+export function SkillCard({
+  skill,
+  installed,
+  onInstall,
+  onUninstall,
+}: SkillCardProps) {
+  const CategoryIcon = categoryIcons[skill.category] || Code;
+  const categoryColor =
+    categoryColors[skill.category] ||
+    "bg-gray-500/10 text-gray-500 border-gray-500/20";
 
   return (
     <Card className="group relative overflow-hidden p-6 transition-all hover:shadow-lg">
@@ -40,10 +47,12 @@ export function SkillCard({ skill, installed, onInstall, onUninstall }: SkillCar
         {/* Header */}
         <div className="mb-4 flex items-start justify-between">
           <div className="flex items-start gap-3">
-            <div className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-lg border',
-              categoryColor
-            )}>
+            <div
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-lg border",
+                categoryColor,
+              )}
+            >
               <CategoryIcon className="h-5 w-5" />
             </div>
             <div className="flex-1">
@@ -93,14 +102,16 @@ export function SkillCard({ skill, installed, onInstall, onUninstall }: SkillCar
         {/* Footer */}
         <div className="mt-4 flex items-center justify-between border-t border-border-default pt-4">
           <div className="flex items-center gap-2">
-            <Badge className={cn('text-xs', categoryColor)}>
-              {skill.category.replace('_', ' ')}
+            <Badge className={cn("text-xs", categoryColor)}>
+              {skill.category.replace("_", " ")}
             </Badge>
             {skill.author_name && (
-              <span className="text-xs text-ink-tertiary">by {skill.author_name}</span>
+              <span className="text-xs text-ink-tertiary">
+                by {skill.author_name}
+              </span>
             )}
           </div>
-          {skill.pricing_model === 'free' && (
+          {skill.pricing_model === "free" && (
             <Badge variant="outline" className="text-xs">
               Free
             </Badge>
@@ -113,9 +124,9 @@ export function SkillCard({ skill, installed, onInstall, onUninstall }: SkillCar
         {installed ? (
           <button
             onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              onUninstall?.(skill.id)
+              e.preventDefault();
+              e.stopPropagation();
+              onUninstall?.(skill.id);
             }}
             className="rounded-md bg-status-success/10 px-3 py-1.5 text-xs font-medium text-status-success hover:bg-status-success/20 transition-colors"
           >
@@ -124,9 +135,9 @@ export function SkillCard({ skill, installed, onInstall, onUninstall }: SkillCar
         ) : (
           <button
             onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              onInstall?.(skill.id)
+              e.preventDefault();
+              e.stopPropagation();
+              onInstall?.(skill.id);
             }}
             className="rounded-md bg-brand-primary/10 px-3 py-1.5 text-xs font-medium text-brand-primary hover:bg-brand-primary/20 transition-colors"
           >
@@ -135,6 +146,5 @@ export function SkillCard({ skill, installed, onInstall, onUninstall }: SkillCar
         )}
       </div>
     </Card>
-  )
+  );
 }
-

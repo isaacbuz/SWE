@@ -6,6 +6,7 @@
 ## Current Situation
 
 ### ✅ Just Completed
+
 - CI pipeline fixes committed and pushed
 - Implementation roadmap created
 - New CI run in progress: https://github.com/isaacbuz/SWE/actions/runs/19198695574
@@ -19,6 +20,7 @@ You have **3 categories** of uncommitted changes:
 **What happened**: Router package renamed from `moe-router` (hyphen) to `moe_router` (underscore)
 
 **Files affected**:
+
 ```
 Deleted:  packages/moe-router/*  (old hyphen version)
 Added:    packages/moe_router/*  (new underscore version)
@@ -49,6 +51,7 @@ Breaking change: Import path changes from 'moe-router' to 'moe_router'"
 **What happened**: Significant new implementation of the Skills marketplace system
 
 **New Files**:
+
 ```
 Documentation:
 ✓ BUILT_IN_SKILLS_IMPLEMENTATION.md
@@ -137,6 +140,7 @@ Co-authored-by: Skills Team <skills@agentOS.com>"
 ## Category 3: Other Implementation Updates
 
 **Modified Files**:
+
 ```
 M GITHUB_ISSUES_OPENAPI_IMPLEMENTATION.md  # Updated status
 M IMPLEMENTATION_STATUS.md                 # Updated progress
@@ -184,6 +188,7 @@ Part of Skills system integration."
 ## Category 4: Summary/Report Documents
 
 **Files**:
+
 ```
 ✓ FINAL_IMPLEMENTATION_REPORT.md
 ✓ GITHUB_ISSUES.md
@@ -218,30 +223,35 @@ These documents track progress and provide project status overview."
 Execute in this order to maintain clean history:
 
 ### 1. MoE Router Refactor (2 min)
+
 ```bash
 git add packages/moe-router/ packages/moe_router/
 git commit -m "refactor(moe-router): rename package to use underscore..."
 ```
 
 ### 2. Skills System Feature (5 min)
+
 ```bash
 git add BUILT_IN_SKILLS_IMPLEMENTATION.md ... # (see Category 2)
 git commit -m "feat(skills): implement complete Skills marketplace system..."
 ```
 
 ### 3. Documentation Updates (3 min)
+
 ```bash
 git add GITHUB_ISSUES_OPENAPI_IMPLEMENTATION.md ... # (see Category 3)
 git commit -m "docs(implementation): update status and integrate Skills..."
 ```
 
 ### 4. Summary Reports (2 min)
+
 ```bash
 git add FINAL_IMPLEMENTATION_REPORT.md ... # (see Category 4)
 git commit -m "docs: add implementation summaries and reports..."
 ```
 
 ### 5. Push Everything (1 min)
+
 ```bash
 git push origin main
 ```
@@ -364,6 +374,7 @@ Once everything is committed and CI is green:
 ---
 
 **Pro Tip**: If you want to review changes before committing, use:
+
 ```bash
 git diff packages/skills_engine/  # Review specific directories
 git diff --stat                   # See summary of all changes

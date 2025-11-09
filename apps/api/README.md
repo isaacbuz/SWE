@@ -73,12 +73,14 @@ apps/api/
 ### Authentication
 
 All endpoints except `/health` and `/` require authentication via:
+
 - **Bearer Token**: `Authorization: Bearer <jwt_token>`
 - **API Key**: `X-API-Key: <api_key>`
 
 ### Core Endpoints
 
 #### Projects (`/api/v1/projects`)
+
 - `POST /` - Create project
 - `GET /` - List projects (paginated)
 - `GET /{project_id}` - Get project
@@ -86,6 +88,7 @@ All endpoints except `/health` and `/` require authentication via:
 - `DELETE /{project_id}` - Delete project
 
 #### Agents (`/api/v1/agents`)
+
 - `POST /` - Create agent
 - `GET /` - List agents (filtered)
 - `GET /{agent_id}` - Get agent
@@ -96,6 +99,7 @@ All endpoints except `/health` and `/` require authentication via:
 - `DELETE /{agent_id}` - Delete agent
 
 #### Issues (`/api/v1/issues`)
+
 - `POST /` - Create issue
 - `GET /` - List issues (filtered)
 - `GET /stats` - Get statistics
@@ -106,6 +110,7 @@ All endpoints except `/health` and `/` require authentication via:
 - `DELETE /{issue_id}` - Delete issue
 
 #### Pull Requests (`/api/v1/prs`)
+
 - `POST /` - Track PR
 - `GET /` - List PRs (filtered)
 - `GET /stats` - Get statistics
@@ -117,6 +122,7 @@ All endpoints except `/health` and `/` require authentication via:
 - `DELETE /{pr_id}` - Stop tracking
 
 #### Analytics (`/api/v1/analytics`)
+
 - `GET /dashboard` - Dashboard metrics
 - `GET /projects/{project_id}` - Project metrics
 - `GET /agents/{agent_id}` - Agent metrics
@@ -130,6 +136,7 @@ All endpoints except `/health` and `/` require authentication via:
 ### JWT Token Flow
 
 1. **Obtain Token** (via OAuth or credentials)
+
    ```bash
    curl -X POST http://localhost:8000/api/v1/auth/token \
      -H "Content-Type: application/json" \
@@ -137,6 +144,7 @@ All endpoints except `/health` and `/` require authentication via:
    ```
 
 2. **Use Token** in subsequent requests
+
    ```bash
    curl http://localhost:8000/api/v1/projects \
      -H "Authorization: Bearer <access_token>"
@@ -152,6 +160,7 @@ All endpoints except `/health` and `/` require authentication via:
 ### API Key Flow
 
 1. **Create API Key** (authenticated request)
+
    ```bash
    curl -X POST http://localhost:8000/api/v1/auth/api-keys \
      -H "Authorization: Bearer <access_token>" \
@@ -168,11 +177,13 @@ All endpoints except `/health` and `/` require authentication via:
 ### OAuth 2.0 (GitHub)
 
 1. **Redirect to GitHub**
+
    ```
    GET /api/v1/auth/github/login
    ```
 
 2. **Handle Callback**
+
    ```
    GET /api/v1/auth/github/callback?code=...&state=...
    ```
@@ -182,16 +193,19 @@ All endpoints except `/health` and `/` require authentication via:
 ## Rate Limiting
 
 Default rate limits:
+
 - **60 requests/minute** per user/IP
 - **1000 requests/hour** per user/IP
 
 Rate limit headers:
+
 - `X-RateLimit-Remaining` - Remaining requests
 - `X-RateLimit-Reset` - Reset timestamp
 
 ## Role-Based Access Control
 
 ### Roles
+
 - **admin** - Full access to all resources
 - **user** - Access to own resources
 - **agent** - Programmatic access for agents
@@ -251,6 +265,7 @@ All errors return structured JSON:
 See `.env.example` for all configuration options.
 
 Key settings:
+
 - **Database**: PostgreSQL with asyncpg driver
 - **Cache**: Redis for rate limiting and sessions
 - **Logging**: JSON format with structlog

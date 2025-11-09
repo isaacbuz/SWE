@@ -1,17 +1,17 @@
-import { Button } from '@/components/ui/button'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface WizardNavigationProps {
-  currentStep: number
-  totalSteps: number
-  onBack?: () => void
-  onNext?: () => void
-  onComplete?: () => void
-  canGoBack?: boolean
-  canGoNext?: boolean
-  isLoading?: boolean
-  className?: string
+  currentStep: number;
+  totalSteps: number;
+  onBack?: () => void;
+  onNext?: () => void;
+  onComplete?: () => void;
+  canGoBack?: boolean;
+  canGoNext?: boolean;
+  isLoading?: boolean;
+  className?: string;
 }
 
 export function WizardNavigation({
@@ -25,11 +25,16 @@ export function WizardNavigation({
   isLoading = false,
   className,
 }: WizardNavigationProps) {
-  const isLastStep = currentStep === totalSteps
-  const isFirstStep = currentStep === 1
+  const isLastStep = currentStep === totalSteps;
+  const isFirstStep = currentStep === 1;
 
   return (
-    <div className={cn('flex items-center justify-between pt-6 border-t', className)}>
+    <div
+      className={cn(
+        "flex items-center justify-between pt-6 border-t",
+        className,
+      )}
+    >
       <Button
         variant="outline"
         onClick={onBack}
@@ -40,21 +45,15 @@ export function WizardNavigation({
       </Button>
 
       {isLastStep ? (
-        <Button
-          onClick={onComplete}
-          disabled={!canGoNext || isLoading}
-        >
-          {isLoading ? 'Processing...' : 'Complete'}
+        <Button onClick={onComplete} disabled={!canGoNext || isLoading}>
+          {isLoading ? "Processing..." : "Complete"}
         </Button>
       ) : (
-        <Button
-          onClick={onNext}
-          disabled={!canGoNext || isLoading}
-        >
+        <Button onClick={onNext} disabled={!canGoNext || isLoading}>
           Next
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       )}
     </div>
-  )
+  );
 }

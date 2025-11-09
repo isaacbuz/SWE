@@ -1,15 +1,15 @@
 "use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Search, Bell, User, Command } from 'lucide-react';
-import { cn } from '@/lib/utils/cn';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Search, Bell, User, Command } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 
 const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/projects', label: 'Projects' },
-  { href: '/agents', label: 'Agents' },
-  { href: '/analytics', label: 'Analytics' },
+  { href: "/", label: "Home" },
+  { href: "/projects", label: "Projects" },
+  { href: "/agents", label: "Agents" },
+  { href: "/analytics", label: "Analytics" },
 ];
 
 export function TopNavbar() {
@@ -21,8 +21,8 @@ export function TopNavbar() {
         {/* Left Section */}
         <div className="flex items-center gap-8">
           {/* Brand */}
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="flex items-center gap-2 text-xl font-bold text-ink-primary hover:text-brand-primary transition-colors"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary text-white">
@@ -34,9 +34,10 @@ export function TopNavbar() {
           {/* Nav Links */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
-              const isActive = pathname === link.href || 
-                (link.href !== '/' && pathname.startsWith(link.href));
-              
+              const isActive =
+                pathname === link.href ||
+                (link.href !== "/" && pathname.startsWith(link.href));
+
               return (
                 <Link
                   key={link.href}
@@ -44,9 +45,9 @@ export function TopNavbar() {
                   className={cn(
                     "px-4 py-2 rounded-md text-sm font-medium transition-colors",
                     "hover:bg-surface-tertiary hover:text-ink-primary",
-                    isActive 
-                      ? "bg-surface-tertiary text-ink-primary" 
-                      : "text-ink-secondary"
+                    isActive
+                      ? "bg-surface-tertiary text-ink-primary"
+                      : "text-ink-secondary",
                   )}
                 >
                   {link.label}
@@ -61,7 +62,7 @@ export function TopNavbar() {
           className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-md bg-surface-tertiary text-ink-tertiary hover:bg-surface-tertiary hover:text-ink-primary transition-colors group"
           onClick={() => {
             // TODO: Open command palette
-            console.log('Open command palette');
+            console.log("Open command palette");
           }}
         >
           <Search className="h-4 w-4" />
@@ -77,7 +78,9 @@ export function TopNavbar() {
           <button className="relative p-2 rounded-md hover:bg-surface-tertiary transition-colors">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-status-success animate-pulse" />
-              <span className="text-sm font-medium text-ink-secondary">3 active</span>
+              <span className="text-sm font-medium text-ink-secondary">
+                3 active
+              </span>
             </div>
           </button>
 

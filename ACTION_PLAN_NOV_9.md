@@ -5,8 +5,9 @@
 All 4 PRs are failing CI due to **missing `pnpm-lock.yaml`** in PR branches.
 
 ### Error Details
+
 ```
-##[error]Dependencies lock file is not found in /home/runner/work/SWE/SWE. 
+##[error]Dependencies lock file is not found in /home/runner/work/SWE/SWE.
 Supported file patterns: pnpm-lock.yaml
 ```
 
@@ -14,12 +15,12 @@ Supported file patterns: pnpm-lock.yaml
 
 ## 📋 Open Pull Requests
 
-| PR# | Title | Branch | Draft | Status |
-|-----|-------|--------|-------|--------|
-| 30 | Tool Permissions & Rate Limiting | `feat/sample-pipeline-issue-18` | ❌ | ❌ FAILING |
-| 29 | OpenAPI Infrastructure Complete | `2025-11-09-5kt2-fZjKI` | ✅ DRAFT | ❌ FAILING |
-| 28 | Mistral & Cohere Providers | `feat-mistral-cohere-ci-8bdb2` | ❌ | ❌ FAILING |
-| 27 | Skills System Complete | `feat/skills-system` | ❌ | ❌ FAILING |
+| PR# | Title                            | Branch                          | Draft    | Status     |
+| --- | -------------------------------- | ------------------------------- | -------- | ---------- |
+| 30  | Tool Permissions & Rate Limiting | `feat/sample-pipeline-issue-18` | ❌       | ❌ FAILING |
+| 29  | OpenAPI Infrastructure Complete  | `2025-11-09-5kt2-fZjKI`         | ✅ DRAFT | ❌ FAILING |
+| 28  | Mistral & Cohere Providers       | `feat-mistral-cohere-ci-8bdb2`  | ❌       | ❌ FAILING |
+| 27  | Skills System Complete           | `feat/skills-system`            | ❌       | ❌ FAILING |
 
 ---
 
@@ -93,6 +94,7 @@ gh pr checks 27
 ### 2. Once CI Passes - Merge Strategy
 
 #### Phase 1: Low-Risk PRs (TODAY)
+
 ```bash
 # Merge PR #30 (Tool Permissions)
 gh pr merge 30 --squash --delete-branch
@@ -102,12 +104,14 @@ gh pr merge 28 --squash --delete-branch
 ```
 
 #### Phase 2: Skills System (THIS WEEK)
+
 ```bash
 # Merge PR #27 (Skills - well tested)
 gh pr merge 27 --squash --delete-branch
 ```
 
 #### Phase 3: OpenAPI Complete (THIS WEEK)
+
 ```bash
 # Mark PR #29 ready for review
 gh pr ready 29
@@ -121,12 +125,14 @@ gh pr merge 29 --squash --delete-branch
 ## 🎯 Expected Timeline
 
 ### Today (Nov 9, 2025)
+
 - **Now → +30min**: Fix all PR branches with lockfile
 - **+30min → +2hr**: Wait for CI to pass
 - **+2hr → +3hr**: Merge PRs #30 and #28
 - **+3hr → End of Day**: Monitor merged PRs
 
 ### This Week
+
 - **Tomorrow**: Merge PR #27 (Skills System)
 - **Day After**: Mark PR #29 ready & review
 - **End of Week**: Merge PR #29, cut v0.2.0 release
@@ -136,12 +142,14 @@ gh pr merge 29 --squash --delete-branch
 ## ✅ Success Criteria
 
 ### After All Fixes
+
 - ✅ All 4 PRs have CI passing
 - ✅ No lockfile errors
 - ✅ All tests passing
 - ✅ Security scans complete
 
 ### After All Merges
+
 - ✅ 0 open PRs
 - ✅ 0 open issues
 - ✅ Main branch healthy
@@ -169,14 +177,14 @@ git pull origin main
 fix_branch() {
   local branch=$1
   local pr=$2
-  
+
   echo "📝 Fixing PR #$pr ($branch)..."
   git checkout "$branch"
   git pull origin "$branch" || true
-  
+
   # Get lockfile from main
   git checkout main -- pnpm-lock.yaml pnpm-workspace.yaml
-  
+
   # Check if there are changes
   if git diff --quiet; then
     echo "✅ No changes needed for $branch"
@@ -187,7 +195,7 @@ fix_branch() {
 - Adds missing pnpm-lock.yaml required by CI
 - Adds pnpm-workspace.yaml for monorepo support
 - Fixes CI error: Dependencies lock file is not found"
-    
+
     git push origin "$branch"
     echo "✅ Pushed fix to $branch"
   fi

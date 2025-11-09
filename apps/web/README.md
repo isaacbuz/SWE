@@ -23,6 +23,7 @@ The application will be available at `http://localhost:3000`.
 ## Architecture
 
 ### Technology Stack
+
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript 5.3 (Strict Mode)
 - **Styling**: Tailwind CSS 3.4
@@ -62,7 +63,9 @@ apps/web/
 ## Design System
 
 ### Color Tokens
+
 The application supports light and dark themes with the following color system:
+
 - **Brand**: Primary action colors (indigo)
 - **Ink**: Text colors (4 levels of hierarchy)
 - **Surface**: Background colors (3 levels)
@@ -70,9 +73,11 @@ The application supports light and dark themes with the following color system:
 - **Status**: Semantic colors (success, warning, danger, info)
 
 ### Spacing Scale
+
 Based on a 4pt grid system (4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px)
 
 ### Typography
+
 - **Display**: General Sans (headings, hero text)
 - **Body**: Inter (all body text)
 - **Mono**: JetBrains Mono (code, technical content)
@@ -80,12 +85,14 @@ Based on a 4pt grid system (4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px)
 ## Features
 
 ### App Shell
+
 - **Top Navbar**: Brand, navigation, command trigger, notifications, user menu
 - **Left Rail**: Collapsible sidebar with workspace navigation
 - **AI Dock**: Context-aware AI assistant panel (collapsible)
 - **Responsive**: Mobile, tablet, and desktop layouts
 
 ### Routes
+
 - `/` - Home dashboard with overview and AI suggestions
 - `/projects` - Project list and management
 - `/projects/[id]` - Project detail with board view
@@ -95,12 +102,14 @@ Based on a 4pt grid system (4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px)
 - `/settings` - User preferences and theme settings
 
 ### Theme System
+
 - Light, dark, and system theme modes
 - Persistent theme selection (localStorage)
 - Smooth transitions between themes
 - CSS variables for dynamic theming
 
 ### Accessibility
+
 - Keyboard navigation support
 - Focus indicators
 - Semantic HTML
@@ -110,6 +119,7 @@ Based on a 4pt grid system (4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px)
 ## Next Steps
 
 ### Integration Tasks
+
 1. **API Integration**: Connect to backend services (GraphQL/tRPC)
 2. **State Management**: Set up Zustand stores and TanStack Query
 3. **Authentication**: Implement auth flow and protected routes
@@ -118,18 +128,21 @@ Based on a 4pt grid system (4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px)
 6. **Charts**: Add Recharts for analytics visualizations
 
 ### Component Development
+
 1. Install shadcn/ui components library
 2. Build reusable UI primitives (buttons, inputs, modals)
 3. Create specialized components (command palette, diff viewer, crew composer)
 4. Add form validation with React Hook Form + Zod
 
 ### Testing
+
 1. Set up Vitest for unit tests
 2. Add Playwright for E2E tests
 3. Implement Testing Library for component tests
 4. Add visual regression testing
 
 ### Performance
+
 1. Implement code splitting and lazy loading
 2. Optimize bundle size
 3. Add performance monitoring
@@ -151,6 +164,7 @@ NEXT_PUBLIC_ENABLE_ANALYTICS=true
 ## Development Guidelines
 
 ### Code Style
+
 - Follow TypeScript strict mode
 - Use functional components with hooks
 - Prefer composition over inheritance
@@ -158,9 +172,10 @@ NEXT_PUBLIC_ENABLE_ANALYTICS=true
 - Use meaningful variable names
 
 ### Component Structure
+
 ```tsx
 // 1. Imports
-import { ComponentProps } from 'react';
+import { ComponentProps } from "react";
 
 // 2. Types
 interface MyComponentProps {
@@ -176,6 +191,7 @@ export function MyComponent({ ...props }: MyComponentProps) {
 ```
 
 ### Naming Conventions
+
 - Components: PascalCase (e.g., `TopNavbar`)
 - Functions: camelCase (e.g., `handleClick`)
 - Files: kebab-case (e.g., `top-navbar.tsx`)

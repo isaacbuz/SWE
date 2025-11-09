@@ -1,19 +1,19 @@
 "use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { 
-  Home, 
-  FolderKanban, 
-  Bot, 
-  BarChart3, 
-  Plug, 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  Home,
+  FolderKanban,
+  Bot,
+  BarChart3,
+  Plug,
   Settings,
   ChevronLeft,
-  Zap
-} from 'lucide-react';
-import { cn } from '@/lib/utils/cn';
-import { useState } from 'react';
+  Zap,
+} from "lucide-react";
+import { cn } from "@/lib/utils/cn";
+import { useState } from "react";
 
 interface NavItem {
   icon: React.ElementType;
@@ -23,27 +23,25 @@ interface NavItem {
 
 const navSections = [
   {
-    title: 'Workspace',
+    title: "Workspace",
     items: [
-      { icon: Home, label: 'Home', href: '/' },
-      { icon: FolderKanban, label: 'Projects', href: '/projects' },
-      { icon: Bot, label: 'Agents', href: '/agents' },
-      { icon: Zap, label: 'Skills', href: '/skills' },
-    ]
+      { icon: Home, label: "Home", href: "/" },
+      { icon: FolderKanban, label: "Projects", href: "/projects" },
+      { icon: Bot, label: "Agents", href: "/agents" },
+      { icon: Zap, label: "Skills", href: "/skills" },
+    ],
   },
   {
-    title: 'Insights',
+    title: "Insights",
     items: [
-      { icon: BarChart3, label: 'Analytics', href: '/analytics' },
-      { icon: Plug, label: 'Integrations', href: '/integrations' },
-    ]
+      { icon: BarChart3, label: "Analytics", href: "/analytics" },
+      { icon: Plug, label: "Integrations", href: "/integrations" },
+    ],
   },
   {
-    title: 'Settings',
-    items: [
-      { icon: Settings, label: 'Settings', href: '/settings' },
-    ]
-  }
+    title: "Settings",
+    items: [{ icon: Settings, label: "Settings", href: "/settings" }],
+  },
 ];
 
 export function LeftRail() {
@@ -51,10 +49,10 @@ export function LeftRail() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <aside 
+    <aside
       className={cn(
         "sticky top-16 h-[calc(100vh-4rem)] border-r border-border-subtle bg-surface-primary transition-all duration-200",
-        collapsed ? "w-16" : "w-60"
+        collapsed ? "w-16" : "w-60",
       )}
     >
       <div className="flex h-full flex-col">
@@ -69,8 +67,9 @@ export function LeftRail() {
               )}
               <div className="space-y-1">
                 {section.items.map((item) => {
-                  const isActive = pathname === item.href || 
-                    (item.href !== '/' && pathname.startsWith(item.href));
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== "/" && pathname.startsWith(item.href));
                   const Icon = item.icon;
 
                   return (
@@ -80,17 +79,19 @@ export function LeftRail() {
                       className={cn(
                         "group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                         "hover:bg-surface-tertiary hover:text-ink-primary",
-                        isActive 
-                          ? "bg-brand-primary/10 text-brand-primary" 
+                        isActive
+                          ? "bg-brand-primary/10 text-brand-primary"
                           : "text-ink-secondary",
-                        collapsed && "justify-center"
+                        collapsed && "justify-center",
                       )}
                       title={collapsed ? item.label : undefined}
                     >
-                      <Icon className={cn(
-                        "h-5 w-5 shrink-0",
-                        isActive && "text-brand-primary"
-                      )} />
+                      <Icon
+                        className={cn(
+                          "h-5 w-5 shrink-0",
+                          isActive && "text-brand-primary",
+                        )}
+                      />
                       {!collapsed && <span>{item.label}</span>}
                       {isActive && !collapsed && (
                         <div className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-primary" />
@@ -110,14 +111,16 @@ export function LeftRail() {
             className={cn(
               "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-ink-secondary transition-colors",
               "hover:bg-surface-tertiary hover:text-ink-primary",
-              collapsed && "justify-center"
+              collapsed && "justify-center",
             )}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <ChevronLeft className={cn(
-              "h-5 w-5 shrink-0 transition-transform",
-              collapsed && "rotate-180"
-            )} />
+            <ChevronLeft
+              className={cn(
+                "h-5 w-5 shrink-0 transition-transform",
+                collapsed && "rotate-180",
+              )}
+            />
             {!collapsed && <span>Collapse</span>}
           </button>
         </div>

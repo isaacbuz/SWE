@@ -17,12 +17,14 @@ JWT (JSON Web Token) is the primary authentication method for user-facing applic
 #### Token Types
 
 **Access Token**:
+
 - Short-lived (default: 30 minutes)
 - Used for API requests
 - Contains user identity and permissions
 - Stateless validation
 
 **Refresh Token**:
+
 - Long-lived (default: 7 days)
 - Used to obtain new access tokens
 - More secure rotation mechanism
@@ -171,8 +173,8 @@ async function apiRequest(url, options = {}) {
     ...options,
     headers: {
       ...options.headers,
-      'Authorization': `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
 
   // If token expired, refresh and retry
@@ -182,8 +184,8 @@ async function apiRequest(url, options = {}) {
       ...options,
       headers: {
         ...options.headers,
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
   }
 
@@ -194,6 +196,7 @@ async function apiRequest(url, options = {}) {
 ### 2. API Key Authentication
 
 API keys provide a simpler authentication method for programmatic access, ideal for:
+
 - CI/CD pipelines
 - Automated scripts
 - Agent-to-API communication
@@ -208,6 +211,7 @@ Example: swe_kj8h3f9d2n4m5p6q7r8s9t0u1v2w3x4y
 ```
 
 Components:
+
 - **Prefix** (`swe_`): Identifies the key type
 - **Random Part**: Cryptographically secure random string
 - **Storage**: Hashed using bcrypt (similar to passwords)
@@ -443,12 +447,12 @@ Frontend extracts tokens from URL and stores them.
 
 ### User Roles
 
-| Role | Description | Permissions |
-|------|-------------|-------------|
-| `admin` | Administrator | Full access to all resources |
-| `user` | Regular user | Access to own resources |
-| `agent` | Programmatic agent | Limited to agent operations |
-| `readonly` | Read-only user | View-only access |
+| Role       | Description        | Permissions                  |
+| ---------- | ------------------ | ---------------------------- |
+| `admin`    | Administrator      | Full access to all resources |
+| `user`     | Regular user       | Access to own resources      |
+| `agent`    | Programmatic agent | Limited to agent operations  |
+| `readonly` | Read-only user     | View-only access             |
 
 ### Permission Scopes
 
@@ -468,6 +472,7 @@ Fine-grained permissions for API keys and tokens:
 ### Enforcement
 
 **Route-level**:
+
 ```python
 @router.get("/admin-only")
 async def admin_endpoint(user = Depends(require_admin)):
@@ -476,6 +481,7 @@ async def admin_endpoint(user = Depends(require_admin)):
 ```
 
 **Scope-level**:
+
 ```python
 @router.post("/projects")
 async def create_project(
@@ -490,12 +496,14 @@ async def create_project(
 ### Token Storage
 
 **Frontend**:
+
 - ✅ Use `httpOnly` cookies (if supporting cookies)
 - ✅ Use secure session storage
 - ❌ Never use `localStorage` for sensitive tokens
 - ✅ Clear tokens on logout
 
 **Backend**:
+
 - ✅ Hash API keys with bcrypt
 - ✅ Use strong JWT secret (min 32 bytes)
 - ✅ Rotate JWT secrets periodically
@@ -504,11 +512,13 @@ async def create_project(
 ### Token Expiration
 
 **Short-lived Access Tokens**:
+
 - Default: 30 minutes
 - Reduces impact of token compromise
 - Forces regular refresh
 
 **Long-lived Refresh Tokens**:
+
 - Default: 7 days
 - Stored more securely
 - Can be rotated on use
@@ -523,6 +533,7 @@ async def create_project(
 ### Rate Limiting
 
 Prevent brute force attacks:
+
 - 5 login attempts per minute
 - 60 API requests per minute
 - Track by IP and user ID
@@ -530,6 +541,7 @@ Prevent brute force attacks:
 ### CSRF Protection
 
 For OAuth flows:
+
 - Generate random state token
 - Store in session/cookie
 - Verify on callback
@@ -540,6 +552,7 @@ For OAuth flows:
 ### Authentication Errors
 
 **Invalid Credentials**:
+
 ```json
 {
   "error": {
@@ -551,6 +564,7 @@ For OAuth flows:
 ```
 
 **Expired Token**:
+
 ```json
 {
   "error": {
@@ -562,6 +576,7 @@ For OAuth flows:
 ```
 
 **Invalid Token**:
+
 ```json
 {
   "error": {
@@ -573,6 +588,7 @@ For OAuth flows:
 ```
 
 **Insufficient Permissions**:
+
 ```json
 {
   "error": {
@@ -589,6 +605,7 @@ For OAuth flows:
 ### cURL Examples
 
 **JWT Login**:
+
 ```bash
 curl -X POST http://localhost:8000/api/v1/auth/token \
   -H "Content-Type: application/json" \
@@ -596,6 +613,7 @@ curl -X POST http://localhost:8000/api/v1/auth/token \
 ```
 
 **Authenticated Request**:
+
 ```bash
 TOKEN="eyJhbGc..."
 curl http://localhost:8000/api/v1/projects \
@@ -603,6 +621,7 @@ curl http://localhost:8000/api/v1/projects \
 ```
 
 **API Key Request**:
+
 ```bash
 API_KEY="swe_abc123..."
 curl http://localhost:8000/api/v1/projects \
@@ -633,19 +652,19 @@ projects = requests.get(
 
 ```javascript
 // Login
-const loginResponse = await fetch('http://localhost:8000/api/v1/auth/token', {
-  method: 'POST',
-  headers: {'Content-Type': 'application/json'},
+const loginResponse = await fetch("http://localhost:8000/api/v1/auth/token", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    email: 'user@example.com',
-    password: 'password'
-  })
+    email: "user@example.com",
+    password: "password",
+  }),
 });
 const tokens = await loginResponse.json();
 
 // Use token
-const projectsResponse = await fetch('http://localhost:8000/api/v1/projects', {
-  headers: {'Authorization': `Bearer ${tokens.access_token}`}
+const projectsResponse = await fetch("http://localhost:8000/api/v1/projects", {
+  headers: { Authorization: `Bearer ${tokens.access_token}` },
 });
 const projects = await projectsResponse.json();
 ```
@@ -653,6 +672,7 @@ const projects = await projectsResponse.json();
 ## Conclusion
 
 The SWE Agent API provides flexible, secure authentication supporting:
+
 - **JWT tokens** for user sessions
 - **API keys** for programmatic access
 - **OAuth 2.0** for social login

@@ -6,7 +6,9 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-ink-primary">Analytics</h1>
-        <p className="mt-2 text-ink-secondary">Track performance, costs, and quality metrics</p>
+        <p className="mt-2 text-ink-secondary">
+          Track performance, costs, and quality metrics
+        </p>
       </div>
 
       {/* Filters */}
@@ -95,7 +97,11 @@ function KPICard({
       <p className="text-sm font-medium text-ink-tertiary">{title}</p>
       <div className="mt-2 flex items-baseline justify-between">
         <p className="text-3xl font-bold text-ink-primary">{value}</p>
-        <div className={"flex items-center gap-1 text-sm font-medium " + trendColor}>
+        <div
+          className={
+            "flex items-center gap-1 text-sm font-medium " + trendColor
+          }
+        >
           <TrendIcon className="h-4 w-4" />
           <span>{change}</span>
         </div>
@@ -109,7 +115,9 @@ function ChartCard({ title }: { title: string }) {
     <div className="rounded-lg border border-border-default bg-surface-secondary p-6">
       <h3 className="text-lg font-semibold text-ink-primary">{title}</h3>
       <div className="mt-6 flex h-64 items-center justify-center rounded-md bg-surface-tertiary">
-        <p className="text-sm text-ink-tertiary">Chart placeholder - Add Recharts</p>
+        <p className="text-sm text-ink-tertiary">
+          Chart placeholder - Add Recharts
+        </p>
       </div>
     </div>
   );

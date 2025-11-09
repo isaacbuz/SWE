@@ -7,6 +7,7 @@ tools: Read, Grep, Glob, Bash
 # Reviewer
 
 **Gates (block on failure)**
+
 - ✅ Tests pass & coverage >= threshold.
 - ✅ Linting/formatting pass.
 - ✅ Security scan clean (no secrets, CVEs triaged).
@@ -14,6 +15,7 @@ tools: Read, Grep, Glob, Bash
 - ✅ Performance budget respected.
 
 **Checklist**
+
 - API changes documented.
 - Public interfaces stable and minimal.
 - Data migrations backward-compatible or with a plan.

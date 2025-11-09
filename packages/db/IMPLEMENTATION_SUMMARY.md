@@ -112,13 +112,15 @@ packages/db/
 ## 3. Key Design Decisions
 
 ### A. UUID-Based Identification
+
 - **Why**: Better for distributed systems, federation, and privacy
 - **Implementation**: `gen_random_uuid()` as default
 - **Trade-off**: Larger index size vs. better scalability
 
 ### B. Evidence-Driven Architecture
+
 - **Why**: Every AI decision is traceable to sources
-- **Implementation**: 
+- **Implementation**:
   - Separate evidence table with credibility_score (0.0-1.0)
   - 15+ source types (code_analysis, test_result, ai_model_output, etc.)
   - Verification fields for human attestation
@@ -126,29 +128,34 @@ packages/db/
 - **Use Case**: Track why agents made specific decisions
 
 ### C. JSONB for Extensibility
+
 - **Fields**: metadata, preferences, capabilities, ai_analysis, etc.
 - **Benefit**: Evolve schema without migrations
 - **GIN Indexes**: On tags and array-type fields for search
 - **Example**: `metadata JSONB DEFAULT '{}'`
 
 ### D. Immutable Audit Logs
+
 - **Implementation**: `is_immutable BOOLEAN DEFAULT true` with CHECK constraint
 - **Compliance**: Meets regulatory requirements (HIPAA, SOC 2)
 - **Forensics**: Complete event history for debugging
 - **Performance**: Separate table for archive-optimized retention
 
 ### E. Flexible Task Assignment
+
 - **Design**: Both `assigned_to_user_id` and `assigned_to_agent_id`
 - **Benefit**: Mix human and AI work
 - **Routing**: MoE router can assign to best agent
 
 ### F. GitHub Integration
+
 - **Level**: Deep GitHub API integration at table level
 - **Fields**: GitHub issue/PR numbers, node IDs, URLs
 - **Sync**: Comments, attachments, status updates
 - **Idempotency**: Handles duplicate pushes gracefully
 
 ### G. Performance Metrics
+
 - **Tables**: agents, projects, agent_executions
 - **Tracking**: Success rate, execution time, token usage, cost
 - **Purpose**: Cost optimization and SLA monitoring
@@ -220,6 +227,7 @@ packages/db/
 ### Docker Support
 
 Includes docker-compose.yml example with:
+
 - PostgreSQL 15 Alpine
 - Redis 7 Alpine
 - Automatic seed data loading
@@ -228,6 +236,7 @@ Includes docker-compose.yml example with:
 ## 6. Seed Data
 
 ### 01_users.sql (5 records)
+
 - admin (admin role)
 - orchestrator-bot (service account)
 - engineer-1 (senior engineer)
@@ -235,6 +244,7 @@ Includes docker-compose.yml example with:
 - manager-1 (engineering manager)
 
 ### 02_agents.sql (10 records)
+
 - orchestrator
 - architect
 - planner
@@ -247,6 +257,7 @@ Includes docker-compose.yml example with:
 - documentation
 
 ### 03_projects.sql (5 records)
+
 - AI Engineering Platform
 - MoE Router Service
 - Frontend UI
@@ -256,6 +267,7 @@ Includes docker-compose.yml example with:
 ## 7. Documentation
 
 ### README.md (450+ lines)
+
 - Complete setup instructions
 - Table-by-table schema documentation
 - PostgreSQL performance tips
@@ -265,6 +277,7 @@ Includes docker-compose.yml example with:
 - Troubleshooting guide
 
 ### QUICK_START.md (350+ lines)
+
 - 1-minute setup for development
 - Docker setup instructions
 - Python code examples
@@ -272,6 +285,7 @@ Includes docker-compose.yml example with:
 - Troubleshooting checklist
 
 ### SCHEMA.md (600+ lines)
+
 - Entity-Relationship Diagram (ASCII)
 - Detailed column documentation
 - All 10 core tables
@@ -281,21 +295,25 @@ Includes docker-compose.yml example with:
 - Performance characteristics
 
 ### IMPLEMENTATION_SUMMARY.md
+
 - This comprehensive overview
 
 ## 8. Technical Specifications
 
 ### PostgreSQL Requirements
+
 - Version: 15+
 - Features: UUID, JSONB, GIN indexes, CHECK constraints
 - Encoding: UTF-8
 
 ### Redis Requirements
+
 - Version: 7+
 - Memory: 512MB minimum (development)
 - Persistence: RDB snapshots for backups
 
 ### Python Requirements
+
 - Version: 3.10+
 - Dependencies:
   - psycopg2-binary (PostgreSQL driver)
@@ -305,6 +323,7 @@ Includes docker-compose.yml example with:
 ## 9. Performance Characteristics
 
 ### Database Indexing
+
 - **Primary Keys**: Auto-incrementing integers (internal IDs)
 - **External IDs**: UUID fields with unique indexes
 - **Foreign Keys**: All indexed for JOIN optimization
@@ -314,12 +333,14 @@ Includes docker-compose.yml example with:
 - **Total Indexes**: 67+ across all tables
 
 ### Query Optimization
+
 - UUID lookups: O(1) with index
 - Project task listing: O(n log n) with composite index
 - Evidence search: O(log n) with GIN index
 - Audit log queries: O(n log n) - consider partitioning for scale
 
 ### Caching Strategy
+
 - Cache layer for expensive operations
 - Rate limiting to prevent abuse
 - Session caching for auth
@@ -328,6 +349,7 @@ Includes docker-compose.yml example with:
 ## 10. Security Features
 
 ### Database Level
+
 - Immutable audit logs for compliance
 - Role-based access control (4 roles)
 - Soft deletes for data retention
@@ -335,6 +357,7 @@ Includes docker-compose.yml example with:
 - CHECK constraints for data validation
 
 ### Application Level
+
 - Password hashing (bcrypt)
 - OAuth/SSO integration (GitHub)
 - Session management with Redis
@@ -344,6 +367,7 @@ Includes docker-compose.yml example with:
 ## 11. Scalability Considerations
 
 ### Current Design (Supports)
+
 - 100K+ users
 - 1000+ projects
 - 10K+ agents
@@ -351,6 +375,7 @@ Includes docker-compose.yml example with:
 - 10M+ audit log entries
 
 ### Future Enhancements
+
 1. **Table Partitioning**: Monthly/yearly for audit_logs
 2. **Materialized Views**: Pre-computed metrics
 3. **Read Replicas**: PostgreSQL replication
@@ -361,6 +386,7 @@ Includes docker-compose.yml example with:
 ## 12. Compliance & Governance
 
 ### Audit Trail
+
 - Complete event logging (CREATE, READ, UPDATE, DELETE)
 - Actor tracking (user_id, agent_id, service_name)
 - Resource change tracking (old_values, new_values)
@@ -368,6 +394,7 @@ Includes docker-compose.yml example with:
 - Immutability guarantee
 
 ### Evidence System
+
 - Credibility scoring (0.0-1.0)
 - Source verification
 - Human attestation
@@ -375,6 +402,7 @@ Includes docker-compose.yml example with:
 - Contradiction detection
 
 ### Data Retention
+
 - Soft deletes with deleted_at timestamp
 - Archive strategy for audit logs
 - Evidence expiration dates
@@ -383,18 +411,21 @@ Includes docker-compose.yml example with:
 ## 13. Testing & Validation
 
 ### Schema Validation
+
 - All CREATE TABLE statements tested
 - Foreign key relationships validated
 - Index creation verified
 - Constraint enforcement confirmed
 
 ### Seed Data
+
 - Idempotent with ON CONFLICT DO NOTHING
 - Realistic development data
 - Relationships intact
 - Sample data for all user roles
 
 ### Documentation
+
 - Setup steps verified on fresh PostgreSQL
 - Docker compose tested
 - Python code examples runnable
@@ -403,17 +434,20 @@ Includes docker-compose.yml example with:
 ## 14. Cost Optimization
 
 ### For AWS RDS
+
 - t3.small instance handles 1000+ QPS
 - gp3 storage with IOPS provisioning
 - Multi-AZ for HA
 - Read replicas for analytics
 
 ### For Redis
+
 - Elasticache cluster mode for 5K+ concurrent connections
 - Redis cluster for horizontal scaling
 - Persistence: RDB snapshots for recovery
 
 ### Cost Estimates
+
 - PostgreSQL: ~$25/month (small project)
 - Redis: ~$15/month
 - Storage: ~$5/month
@@ -422,12 +456,14 @@ Includes docker-compose.yml example with:
 ## 15. Known Limitations & Future Work
 
 ### Current Limitations
+
 1. No automatic schema versioning (manual migration tracking)
 2. No time-series metrics (future: TimescaleDB extension)
 3. No full-text search (future: PostgreSQL FTS)
 4. No horizontal sharding (future: citus extension)
 
 ### Recommended Next Steps
+
 1. Implement ORM layer (SQLAlchemy models)
 2. Add migration framework (Alembic)
 3. Create Python data access layer
@@ -439,6 +475,7 @@ Includes docker-compose.yml example with:
 ## 16. File Deliverables
 
 ### SQL Files (6)
+
 - `schema/users.sql` - 56 lines
 - `schema/projects.sql` - 55 lines
 - `schema/agents.sql` - 116 lines
@@ -447,30 +484,36 @@ Includes docker-compose.yml example with:
 - `schema/audit_logs.sql` - 117 lines
 
 ### Migration Files (1)
+
 - `migrations/001_initial_schema.sql` - 547 lines (complete schema in one file)
 
 ### Seed Files (3)
+
 - `seeds/01_users.sql` - 40 lines
 - `seeds/02_agents.sql` - 95 lines
 - `seeds/03_projects.sql` - 55 lines
 
 ### Python Files (2)
+
 - `redis.py` - 683 lines (complete Redis utilities)
 - `setup.py` - 279 lines (database setup script)
 
 ### Documentation (4)
+
 - `README.md` - 450+ lines
 - `QUICK_START.md` - 350+ lines
 - `SCHEMA.md` - 600+ lines
 - `IMPLEMENTATION_SUMMARY.md` - This file
 
 ### Configuration Files (2)
+
 - `requirements.txt` - Package dependencies
 - `__init__.py` - Package exports
 
 ## 17. Success Metrics
 
 ### Code Quality
+
 - ✓ All SQL tested and validated
 - ✓ Python code follows PEP 8
 - ✓ Comprehensive docstrings
@@ -478,6 +521,7 @@ Includes docker-compose.yml example with:
 - ✓ Error handling and logging
 
 ### Documentation Quality
+
 - ✓ Setup instructions verified
 - ✓ Code examples tested
 - ✓ Schema fully documented
@@ -485,6 +529,7 @@ Includes docker-compose.yml example with:
 - ✓ Performance tips included
 
 ### Feature Completeness
+
 - ✓ All 10 core tables implemented
 - ✓ All relationships defined
 - ✓ All indexes created

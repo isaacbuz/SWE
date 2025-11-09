@@ -1,12 +1,7 @@
 {
   "job_id": "JOB-YYYY-MM-DD-###",
   "brief": "Build a grants-finder web app for U.S. federal programs: search/filter by agency, eligibility, location; favorites; CSV export.",
-  "tags": [
-    "gov",
-    "web",
-    "rag",
-    "google-sheets-intake"
-  ],
+  "tags": ["gov", "web", "rag", "google-sheets-intake"],
   "inputs": {
     "google_sheet": {
       "spreadsheet_id": "SPREADSHEET_ID",

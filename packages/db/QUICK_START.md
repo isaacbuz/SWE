@@ -5,6 +5,7 @@ Fast setup guide for the database infrastructure.
 ## 1-Minute Setup (Development)
 
 ### Prerequisites
+
 - PostgreSQL 15+ installed locally
 - Redis 7+ installed locally
 - `psql` CLI tool available
@@ -312,6 +313,7 @@ Use: `psql -d ai_company_db -f seeds/01_users.sql` with idempotent SQL (uses `ON
 ## Support
 
 For issues, check:
+
 - PostgreSQL logs: `/var/log/postgresql/postgresql.log`
 - Redis logs: `redis-cli MONITOR`
 - Application logs for connection errors

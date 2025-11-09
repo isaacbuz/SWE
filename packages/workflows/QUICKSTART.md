@@ -50,6 +50,7 @@ python worker.py
 ```
 
 You should see:
+
 ```
 INFO - Autonomous Coding System - Temporal Worker
 INFO - Connected to Temporal namespace: default
@@ -67,6 +68,7 @@ python client.py plan_patch_pr
 ```
 
 Expected output:
+
 ```
 Workflow started: plan-patch-pr-1234567890
 Workflow URL: http://localhost:8233/namespaces/default/workflows/plan-patch-pr-1234567890
@@ -80,6 +82,7 @@ Quality score: 92.5
 ### 3. View in Web UI
 
 Open http://localhost:8233 and:
+
 - Navigate to "Workflows"
 - Find your workflow by ID
 - Click to view execution history
@@ -277,6 +280,7 @@ export TEMPORAL_TASK_QUEUE="autonomous-coding-task-queue"
 **Problem:** Worker fails to connect to Temporal
 
 **Solution:**
+
 1. Ensure Temporal server is running: `temporal server start-dev`
 2. Check connection: `telnet localhost 7233`
 3. Verify namespace exists
@@ -286,6 +290,7 @@ export TEMPORAL_TASK_QUEUE="autonomous-coding-task-queue"
 **Problem:** Workflow exceeds timeout
 
 **Solution:**
+
 1. Increase timeout in `config.py`
 2. Check activity execution times
 3. Review worker logs for bottlenecks
@@ -295,6 +300,7 @@ export TEMPORAL_TASK_QUEUE="autonomous-coding-task-queue"
 **Problem:** Activity fails with error
 
 **Solution:**
+
 1. Check worker logs for error details
 2. Verify retry policy in `config.py`
 3. Review activity implementation
@@ -304,6 +310,7 @@ export TEMPORAL_TASK_QUEUE="autonomous-coding-task-queue"
 **Problem:** Workflow appears stuck
 
 **Solution:**
+
 1. Check Temporal Web UI for workflow history
 2. Look for pending activities
 3. Check worker health and availability

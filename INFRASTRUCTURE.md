@@ -27,6 +27,7 @@ The project uses GitHub Actions for continuous integration and deployment:
 The CI pipeline includes 7 major jobs:
 
 #### 1. **Lint & Format** (`lint`)
+
 - **Trigger**: All branches and PRs
 - **Tasks**:
   - ESLint checks for TypeScript/JavaScript
@@ -36,6 +37,7 @@ The CI pipeline includes 7 major jobs:
 - **Failure**: Blocks PR merge
 
 #### 2. **Security Scanning** (`security`)
+
 - **Trigger**: All branches and PRs
 - **Tasks**:
   - npm audit for JavaScript dependencies
@@ -46,6 +48,7 @@ The CI pipeline includes 7 major jobs:
 - **Failure**: Non-blocking but uploads reports
 
 #### 3. **Test & Coverage** (`test`)
+
 - **Trigger**: All branches and PRs
 - **Services**:
   - PostgreSQL 16 (test database)
@@ -59,6 +62,7 @@ The CI pipeline includes 7 major jobs:
 - **Failure**: Blocks PR merge if coverage < 80%
 
 #### 4. **Build Packages** (`build`)
+
 - **Trigger**: Depends on lint, test
 - **Tasks**:
   - Installs all dependencies
@@ -68,6 +72,7 @@ The CI pipeline includes 7 major jobs:
 - **Failure**: Blocks PR merge
 
 #### 5. **Build & Scan Docker Images** (`build-docker`)
+
 - **Trigger**: Depends on lint, test
 - **Tasks**:
   - Multi-stage Docker build
@@ -78,6 +83,7 @@ The CI pipeline includes 7 major jobs:
 - **Failure**: Non-blocking on PR, blocks on main
 
 #### 6. **Integration Tests** (`integration-tests`)
+
 - **Trigger**: Depends on build
 - **Services**:
   - PostgreSQL 16
@@ -89,6 +95,7 @@ The CI pipeline includes 7 major jobs:
 - **Failure**: Blocks PR merge
 
 #### 7. **Auto-Merge Ready PRs** (`auto-merge`)
+
 - **Trigger**: All jobs pass
 - **Conditions**:
   - PR must be approved OR
@@ -99,12 +106,14 @@ The CI pipeline includes 7 major jobs:
 ### CD Pipeline (`.github/workflows/cd.yml`)
 
 Triggered on:
+
 - Push to main branch
 - Git tags matching `v*.*.*`
 
 #### Deployment Environments
 
 **Staging Environment:**
+
 - Trigger: Merge to main (non-tag)
 - Endpoint: `https://staging-api.example.com`
 - Features:
@@ -113,6 +122,7 @@ Triggered on:
   - Database migrations
 
 **Production Environment:**
+
 - Trigger: Git tag `v*.*.*`
 - Endpoint: `https://api.example.com`
 - Features:
@@ -138,11 +148,13 @@ Triggered on:
 All sensitive values are stored in GitHub Secrets, not in the repository:
 
 **Required Secrets for CI/CD:**
+
 ```
 GITHUB_TOKEN          # Automatic, provided by GitHub Actions
 ```
 
 **Optional Secrets for CD:**
+
 ```
 STAGING_DEPLOY_KEY    # SSH key for staging deployment
 PROD_DEPLOY_KEY       # SSH key for production deployment
@@ -203,6 +215,7 @@ Stage 2: Runtime
 ### Docker Build Caching
 
 The CI pipeline uses GitHub Actions cache for Docker builds:
+
 ```yaml
 cache-from: type=gha
 cache-to: type=gha,mode=max
@@ -224,6 +237,7 @@ This provides significant speedup for subsequent builds.
 ### Quick Start
 
 1. **Clone and setup:**
+
 ```bash
 git clone https://github.com/your-org/ai-company.git
 cd ai-company
@@ -231,11 +245,13 @@ cp .env.example .env
 ```
 
 2. **Start services:**
+
 ```bash
 docker-compose up -d
 ```
 
 3. **Check health:**
+
 ```bash
 # API
 curl http://localhost:8000/health
@@ -253,6 +269,7 @@ redis-cli -p 6379 -a redis_password
 ### Docker Compose Services
 
 #### PostgreSQL (Port 5432)
+
 - **Image**: postgres:16-alpine
 - **Database**: ai_company_db
 - **User**: postgres / postgres (change in production)
@@ -260,6 +277,7 @@ redis-cli -p 6379 -a redis_password
 - **Data Persistence**: postgres_data volume
 
 #### Redis (Port 6379)
+
 - **Image**: redis:7-alpine
 - **Password**: redis_password (change in production)
 - **Memory**: 512MB limit with LRU eviction
@@ -267,6 +285,7 @@ redis-cli -p 6379 -a redis_password
 - **Health Check**: Every 10s
 
 #### Temporal (Port 7233, UI 8080)
+
 - **Image**: temporalio/auto-setup:latest
 - **Namespace**: default
 - **Task Queue**: ai-company-tasks
@@ -275,6 +294,7 @@ redis-cli -p 6379 -a redis_password
 - **Health Check**: Every 10s
 
 #### API Service (Port 8000)
+
 - **Build**: Local Dockerfile
 - **Environment**: development
 - **Debug**: Enabled
@@ -327,6 +347,7 @@ cp .env.example .env
 ```
 
 Key variables for development:
+
 - `ENVIRONMENT=development`
 - `DEBUG=true`
 - `LOG_LEVEL=INFO`
@@ -338,6 +359,7 @@ Key variables for development:
 Database schema is initialized via `infrastructure/db/init.sql` on first start.
 
 For subsequent migrations, use Alembic:
+
 ```bash
 # Generate migration
 alembic revision --autogenerate -m "Add new table"
@@ -349,6 +371,7 @@ alembic upgrade head
 ### Scaling Services
 
 Scale multiple API instances:
+
 ```bash
 docker-compose up -d --scale api=3
 ```
@@ -377,6 +400,7 @@ Automatically triggered on every merge to `main`:
 4. Notifies deployment status
 
 **Health Check Endpoint:**
+
 ```
 GET https://staging-api.example.com/health
 ```
@@ -392,6 +416,7 @@ git push origin v1.0.0
 ```
 
 This triggers:
+
 1. Pre-deployment safety checks
 2. Database backups
 3. Blue-green deployment
@@ -402,17 +427,20 @@ This triggers:
 ### Rollback Procedure
 
 Automatic rollback is triggered if:
+
 - Health checks fail post-deployment
 - Smoke tests fail
 - Critical errors detected
 
 The system automatically:
+
 1. Identifies previous stable version
 2. Restores database from backup
 3. Redeployment with previous version
 4. Creates incident ticket
 
 Manual rollback:
+
 ```bash
 # Rollback to previous tag
 git tag v1.0.1-rollback $(git describe --tags --abbrev=0 $(git rev-list --tags --skip=1 -n 1))
@@ -422,12 +450,14 @@ git push origin v1.0.1-rollback
 ### Monitoring Post-Deployment
 
 The monitoring job checks:
+
 - Application metrics (error rate, latency)
 - Resource utilization (CPU, memory)
 - Database connection pool
 - External API health
 
 Alerts trigger if:
+
 - Error rate > 5%
 - P95 latency > 1000ms
 - CPU > 80%
@@ -484,6 +514,7 @@ Alerts trigger if:
 ### Common Issues
 
 #### Services don't start
+
 ```bash
 # Check Docker daemon
 docker ps
@@ -499,6 +530,7 @@ lsof -i :8000
 ```
 
 #### Database connection fails
+
 ```bash
 # Check PostgreSQL health
 docker-compose exec postgres pg_isready
@@ -511,6 +543,7 @@ docker-compose exec postgres psql -U postgres -d ai_company_db
 ```
 
 #### Redis connection fails
+
 ```bash
 # Check Redis health
 docker-compose exec redis redis-cli ping
@@ -523,6 +556,7 @@ docker-compose exec redis redis-cli info memory
 ```
 
 #### API won't start
+
 ```bash
 # Check logs
 docker-compose logs api
@@ -539,6 +573,7 @@ curl http://localhost:8000/health
 #### CI/CD failures
 
 **Lint failures:**
+
 ```bash
 # Auto-fix formatting
 pnpm format
@@ -548,6 +583,7 @@ pnpm lint --fix
 ```
 
 **Test failures:**
+
 ```bash
 # Run tests locally
 pnpm test
@@ -557,6 +593,7 @@ pnpm test --coverage
 ```
 
 **Build failures:**
+
 ```bash
 # Clean build
 pnpm clean
@@ -569,6 +606,7 @@ cat .turbo/turbo.log
 ### Performance Optimization
 
 #### Slow database queries
+
 ```bash
 # Enable query logging
 docker-compose exec postgres psql -U postgres -d ai_company_db
@@ -577,6 +615,7 @@ docker-compose exec postgres psql -U postgres -d ai_company_db
 ```
 
 #### High memory usage
+
 ```bash
 # Check container memory
 docker stats
@@ -585,6 +624,7 @@ docker stats
 ```
 
 #### Slow Docker builds
+
 ```bash
 # Enable BuildKit
 export DOCKER_BUILDKIT=1
@@ -609,6 +649,7 @@ gh actions-cache list
 ## Support
 
 For issues or questions:
+
 1. Check existing GitHub issues
 2. Review this documentation
 3. Check GitHub Actions logs

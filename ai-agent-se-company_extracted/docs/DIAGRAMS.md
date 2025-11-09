@@ -1,6 +1,7 @@
 # Diagrams (Mermaid/PlantUML)
 
 ## Multi-Layer (Mermaid)
+
 ```mermaid
 flowchart TD
   U[User/Client] --> G[Gateway/API]
@@ -24,6 +25,7 @@ flowchart TD
 ```
 
 ## Sequence (PlantUML)
+
 ```plantuml
 @startuml
 actor User
