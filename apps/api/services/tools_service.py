@@ -93,8 +93,9 @@ class ToolExecutorService:
     
     def _register_default_handlers(self):
         """Register default tool handlers."""
-        # TODO: Register actual handlers that call TypeScript ToolExecutor
-        # For now, mock handlers
+        # Tool execution is handled via HTTP calls to the TypeScript ToolExecutor service
+        # See execute() method for implementation
+        # Mock handlers are kept for fallback/testing purposes
         self._handlers["createIssues"] = self._mock_create_issues
     
     async def execute(
