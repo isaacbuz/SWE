@@ -8,8 +8,9 @@ import { SuggestionChip } from './suggestion-chip'
 import { PromptBar } from './prompt-bar'
 import { ExecSummary } from './exec-summary'
 import { RiskList } from './risk-list'
+import { ProviderVisibility } from './provider-visibility'
 
-type TabType = 'summary' | 'risks' | 'actions'
+type TabType = 'summary' | 'risks' | 'actions' | 'provider'
 
 interface AIDockContentProps {
   context?: {
@@ -73,6 +74,12 @@ export function AIDockContent({ context }: AIDockContentProps) {
           Exec Summary
         </Tab>
         <Tab
+          active={activeTab === 'provider'}
+          onClick={() => setActiveTab('provider')}
+        >
+          Provider
+        </Tab>
+        <Tab
           active={activeTab === 'risks'}
           onClick={() => setActiveTab('risks')}
         >
@@ -89,6 +96,55 @@ export function AIDockContent({ context }: AIDockContentProps) {
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4">
         {activeTab === 'summary' && <ExecSummary context={context} />}
+        {activeTab === 'provider' && (
+          <ProviderVisibility
+            currentProvider={{
+              id: 'openai:gpt-4',
+              name: 'OpenAI',
+              model: 'GPT-4',
+              status: 'healthy',
+            }}
+            lastExecution={{
+              id: 'exec-1',
+              provider: {
+                id: 'openai:gpt-4',
+                name: 'OpenAI',
+                model: 'GPT-4',
+                status: 'healthy',
+              },
+              task: 'Create GitHub Issues',
+              duration: 3200,
+              toolCalls: [
+                {
+                  id: 'call-1',
+                  name: 'analyzeCode',
+                  duration: 1200,
+                  status: 'success',
+                  input: { path: './src' },
+                  output: { issues: [] },
+                },
+                {
+                  id: 'call-2',
+                  name: 'createIssues',
+                  duration: 800,
+                  status: 'success',
+                  input: { owner: 'isaacbuz', repo: 'SWE', tasks: [] },
+                  output: { issues: [42, 43, 44, 45, 46] },
+                },
+              ],
+              tokensIn: 2450,
+              tokensOut: 1200,
+              cost: 0.042,
+              timestamp: new Date(),
+            }}
+            onProviderSwitch={(providerId) => {
+              console.log('Switching to provider:', providerId)
+            }}
+            onRerun={(providerId) => {
+              console.log('Re-running with provider:', providerId)
+            }}
+          />
+        )}
         {activeTab === 'risks' && <RiskList context={context} />}
         {activeTab === 'actions' && <ActionsSuggestions context={context} />}
       </div>

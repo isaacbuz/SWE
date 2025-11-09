@@ -1,0 +1,193 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# GitHub
+.github
+.github/workflows
+
+# Version control
+.hg
+.svn
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*.swn
+*~
+.DS_Store
+Thumbs.db
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.sublime-project
+
+# Node.js
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+.pnpm-store
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.pylintrc
+.flake8
+
+# Testing
+coverage
+.nyc_output
+dist
+test-results
+
+# Build artifacts
+dist
+build
+*.pyc
+.turbo
+.next
+out
+
+# Documentation
+docs/_build
+site
+
+# Docker related
+docker-compose.yml
+Dockerfile*
+.dockerignore
+.docker
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+tmp/
+temp/
+
+# OS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+*.sublime-workspace
+.vagrant
+.vagrant/
+
+# CI/CD (pipeline artifacts only, not definitions)
+.github/workflows (kept in git for CI/CD)
+
+# Infrastructure as Code (source kept, not terraform state)
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Databases and data
+*.db
+*.sqlite
+*.sqlite3
+postgres_data/
+redis_data/
+
+# Certificates and keys (security)
+*.key
+*.pem
+*.crt
+*.pfx
+*.p12
+tls/
+certs/
+
+# Secrets management
+.vault
+vault/
+secrets/
+
+# Large files
+*.tar
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# Cache
+.cache/
+.pytest_cache/
+.ruff_cache/
+
+# Package manager specific
+package-lock.json (if using npm)
+Pipfile.lock
+
+# IDE specific directories
+.vscode/
+.idea/
+.eclipse/
+
+# Virtual environments
+.env.venv
+venv/
+virtualenv/
+
+# Miscellaneous
+NOTES.md
+TODO.md
+.editorconfig
+.prettierignore
+.eslintignore
+
+# Keep only necessary files for production
+# Minimum required: source code, requirements.txt, and package.json

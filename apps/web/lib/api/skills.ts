@@ -1,7 +1,7 @@
 /**
  * Skills API Client
  */
-import { Skill, SkillDetail, SkillExecutionResult, SkillInstallation } from './types'
+import { Skill, SkillDetail, SkillExecutionResult, SkillInstallation, SkillAnalytics, SkillReview, SkillReviewCreate, SkillVersion } from './types'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
@@ -39,6 +39,27 @@ export interface SkillExecutionRequest {
   context?: Record<string, any>
 }
 
+
+async function apiRequest<T>(
+  endpoint: string,
+  options?: RequestInit
+): Promise<T> {
+  const response = await fetch(`${API_BASE}/api/v1${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+  })
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: 'Request failed' }))
+    throw new Error(error.detail || error.message || 'Request failed')
+  }
+
+  return response.json()
+}
+
 export const skillsApi = {
   async listSkills(params: SkillsListParams = {}): Promise<Skill[]> {
     const queryParams = new URLSearchParams()
@@ -49,64 +70,80 @@ export const skillsApi = {
     if (params.limit) queryParams.append('limit', params.limit.toString())
     if (params.offset) queryParams.append('offset', params.offset.toString())
 
-    const response = await fetch(`${API_BASE}/api/v1/skills?${queryParams}`)
-    if (!response.ok) throw new Error('Failed to fetch skills')
-    return response.json()
+    return apiRequest<Skill[]>(`/skills?${queryParams}`)
   },
 
   async getSkill(skillId: string): Promise<SkillDetail> {
-    const response = await fetch(`${API_BASE}/api/v1/skills/${skillId}`)
-    if (!response.ok) throw new Error('Failed to fetch skill')
-    return response.json()
+    return apiRequest<SkillDetail>(`/skills/${skillId}`)
   },
 
   async createSkill(data: SkillCreateInput): Promise<Skill> {
-    const response = await fetch(`${API_BASE}/api/v1/skills`, {
+    return apiRequest<Skill>('/skills', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Failed to create skill' }))
-      throw new Error(error.detail || 'Failed to create skill')
-    }
-    return response.json()
   },
 
   async executeSkill(
     skillId: string,
     request: SkillExecutionRequest
   ): Promise<SkillExecutionResult> {
-    const response = await fetch(`${API_BASE}/api/v1/skills/${skillId}/execute`, {
+    return apiRequest<SkillExecutionResult>(`/skills/${skillId}/execute`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request),
     })
-    if (!response.ok) throw new Error('Failed to execute skill')
-    return response.json()
   },
 
   async installSkill(skillId: string, version?: string): Promise<SkillInstallation> {
-    const response = await fetch(`${API_BASE}/api/v1/skills/${skillId}/install`, {
+    return apiRequest<SkillInstallation>(`/skills/${skillId}/install`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ version }),
     })
-    if (!response.ok) throw new Error('Failed to install skill')
-    return response.json()
   },
 
   async uninstallSkill(skillId: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/api/v1/skills/${skillId}/install`, {
+    return apiRequest<void>(`/skills/${skillId}/install`, {
       method: 'DELETE',
     })
-    if (!response.ok) throw new Error('Failed to uninstall skill')
   },
 
   async listInstalledSkills(): Promise<SkillInstallation[]> {
-    const response = await fetch(`${API_BASE}/api/v1/skills/installed`)
-    if (!response.ok) throw new Error('Failed to fetch installed skills')
-    return response.json()
+    return apiRequest<SkillInstallation[]>('/skills/installed')
+  },
+
+  async getSkillAnalytics(
+    skillId: string,
+    params?: { start_date?: string; end_date?: string }
+  ): Promise<SkillAnalytics> {
+    const queryParams = new URLSearchParams()
+    if (params?.start_date) queryParams.append('start_date', params.start_date)
+    if (params?.end_date) queryParams.append('end_date', params.end_date)
+
+    return apiRequest<SkillAnalytics>(`/skills/${skillId}/analytics?${queryParams}`)
+  },
+
+  async getSkillReviews(
+    skillId: string,
+    params?: { limit?: number; offset?: number }
+  ): Promise<SkillReview[]> {
+    const queryParams = new URLSearchParams()
+    if (params?.limit) queryParams.append('limit', params.limit.toString())
+    if (params?.offset) queryParams.append('offset', params.offset.toString())
+
+    return apiRequest<SkillReview[]>(`/skills/${skillId}/reviews?${queryParams}`)
+  },
+
+  async createSkillReview(
+    skillId: string,
+    review: SkillReviewCreate
+  ): Promise<SkillReview> {
+    return apiRequest<SkillReview>(`/skills/${skillId}/reviews`, {
+      method: 'POST',
+      body: JSON.stringify(review),
+    })
+  },
+
+  async getSkillVersions(skillId: string): Promise<SkillVersion[]> {
+    return apiRequest<SkillVersion[]>(`/skills/${skillId}/versions`)
   },
 }
-
