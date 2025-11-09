@@ -19,23 +19,6 @@ export function CommandPalette() {
   const [selectedTool, setSelectedTool] = useState<ToolSpec | null>(null)
   const { data: tools = [], isLoading: toolsLoading } = useTools()
 
-  // Fuzzy search setup
-  const fuse = useMemo(() => {
-    return new Fuse(actions, {
-      keys: ['label', 'description', 'keywords'],
-      threshold: 0.3,
-      includeScore: true,
-    })
-  }, [actions])
-
-  // Search results
-  const results = useMemo(() => {
-    if (!search) {
-      return actions
-    }
-    return fuse.search(search).map(result => result.item)
-  }, [search, fuse, actions])
-
   // Convert tools to command actions
   const toolActions = useMemo(() => {
     return tools.map((tool): CommandAction => ({
@@ -73,10 +56,6 @@ export function CommandPalette() {
     return fuse.search(search).map(result => result.item)
   }, [search, fuse, allActions])
 
-  // Group tools by category
-  const groupedTools = useMemo(() => {
-    return groupToolsByCategory(tools)
-  }, [tools])
 
   // Group results by category
   const grouped = useMemo(() => {

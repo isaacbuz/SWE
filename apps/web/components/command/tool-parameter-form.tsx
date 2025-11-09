@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Select } from '@/components/ui/select'
+import * as Select from '@radix-ui/react-select'
 import { Loader2 } from 'lucide-react'
 
 interface ToolParameterFormProps {
@@ -104,17 +104,18 @@ export function ToolParameterForm({ tool, onExecute, onCancel }: ToolParameterFo
             {prop.description || key}
             {isRequired && <span className="text-red-500"> *</span>}
           </Label>
-          <Select
+          <select
             id={key}
             value={value || ''}
-            onValueChange={(val) => updateInput(key, val)}
+            onChange={(e) => updateInput(key, e.target.value)}
+            className="w-full rounded-lg border border-border-default bg-surface-secondary px-3 py-2 text-sm outline-none focus:border-brand-primary"
           >
             {prop.enum.map((option: string) => (
               <option key={option} value={option}>
                 {option}
               </option>
             ))}
-          </Select>
+          </select>
           {error && <p className="text-sm text-red-500">{error}</p>}
         </div>
       )
