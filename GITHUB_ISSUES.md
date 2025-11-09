@@ -138,7 +138,7 @@
 **Due**: Week 5
 
 - [x] Issue #90: Set up OpenTelemetry distributed tracing ✅ **COMPLETE**
-- [ ] Issue #91: Configure Prometheus metrics collection
+- [x] Issue #91: Configure Prometheus metrics collection ✅ **COMPLETE**
 - [ ] Issue #92: Create Grafana dashboards
 - [ ] Issue #93: Implement structured logging
 - [ ] Issue #94: Set up alerting system
