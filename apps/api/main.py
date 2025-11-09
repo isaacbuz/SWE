@@ -18,6 +18,7 @@ from routers import (
     prs_router,
     analytics_router,
     skills_router,
+    tools_router,
 )
 from websocket import init_websocket_server
 from events import init_broadcaster
@@ -269,6 +270,7 @@ app.include_router(issues_router, prefix=settings.api_prefix)
 app.include_router(prs_router, prefix=settings.api_prefix)
 app.include_router(analytics_router, prefix=settings.api_prefix)
 app.include_router(skills_router, prefix=settings.api_prefix)
+app.include_router(tools_router, prefix=settings.api_prefix)
 
 
 # Mount WebSocket server
