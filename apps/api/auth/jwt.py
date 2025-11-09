@@ -111,10 +111,17 @@ class JWTHandler:
                 return None
 
             # Extract token data
+            # Refresh tokens don't have role, so use USER as default
+            role_str = payload.get("role")
+            if role_str:
+                role = UserRole(role_str)
+            else:
+                role = UserRole.USER  # Default for refresh tokens
+            
             token_data = TokenData(
                 sub=payload.get("sub"),
                 email=payload.get("email"),
-                role=UserRole(payload.get("role")),
+                role=role,
                 scopes=payload.get("scopes", []),
                 token_type=TokenType(token_type),
                 exp=datetime.fromtimestamp(payload.get("exp")),
