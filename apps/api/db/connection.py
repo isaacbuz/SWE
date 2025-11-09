@@ -47,3 +47,15 @@ async def close_db_pool():
         _db_pool = None
         logger.info("Database connection pool closed")
 
+
+async def db_health_check() -> bool:
+    """Check database connection health"""
+    try:
+        pool = await get_db_pool()
+        async with pool.acquire() as conn:
+            await conn.fetchval("SELECT 1")
+        return True
+    except Exception as e:
+        logger.error(f"Database health check failed: {e}")
+        return False
+

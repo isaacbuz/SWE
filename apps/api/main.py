@@ -55,7 +55,18 @@ async def lifespan(app: FastAPI):
         logger.warning(f"Redis initialization failed (non-critical): {e}")
         logger.info("continuing_without_redis")
 
-    # TODO: Run database migrations
+    # Run database migrations
+    try:
+        from db.migrations import run_migrations
+        migration_success = await run_migrations()
+        if migration_success:
+            logger.info("database_migrations_completed")
+        else:
+            logger.warning("database_migrations_failed_or_skipped")
+    except Exception as e:
+        logger.warning(f"Migration runner failed (non-critical): {e}")
+        logger.info("continuing_without_migrations")
+
     # TODO: Initialize background task queues
     # TODO: Load configuration from external sources
 
