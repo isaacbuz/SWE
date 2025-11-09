@@ -6,7 +6,10 @@ Utilities for token counting, prompt compression, rate limiting, and retry handl
 
 from .token_counter import (
     TokenCounter,
+    TokenCounterResult,
+    UnsupportedTokenizerError,
     count_tokens,
+    count_tokens_with_details,
     count_messages_tokens,
     estimate_cost,
     fits_context_window,
@@ -39,7 +42,10 @@ from .retry_handler import (
 __all__ = [
     # Token counter
     "TokenCounter",
+    "TokenCounterResult",
+    "UnsupportedTokenizerError",
     "count_tokens",
+    "count_tokens_with_details",
     "count_messages_tokens",
     "estimate_cost",
     "fits_context_window",
