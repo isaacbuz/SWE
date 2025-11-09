@@ -41,7 +41,11 @@ async def lifespan(app: FastAPI):
     broadcaster = init_broadcaster()
     logger.info("event_broadcaster_initialized")
 
-    # TODO: Initialize database connection pool
+    # Initialize database connection pool
+    from db.connection import get_db_pool
+    await get_db_pool()
+    logger.info("database_connection_pool_initialized")
+
     # TODO: Initialize Redis connection pool
     # TODO: Run database migrations
     # TODO: Initialize background task queues
@@ -54,7 +58,11 @@ async def lifespan(app: FastAPI):
     # Shutdown
     logger.info("application_shutting_down")
 
-    # TODO: Close database connections
+    # Close database connections
+    from db.connection import close_db_pool
+    await close_db_pool()
+    logger.info("database_connection_pool_closed")
+
     # TODO: Close Redis connections
     # TODO: Gracefully shutdown background tasks
     # TODO: Flush logs and metrics

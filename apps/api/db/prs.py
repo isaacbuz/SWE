@@ -134,14 +134,9 @@ class PRsService:
                 params.append(project_id)
             
             if status:
-                # Map PR status to task status
-                task_status = self.PR_STATUS_TO_TASK_STATUS.get(status, "open")
+                # Filter by PR status in metadata
                 param_count += 1
-                conditions.append(f"t.status = ${param_count}")
-                params.append(task_status)
-                # Also check metadata for PR status
-                param_count += 1
-                conditions.append(f"(t.metadata->>'pr_status' = ${param_count} OR t.metadata->>'pr_status' IS NULL)")
+                conditions.append(f"(t.metadata->>'pr_status' = ${param_count} OR (t.metadata->>'pr_status' IS NULL AND t.status = 'open'))")
                 params.append(status)
             
             where_clause = " AND ".join(conditions)
