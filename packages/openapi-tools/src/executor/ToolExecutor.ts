@@ -155,7 +155,7 @@ export class ToolExecutor {
 
       // 4. Circuit breaker check
       if (this.options.circuitBreaker) {
-        if (!this.circuitBreaker.isOpen(toolName)) {
+        if (this.circuitBreaker.isOpen(toolName)) {
           return {
             success: false,
             error: `Circuit breaker is open for tool '${toolName}'`,
@@ -293,4 +293,3 @@ export class ToolExecutor {
     return this.handlers.has(name);
   }
 }
-
