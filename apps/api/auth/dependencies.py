@@ -96,6 +96,7 @@ async def get_current_user_from_api_key(
         return None
 
     # Extract key prefix from API key
+    from auth.jwt import api_key_handler
     key_prefix = api_key_handler.extract_key_prefix(api_key)
     if not key_prefix:
         return None
@@ -131,7 +132,7 @@ async def get_current_user_from_api_key(
         return None
     
     # Convert to CurrentUser
-    return await user_service.to_current_user(user_data)
+    return user_service.to_current_user(user_data)
 
 
 async def get_current_user(
@@ -176,7 +177,7 @@ async def get_current_active_user(
     """
     # Verify user is active in database
     from services.users import user_service
-    user_data = await user_service.get_user_by_id(user.id)
+    user_data = await user_service.get_user_by_id(int(current_user.id))
     if not user_data or not user_data.get("is_active"):
         raise AuthenticationError("User account is inactive")
     return current_user

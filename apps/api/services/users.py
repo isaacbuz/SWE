@@ -187,7 +187,7 @@ class UserService:
             await self._release_connection(conn)
 
     @staticmethod
-    async def to_current_user(user_data: Dict[str, Any]) -> CurrentUser:
+    def to_current_user(user_data: Dict[str, Any]) -> CurrentUser:
         """Convert user data to CurrentUser model"""
         # Map database role to UserRole enum
         role_mapping = {
