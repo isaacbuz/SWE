@@ -32,9 +32,6 @@ structlog==24.1.0
 # Rate limiting
 slowapi==0.1.9
 
-# CORS and middleware
-python-cors==1.0.0
-
 # WebSocket
 python-socketio==5.10.0
 python-engineio==4.8.0

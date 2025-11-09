@@ -61,7 +61,7 @@ export default function InstalledSkillsPage() {
             <Card className="p-12 text-center">
               {installedSkills.length === 0 ? (
                 <>
-                  <p className="text-ink-secondary">You haven't installed any skills yet.</p>
+                  <p className="text-ink-secondary">You haven&apos;t installed any skills yet.</p>
                   <Link href="/skills">
                     <Button className="mt-4">Browse Marketplace</Button>
                   </Link>
