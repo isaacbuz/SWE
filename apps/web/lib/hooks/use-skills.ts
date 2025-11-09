@@ -3,7 +3,7 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { skillsApi, SkillsListParams, SkillCreateInput, SkillExecutionRequest } from '../api/skills'
-import { Skill, SkillDetail } from '../api/types'
+import { Skill, SkillDetail, SkillAnalytics, SkillReview, SkillReviewCreate, SkillVersion } from '../api/types'
 
 export function useSkills(params: SkillsListParams = {}) {
   return useQuery({
@@ -70,3 +70,45 @@ export function useInstalledSkills() {
   })
 }
 
+export function useSkillAnalytics(
+  skillId: string | null,
+  params?: { start_date?: string; end_date?: string }
+) {
+  return useQuery({
+    queryKey: ['skill-analytics', skillId, params],
+    queryFn: () => (skillId ? skillsApi.getSkillAnalytics(skillId, params) : null),
+    enabled: !!skillId,
+  })
+}
+
+export function useSkillReviews(
+  skillId: string | null,
+  params?: { limit?: number; offset?: number }
+) {
+  return useQuery({
+    queryKey: ['skill-reviews', skillId, params],
+    queryFn: () => (skillId ? skillsApi.getSkillReviews(skillId, params) : []),
+    enabled: !!skillId,
+  })
+}
+
+export function useCreateSkillReview() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: ({ skillId, review }: { skillId: string; review: SkillReviewCreate }) =>
+      skillsApi.createSkillReview(skillId, review),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['skill-reviews', variables.skillId] })
+      queryClient.invalidateQueries({ queryKey: ['skill', variables.skillId] })
+    },
+  })
+}
+
+export function useSkillVersions(skillId: string | null) {
+  return useQuery({
+    queryKey: ['skill-versions', skillId],
+    queryFn: () => (skillId ? skillsApi.getSkillVersions(skillId) : []),
+    enabled: !!skillId,
+  })
+}

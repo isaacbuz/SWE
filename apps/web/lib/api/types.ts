@@ -61,3 +61,51 @@ export interface SkillInstallation {
   last_used_at?: string
   use_count: number
 }
+
+export interface SkillAnalytics {
+  skill_id: string
+  start_date?: string
+  end_date?: string
+  executions: number
+  executions_success?: number
+  installations: number
+  downloads: number
+  avg_rating: number
+  review_count: number
+  rating_breakdown?: Record<number, number>
+  avg_latency_ms?: number
+  p50_latency_ms?: number
+  p95_latency_ms?: number
+  p99_latency_ms?: number
+  total_cost_usd?: number
+  avg_cost_per_execution?: number
+  unique_users?: number
+  updated_at: string
+}
+
+export interface SkillReview {
+  id: string
+  skill_id: string
+  user_id: string
+  rating: number
+  title?: string
+  review_text?: string
+  created_at: string
+}
+
+export interface SkillReviewCreate {
+  rating: number
+  title?: string
+  review_text?: string
+}
+
+export interface SkillVersion {
+  id: string
+  skill_id: string
+  version: string
+  changelog?: string
+  breaking_changes: boolean
+  migration_guide?: string
+  status: string
+  created_at: string
+}
