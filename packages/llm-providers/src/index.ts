@@ -31,4 +31,5 @@ export { AnthropicProvider } from './providers/anthropic';
 export { GeminiProvider } from './providers/google';
 export { MistralProvider } from './providers/mistral';
 export { CohereProvider } from './providers/cohere';
+export { GraniteProvider } from './providers/ibm';
 

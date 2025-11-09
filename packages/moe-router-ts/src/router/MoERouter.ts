@@ -202,7 +202,7 @@ export class MoERouter {
     if (provider.name.includes('gpt-3.5') || provider.name.includes('claude-3-sonnet') || provider.name.includes('gemini-pro') || provider.name.includes('mistral-medium') || provider.name.includes('cohere:command')) {
       return 0.85;
     }
-    if (provider.name.includes('claude-3-haiku') || provider.name.includes('mistral-small') || provider.name.includes('cohere:command-light')) {
+    if (provider.name.includes('claude-3-haiku') || provider.name.includes('mistral-small') || provider.name.includes('cohere:command-light') || provider.name.includes('granite')) {
       return 0.75;
     }
     return 0.7; // Default
