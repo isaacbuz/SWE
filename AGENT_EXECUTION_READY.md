@@ -83,17 +83,28 @@ Each issue in `IMPLEMENTATION_PLAN.md` includes:
 5. **Testing Requirements**: How to verify completion
 6. **PR Structure**: How to structure the pull request
 
-### Execution Strategy
+### Execution Strategy (Real-Time for Subagents)
 
 **Parallel Execution**:
-- Epic 1 issues can be worked on in parallel (infrastructure setup)
-- Epic 2 issues can be worked on in parallel (frontend features)
-- Epic 10 issues must be sequential (deployment pipeline)
+- Epic 1: All 6 issues can execute simultaneously (12-24 hours total)
+- Epic 2: Most issues can execute in parallel, Issue #18 waits for #9 (12-36 hours total)
+- Epic 10: Sequential execution required due to dependencies (15-30 hours total)
+
+**Execution Time Estimates**:
+- Epic 1: 12-24 hours (parallel execution, 6 agents)
+- Epic 2: 12-36 hours (parallel execution, 12 agents)
+- Epic 10: 15-30 hours (sequential execution, 1 agent)
+- **Total**: 24-36 hours with optimal parallelization
+- **Sequential Total**: 40-84 hours if run sequentially
 
 **Priority Order**:
 1. **High Priority** (15 issues): Infrastructure, core frontend, production deployment
 2. **Medium Priority** (11 issues): Frontend features, monitoring, optimization
 3. **Low Priority** (4 issues): Theme system, keyboard shortcuts, integrations UI
+
+**Agent Spawning Strategy**:
+- Phase 1: Spawn 6 infrastructure agents + 12 frontend agents in parallel
+- Phase 2: After Phase 1 completes, spawn 1 deployment agent for sequential execution
 
 ### GitHub Issue Creation
 
