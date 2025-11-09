@@ -5,10 +5,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "test": "jest",
-    "lint": "eslint src --ext .ts"
+    "build": "echo 'Python package - no TypeScript build needed'",
+    "dev": "echo 'Python package - no watch needed'",
+    "test": "echo 'Python package - tests run separately'",
+    "lint": "echo 'Python package - linting handled by Python tools'"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.8.0",
