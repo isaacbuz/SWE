@@ -14,6 +14,7 @@ from middleware import limiter
 from db.connection import get_db_pool
 from db.projects import ProjectsService
 from db.users import UsersService
+from services.github import get_github_service
 
 
 router = APIRouter(prefix="/projects", tags=["projects"])
@@ -109,7 +110,13 @@ async def create_project(
             detail="User not found"
         )
     
-    # TODO: Validate repository exists and user has access (GitHub API check)
+    # Validate repository exists and user has access (GitHub API check)
+    github_service = get_github_service()
+    if not await github_service.validate_repository(project.repository_url):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Repository {project.repository_url} does not exist or is not accessible"
+        )
     
     # Create project in database
     try:

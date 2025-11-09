@@ -14,6 +14,7 @@ from db.connection import get_db_pool
 from db.prs import PRsService
 from db.users import UsersService
 from db.projects import ProjectsService
+from services.github import get_github_service
 
 
 router = APIRouter(prefix="/prs", tags=["pull-requests"])
@@ -232,11 +233,17 @@ async def create_pr(
             detail="Invalid GitHub PR URL"
         )
     
-    # TODO: Fetch PR details from GitHub API (title, description, author)
-    # For now, use placeholder values
+    # Fetch PR details from GitHub API
     title = f"PR #{pr_number}"
     description = None
     author = "unknown"
+    
+    github_service = get_github_service()
+    github_pr = await github_service.get_pr_details(pr.github_pr_url)
+    if github_pr:
+        title = github_pr.get("title") or title
+        description = github_pr.get("description") or description
+        author = github_pr.get("author") or author
     
     # Create PR record in database
     try:
@@ -564,10 +571,20 @@ async def sync_pr(
             detail=f"PR {pr_id} not found"
         )
     
-    # TODO: Fetch latest PR data from GitHub API
-    # TODO: Update PR in database with latest data
+    # Fetch latest PR data from GitHub API
+    github_service = get_github_service()
+    github_pr = await github_service.get_pr_details(pr_data.get("github_url"))
     
-    # For now, just return the current PR
+    if github_pr:
+        # Update PR in database with latest data
+        updated_pr = await prs_service.update_pr(
+            pr_id=pr_id,
+            user_id=user_id,
+            status="merged" if github_pr.get("merged") else "closed" if github_pr.get("state") == "closed" else None
+        )
+        if updated_pr:
+            pr_data = updated_pr
+    
     return pr_data_to_model(pr_data)
 
 

@@ -14,6 +14,7 @@ from db.connection import get_db_pool
 from db.issues import IssuesService
 from db.users import UsersService
 from db.projects import ProjectsService
+from services.github import get_github_service
 
 
 router = APIRouter(prefix="/issues", tags=["issues"])
@@ -158,17 +159,30 @@ async def create_issue(
             detail=f"Project {issue.project_id} not found"
         )
     
-    # TODO: If github_issue_url provided, fetch issue details from GitHub API
+    # If github_issue_url provided, fetch issue details from GitHub API
+    title = issue.title
+    description = issue.description
+    labels = issue.labels
+    
+    if issue.github_issue_url:
+        github_service = get_github_service()
+        github_issue = await github_service.get_issue_details(issue.github_issue_url)
+        if github_issue:
+            # Use GitHub data if available, otherwise use provided values
+            title = github_issue.get("title") or title
+            description = github_issue.get("description") or description
+            if github_issue.get("labels"):
+                labels = list(set(labels + github_issue["labels"]))
     
     # Create issue in database
     try:
         issue_data = await issues_service.create_issue(
             project_id=issue.project_id,
-            title=issue.title,
-            description=issue.description,
+            title=title,
+            description=description,
             github_issue_url=issue.github_issue_url,
             priority=issue.priority.value,
-            labels=issue.labels,
+            labels=labels,
             created_by_user_id=user_id
         )
         
