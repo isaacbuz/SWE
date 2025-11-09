@@ -1,18 +1,6 @@
-# @ai-company/audit-logging
+# Audit Logging
 
-Tool execution audit logging system with PII detection and redaction.
-
-## Overview
-
-Comprehensive audit logging for tool executions with automatic PII detection, redaction, and retention policies.
-
-## Features
-
-- ✅ Complete audit trail for all tool executions
-- ✅ Automatic PII detection and redaction
-- ✅ Configurable retention policies
-- ✅ Query and filter capabilities
-- ✅ Secure error sanitization
+Comprehensive audit logging for compliance and security.
 
 ## Installation
 
@@ -22,86 +10,74 @@ pnpm add @ai-company/audit-logging
 
 ## Usage
 
-### Basic Usage
+### Basic Setup
 
 ```typescript
-import { AuditLogger } from '@ai-company/audit-logging';
+import { createAuditLogger, AuditEventType } from '@ai-company/audit-logging';
+import { createLogger } from '@ai-company/observability';
 
-const logger = new AuditLogger({
-  detectPII: true,
-  includeArguments: true,
-  includeResults: false,
-  retentionDays: 90,
+const structuredLogger = createLogger({ serviceName: 'my-service' });
+const auditLogger = createAuditLogger({
+  serviceName: 'my-service',
+  enableStructuredLogging: true,
+  structuredLogger,
 });
+
+// Log user action
+await auditLogger.logUserAction(
+  'user-123',
+  'user@example.com',
+  'create',
+  'project',
+  'project-456',
+  'success'
+);
 
 // Log tool execution
-const logId = await logger.logExecution(
+await auditLogger.logToolExecution(
   'user-123',
-  'createIssue',
-  { title: 'Bug fix', body: 'Fix the bug' },
-  { issueId: '123' },
-  true,
-  150,
-  undefined,
-  { ipAddress: '192.168.1.1' }
+  'github_create_issue',
+  'success',
+  { issueId: '789' }
 );
-```
 
-### Query Logs
-
-```typescript
-// Query logs for a user
-const userLogs = await logger.queryLogs({
+// Query audit logs
+const logs = await auditLogger.query({
   userId: 'user-123',
+  eventType: AuditEventType.TOOL_EXECUTE,
   limit: 100,
 });
-
-// Query logs for a tool
-const toolLogs = await logger.queryLogs({
-  toolName: 'createIssue',
-  startDate: new Date('2025-01-01'),
-  success: true,
-});
 ```
 
-### Custom Storage
+## Event Types
+
+- `USER_LOGIN`, `USER_LOGOUT`
+- `USER_CREATE`, `USER_UPDATE`, `USER_DELETE`
+- `PROJECT_CREATE`, `PROJECT_UPDATE`, `PROJECT_DELETE`
+- `AGENT_CREATE`, `AGENT_UPDATE`, `AGENT_DELETE`, `AGENT_EXECUTE`
+- `TOOL_EXECUTE`, `TOOL_CREATE`, `TOOL_UPDATE`, `TOOL_DELETE`
+- `API_ACCESS`, `API_ERROR`
+- `PERMISSION_GRANT`, `PERMISSION_REVOKE`
+- `CONFIG_CHANGE`, `SECURITY_EVENT`
+
+## Query Filters
 
 ```typescript
-import { AuditLogger, AuditLogStorage } from '@ai-company/audit-logging';
+const filters: AuditLogFilters = {
+  userId: 'user-123',
+  eventType: AuditEventType.TOOL_EXECUTE,
+  resourceType: 'tool',
+  startDate: new Date('2025-11-01'),
+  endDate: new Date('2025-11-09'),
+  result: 'success',
+  limit: 100,
+  offset: 0,
+};
 
-class DatabaseStorage implements AuditLogStorage {
-  async save(entry: AuditLogEntry): Promise<void> {
-    // Save to database
-  }
-
-  async query(filter: AuditLogFilter): Promise<AuditLogEntry[]> {
-    // Query database
-  }
-
-  async deleteOlderThan(date: Date): Promise<number> {
-    // Delete old entries
-  }
-}
-
-const logger = new AuditLogger({
-  storage: new DatabaseStorage(),
-});
+const logs = await auditLogger.query(filters);
 ```
 
-## PII Detection
+## Related
 
-Automatically detects and redacts:
-- Email addresses
-- Phone numbers
-- SSNs
-- Credit card numbers
-- IP addresses
-
-## Related Packages
-
-- `@ai-company/tool-executor` - Tool execution engine
-
-## License
-
-MIT
-
+- [Structured Logging](../observability/src/logging/README.md)
+- [Audit Logging API](../../apps/api/routers/audit.py)

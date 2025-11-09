@@ -21,6 +21,7 @@ from routers import (
     tools_router,
     metrics_router,
     cost_tracking_router,
+    audit_router,
 )
 from websocket import init_websocket_server
 from events import init_broadcaster
@@ -275,6 +276,7 @@ app.include_router(skills_router, prefix=settings.api_prefix)
 app.include_router(tools_router, prefix=settings.api_prefix)
 app.include_router(metrics_router)
 app.include_router(cost_tracking_router)
+app.include_router(audit_router)
 
 
 # Mount WebSocket server

@@ -1,26 +1,22 @@
 {
   "name": "@ai-company/audit-logging",
-  "version": "0.1.0",
-  "description": "Tool execution audit logging system",
+  "version": "1.0.0",
+  "description": "Audit logging for compliance and security",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage",
-    "lint": "eslint src --ext .ts",
-    "typecheck": "tsc --noEmit"
+    "test": "jest",
+    "lint": "eslint src --ext .ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@ai-company/observability": "workspace:*"
+  },
   "devDependencies": {
-    "@types/node": "^22",
+    "@types/node": "^20.11.19",
     "typescript": "^5.3.3",
-    "vitest": "^1.0.0"
-  },
-  "exports": {
-    ".": "./dist/index.js",
-    "./logger": "./dist/logger/index.js"
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.12"
   }
 }
-

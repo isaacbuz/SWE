@@ -1,17 +1,8 @@
-/**
- * @ai-company/audit-logging
- * 
- * Tool execution audit logging system
- */
-
-export { AuditLogger } from './logger/AuditLogger';
-export { PIIDetector } from './utils/piidetector';
-export { InMemoryAuditLogStorage } from './logger/AuditLogger';
-export type {
+export {
+  AuditLogger,
   AuditLogEntry,
-  AuditLogFilter,
-  PIIDetectionResult,
+  AuditLogFilters,
   AuditLoggerConfig,
-  AuditLogStorage,
-} from './types';
-
+  AuditEventType,
+  createAuditLogger,
+} from './AuditLogger';
