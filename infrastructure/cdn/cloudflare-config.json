@@ -1,0 +1,118 @@
+{
+  "name": "swe-platform-cdn",
+  "description": "Cloudflare CDN configuration for SWE Platform",
+  "settings": {
+    "cache_level": "aggressive",
+    "browser_cache_ttl": 31536000,
+    "edge_cache_ttl": 31536000,
+    "minify": {
+      "css": true,
+      "html": true,
+      "js": true
+    },
+    "compression": {
+      "brotli": true,
+      "gzip": true
+    },
+    "http2": true,
+    "http3": true,
+    "0rtt": true,
+    "automatic_https_rewrites": true,
+    "always_use_https": true,
+    "ssl": "full",
+    "tls_1_3": true,
+    "min_tls_version": "1.2",
+    "security_headers": {
+      "strict_transport_security": {
+        "enabled": true,
+        "max_age": 31536000,
+        "include_subdomains": true,
+        "nosniff": true
+      },
+      "x_frame_options": "SAMEORIGIN",
+      "x_content_type_options": "nosniff",
+      "x_xss_protection": "1; mode=block"
+    },
+    "cache_rules": [
+      {
+        "name": "Static Assets",
+        "pattern": "/_next/static/*",
+        "cache_level": "cache_everything",
+        "edge_cache_ttl": 31536000,
+        "browser_cache_ttl": 31536000
+      },
+      {
+        "name": "Images",
+        "pattern": "/_next/image/*",
+        "cache_level": "cache_everything",
+        "edge_cache_ttl": 31536000,
+        "browser_cache_ttl": 31536000
+      },
+      {
+        "name": "API Routes",
+        "pattern": "/api/*",
+        "cache_level": "bypass",
+        "edge_cache_ttl": 0,
+        "browser_cache_ttl": 0
+      },
+      {
+        "name": "HTML Pages",
+        "pattern": "/*",
+        "cache_level": "standard",
+        "edge_cache_ttl": 3600,
+        "browser_cache_ttl": 0
+      }
+    ],
+    "page_rules": [
+      {
+        "target": "*_next/static/*",
+        "actions": {
+          "cache_level": "cache_everything",
+          "edge_cache_ttl": 31536000,
+          "browser_cache_ttl": 31536000
+        }
+      },
+      {
+        "target": "*_next/image/*",
+        "actions": {
+          "cache_level": "cache_everything",
+          "edge_cache_ttl": 31536000,
+          "browser_cache_ttl": 31536000
+        }
+      },
+      {
+        "target": "*/api/*",
+        "actions": {
+          "cache_level": "bypass"
+        }
+      }
+    ],
+    "workers": {
+      "enabled": false,
+      "routes": []
+    },
+    "rate_limiting": {
+      "enabled": true,
+      "rules": [
+        {
+          "name": "API Rate Limit",
+          "pattern": "/api/*",
+          "threshold": 100,
+          "period": 60,
+          "action": "challenge"
+        }
+      ]
+    }
+  },
+  "dns": {
+    "records": [
+      {
+        "type": "CNAME",
+        "name": "cdn",
+        "content": "swe-platform.pages.dev",
+        "proxied": true
+      }
+    ]
+  }
+}
+
