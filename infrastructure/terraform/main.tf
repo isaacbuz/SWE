@@ -308,7 +308,7 @@ resource "google_container_cluster" "gke_cluster" {
   }
 }
 
-# GKE Node Pool
+# GKE Node Pool - Default Pool
 resource "google_container_node_pool" "primary" {
   name           = "${var.app_name}-node-pool-${var.environment}"
   cluster        = google_container_cluster.gke_cluster.id
@@ -327,7 +327,7 @@ resource "google_container_node_pool" "primary" {
 
   node_config {
     machine_type = var.gke_machine_type
-    disk_size_gb = 50
+    disk_size_gb = 100
     disk_type    = "pd-ssd"
 
     oauth_scopes = [
@@ -352,10 +352,56 @@ resource "google_container_node_pool" "primary" {
     labels = {
       environment = var.environment
       application = var.app_name
+      pool-type   = "default"
     }
 
     metadata = {
       disable-legacy-endpoints = "true"
+    }
+  }
+}
+
+# GKE Node Pool - Spot/Preemptible Pool (Cost Optimization)
+resource "google_container_node_pool" "spot" {
+  name     = "${var.app_name}-spot-pool-${var.environment}"
+  cluster  = google_container_cluster.gke_cluster.id
+  location = var.gcp_region
+
+  autoscaling {
+    min_node_count = 0
+    max_node_count = 5
+  }
+
+  management {
+    auto_repair  = true
+    auto_upgrade = true
+  }
+
+  node_config {
+    machine_type  = var.gke_machine_type
+    disk_size_gb  = 100
+    disk_type     = "pd-standard"
+    preemptible   = true
+    spot          = true
+
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
+
+    workload_metadata_config {
+      mode = "GKE_METADATA"
+    }
+
+    labels = {
+      environment = var.environment
+      application = var.app_name
+      pool-type   = "spot"
+    }
+
+    taints {
+      key    = "spot"
+      value  = "true"
+      effect = "NO_SCHEDULE"
     }
   }
 }
@@ -386,31 +432,123 @@ resource "google_service_account_iam_member" "workload_identity" {
   member             = "serviceAccount:${data.google_client_config.default.project}.svc.id.goog[${var.kube_namespace}/${var.app_name}-ksa]"
 }
 
-# Outputs
-output "kubernetes_cluster_name" {
-  value = google_container_cluster.gke_cluster.name
+# Cloud DNS Zone
+resource "google_dns_managed_zone" "piehr_zone" {
+  name        = "${var.app_name}-zone-${var.environment}"
+  dns_name    = var.dns_zone_name
+  description = "DNS zone for ${var.app_name} ${var.environment}"
+
+  visibility = "public"
+
+  dnssec_config {
+    state = "on"
+  }
 }
 
-output "kubernetes_cluster_host" {
-  value = google_container_cluster.gke_cluster.endpoint
+# Cloud DNS Records
+resource "google_dns_record_set" "api" {
+  name         = "api.${google_dns_managed_zone.piehr_zone.dns_name}"
+  type         = "A"
+  ttl          = 300
+  managed_zone = google_dns_managed_zone.piehr_zone.name
+  rrdatas      = [google_compute_global_address.lb_ip.address]
 }
 
-output "cloud_sql_private_ip" {
-  value = google_sql_database_instance.postgres.private_ip_address
+resource "google_dns_record_set" "web" {
+  name         = google_dns_managed_zone.piehr_zone.dns_name
+  type         = "A"
+  ttl          = 300
+  managed_zone = google_dns_managed_zone.piehr_zone.name
+  rrdatas      = [google_compute_global_address.lb_ip.address]
 }
 
-output "redis_host" {
-  value = google_redis_instance.cache.host
+# Global IP Address for Load Balancer
+resource "google_compute_global_address" "lb_ip" {
+  name         = "${var.app_name}-lb-ip-${var.environment}"
+  address_type = "EXTERNAL"
+  ip_version   = "IPV4"
 }
 
-output "redis_port" {
-  value = google_redis_instance.cache.port
+# Cloud Armor Security Policy
+resource "google_compute_security_policy" "armor_policy" {
+  name        = "${var.app_name}-armor-${var.environment}"
+  description = "Cloud Armor security policy for ${var.app_name}"
+
+  # Default rule - allow all
+  rule {
+    action   = "allow"
+    priority = "2147483647"
+    match {
+      versioned_expr = "SRC_IPS_V1"
+      config {
+        src_ip_ranges = ["*"]
+      }
+    }
+    description = "Default allow rule"
+  }
+
+  # Rate limiting rule
+  rule {
+    action   = "throttle"
+    priority = "1000"
+    match {
+      versioned_expr = "SRC_IPS_V1"
+      config {
+        src_ip_ranges = ["*"]
+      }
+    }
+    rate_limit_options {
+      conform_action = "allow"
+      exceed_action  = "deny(429)"
+      enforce_on_key = "IP"
+      rate_limit_threshold {
+        count        = 100
+        interval_sec = 60
+      }
+    }
+    description = "Rate limiting rule"
+  }
+
+  # Block known bad IPs
+  rule {
+    action   = "deny(403)"
+    priority = "100"
+    match {
+      versioned_expr = "SRC_IPS_V1"
+      config {
+        src_ip_ranges = var.blocked_ip_ranges
+      }
+    }
+    description = "Block known bad IP ranges"
+  }
 }
 
-output "gcs_bucket_name" {
-  value = google_storage_bucket.app_bucket.name
+# Cloud Monitoring Notification Channel (Email)
+resource "google_monitoring_notification_channel" "email" {
+  display_name = "${var.app_name}-email-${var.environment}"
+  type         = "email"
+  labels = {
+    email_address = var.alert_email
+  }
 }
 
-output "service_account_email" {
-  value = google_service_account.gke_sa.email
+# Cloud Monitoring Alert Policy - High Error Rate
+resource "google_monitoring_alert_policy" "high_error_rate" {
+  display_name = "${var.app_name} High Error Rate"
+  combiner     = "OR"
+  conditions {
+    display_name = "Error rate too high"
+    condition_threshold {
+      filter          = "resource.type=\"k8s_container\" AND resource.labels.cluster_name=\"${google_container_cluster.gke_cluster.name}\""
+      duration        = "300s"
+      comparison      = "COMPARISON_GT"
+      threshold_value = 0.05
+      aggregations {
+        alignment_period   = "60s"
+        per_series_aligner = "ALIGN_RATE"
+      }
+    }
+  }
+  notification_channels = [google_monitoring_notification_channel.email.name]
+  enabled               = true
 }
