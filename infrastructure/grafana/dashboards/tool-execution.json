@@ -1,0 +1,167 @@
+{
+  "dashboard": {
+    "title": "SWE Platform - Tool Execution Metrics",
+    "tags": ["swe-platform", "tools", "execution"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Tool Execution Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(rate(swe_platform_tool_executions_total[5m])) by (tool_name)",
+            "legendFormat": "{{tool_name}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "ops", "label": "Executions/sec"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Success vs Error Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(rate(swe_platform_tool_executions_total{status=\"success\"}[5m])) by (tool_name)",
+            "legendFormat": "{{tool_name}} - Success",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(swe_platform_tool_executions_total{status=\"error\"}[5m])) by (tool_name)",
+            "legendFormat": "{{tool_name}} - Error",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"format": "ops", "label": "Rate"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Execution Duration (p95)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(swe_platform_tool_execution_duration_seconds_bucket[5m])) by (le, tool_name))",
+            "legendFormat": "{{tool_name}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Duration"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Execution Duration Percentiles",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(swe_platform_tool_execution_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p50",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(swe_platform_tool_execution_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p95",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(swe_platform_tool_execution_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p99",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Duration"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Top Tools by Execution Count",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "topk(10, sum(rate(swe_platform_tool_executions_total[5m])) by (tool_name))",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "tool_name": "Tool",
+                "Value": "Execution Rate"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Error Rate by Tool",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "topk(10, sum(rate(swe_platform_tool_executions_total{status=\"error\"}[5m])) by (tool_name))",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "tool_name": "Tool",
+                "Value": "Error Rate"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Tool Usage Distribution",
+        "type": "piechart",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24},
+        "targets": [
+          {
+            "expr": "sum(rate(swe_platform_tool_executions_total[5m])) by (tool_name)",
+            "legendFormat": "{{tool_name}}",
+            "refId": "A"
+          }
+        ]
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    }
+  }
+}
+

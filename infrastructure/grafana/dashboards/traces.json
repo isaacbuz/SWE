@@ -1,0 +1,107 @@
+{
+  "dashboard": {
+    "title": "SWE Platform - Distributed Traces",
+    "tags": ["swe-platform", "traces", "opentelemetry"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Trace Overview",
+        "type": "text",
+        "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+        "options": {
+          "content": "## OpenTelemetry Distributed Traces\n\nThis dashboard shows distributed trace data collected via OpenTelemetry. Traces are exported to Tempo/Jaeger for visualization.\n\n**Note**: This dashboard requires Tempo or Jaeger data source configured in Grafana."
+        }
+      },
+      {
+        "id": 2,
+        "title": "Trace Service Map",
+        "type": "nodeGraph",
+        "gridPos": {"h": 12, "w": 24, "x": 0, "y": 4},
+        "targets": [
+          {
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            },
+            "queryType": "serviceMap",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Trace Search",
+        "type": "traces",
+        "gridPos": {"h": 12, "w": 24, "x": 0, "y": 16},
+        "targets": [
+          {
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            },
+            "query": "{ service_name=\"swe-platform\" }",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "spanBarType": "Tag",
+          "spanBarValue": "duration",
+          "showSpanBarLabel": true,
+          "showServiceName": true,
+          "showOperationName": true,
+          "showTraceID": true,
+          "showSpanID": true,
+          "showDuration": true,
+          "showLogs": true,
+          "showTags": true,
+          "showProcessTags": true
+        }
+      },
+      {
+        "id": 4,
+        "title": "Trace Duration Distribution",
+        "type": "histogram",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28},
+        "targets": [
+          {
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            },
+            "query": "{ service_name=\"swe-platform\" }",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Error Rate by Service",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28},
+        "targets": [
+          {
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            },
+            "query": "{ service_name=\"swe-platform\", status=\"error\" }",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Error Rate"},
+          {"format": "short"}
+        ]
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    }
+  }
+}
+

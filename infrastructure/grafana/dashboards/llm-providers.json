@@ -1,0 +1,186 @@
+{
+  "dashboard": {
+    "title": "SWE Platform - LLM Provider Metrics",
+    "tags": ["swe-platform", "llm", "providers"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Request Rate by Provider",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(rate(swe_platform_llm_provider_requests_total[5m])) by (provider)",
+            "legendFormat": "{{provider}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps", "label": "Requests/sec"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Success vs Error Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(rate(swe_platform_llm_provider_requests_total{status=\"success\"}[5m])) by (provider)",
+            "legendFormat": "{{provider}} - Success",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(swe_platform_llm_provider_requests_total{status=\"error\"}[5m])) by (provider)",
+            "legendFormat": "{{provider}} - Error",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps", "label": "Rate"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Latency by Provider (p95)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(swe_platform_llm_provider_latency_seconds_bucket[5m])) by (le, provider))",
+            "legendFormat": "{{provider}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Latency"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Latency by Model",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(swe_platform_llm_provider_latency_seconds_bucket[5m])) by (le, model))",
+            "legendFormat": "{{model}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Latency"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Token Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "sum(rate(swe_platform_llm_provider_tokens_total{type=\"prompt\"}[5m])) by (provider)",
+            "legendFormat": "{{provider}} - Prompt",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(swe_platform_llm_provider_tokens_total{type=\"completion\"}[5m])) by (provider)",
+            "legendFormat": "{{provider}} - Completion",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"format": "tokens", "label": "Tokens/sec"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Cost by Provider",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "sum(rate(swe_platform_llm_provider_cost_usd_total[1h])) by (provider)",
+            "legendFormat": "{{provider}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "currencyUSD", "label": "Cost/hour"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Cost by Model",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "targets": [
+          {
+            "expr": "sum(rate(swe_platform_llm_provider_cost_usd_total[1h])) by (model)",
+            "legendFormat": "{{model}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "currencyUSD", "label": "Cost/hour"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Provider Usage Distribution",
+        "type": "piechart",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "targets": [
+          {
+            "expr": "sum(rate(swe_platform_llm_provider_requests_total[5m])) by (provider)",
+            "legendFormat": "{{provider}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Top Models by Request Count",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32},
+        "targets": [
+          {
+            "expr": "topk(10, sum(rate(swe_platform_llm_provider_requests_total[5m])) by (model))",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "model": "Model",
+                "Value": "Request Rate"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    }
+  }
+}
+
