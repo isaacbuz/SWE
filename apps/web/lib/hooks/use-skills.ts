@@ -3,7 +3,7 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { skillsApi, SkillsListParams, SkillCreateInput, SkillExecutionRequest } from '../api/skills'
-import { Skill, SkillDetail, SkillAnalytics, SkillReview, SkillReviewCreate } from '../api/types'
+import { Skill, SkillDetail, SkillAnalytics, SkillReview, SkillReviewCreate, SkillVersion } from '../api/types'
 
 export function useSkills(params: SkillsListParams = {}) {
   return useQuery({
@@ -102,5 +102,13 @@ export function useCreateSkillReview() {
       queryClient.invalidateQueries({ queryKey: ['skill-reviews', variables.skillId] })
       queryClient.invalidateQueries({ queryKey: ['skill', variables.skillId] })
     },
+  })
+}
+
+export function useSkillVersions(skillId: string | null) {
+  return useQuery({
+    queryKey: ['skill-versions', skillId],
+    queryFn: () => (skillId ? skillsApi.getSkillVersions(skillId) : []),
+    enabled: !!skillId,
   })
 }

@@ -98,3 +98,14 @@ export interface SkillReviewCreate {
   title?: string
   review_text?: string
 }
+
+export interface SkillVersion {
+  id: string
+  skill_id: string
+  version: string
+  changelog?: string
+  breaking_changes: boolean
+  migration_guide?: string
+  status: string
+  created_at: string
+}

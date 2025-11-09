@@ -1,7 +1,7 @@
 /**
  * Skills API Client
  */
-import { Skill, SkillDetail, SkillExecutionResult, SkillInstallation, SkillAnalytics, SkillReview, SkillReviewCreate } from './types'
+import { Skill, SkillDetail, SkillExecutionResult, SkillInstallation, SkillAnalytics, SkillReview, SkillReviewCreate, SkillVersion } from './types'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
@@ -141,5 +141,9 @@ export const skillsApi = {
       method: 'POST',
       body: JSON.stringify(review),
     })
+  },
+
+  async getSkillVersions(skillId: string): Promise<SkillVersion[]> {
+    return apiRequest<SkillVersion[]>(`/skills/${skillId}/versions`)
   },
 }

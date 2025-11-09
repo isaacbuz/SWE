@@ -3,10 +3,11 @@
 import { use, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Star, Download, Zap, Code, Play, Install, Trash2, BarChart3 } from 'lucide-react'
-import { useSkill, useInstallSkill, useUninstallSkill, useInstalledSkills, useSkillReviews } from '@/lib/hooks/use-skills'
+import { useSkill, useInstallSkill, useUninstallSkill, useInstalledSkills, useSkillReviews, useSkillVersions } from '@/lib/hooks/use-skills'
 import { SkillPlayground } from '@/components/skills/skill-playground'
 import { ReviewList } from '@/components/skills/review-list'
 import { ReviewForm } from '@/components/skills/review-form'
+import { VersionList } from '@/components/skills/version-list'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
@@ -22,6 +23,7 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
   const { data: skill, isLoading, error } = useSkill(id)
   const { data: installedSkills } = useInstalledSkills()
   const { data: reviews = [] } = useSkillReviews(id)
+  const { data: versions = [] } = useSkillVersions(id)
   const [showReviewForm, setShowReviewForm] = useState(false)
   const isInstalled = installedSkills?.some(s => s.skill_id === id)
 
@@ -157,6 +159,7 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="playground">Playground</TabsTrigger>
           <TabsTrigger value="documentation">Documentation</TabsTrigger>
+          <TabsTrigger value="versions">Versions</TabsTrigger>
           <TabsTrigger value="reviews">Reviews</TabsTrigger>
         </TabsList>
 
@@ -231,6 +234,17 @@ export default function SkillDetailPage({ params }: SkillDetailPageProps) {
               </pre>
             </Card>
           )}
+        </TabsContent>
+
+        {/* Versions Tab */}
+        <TabsContent value="versions" className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold mb-2">Version History</h2>
+            <p className="text-sm text-muted-foreground">
+              View changelog and migration guides for each version
+            </p>
+          </div>
+          <VersionList versions={versions} currentVersion={skill.version} />
         </TabsContent>
 
         {/* Reviews Tab */}

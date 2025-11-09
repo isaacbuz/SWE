@@ -35,22 +35,12 @@ SkillsService = Union[SkillsDatabaseService, InMemorySkillsService]
 
 def serialize_skill(skill_dict: Dict[str, Any]) -> Skill:
     """Convert raw skill dicts into response models."""
-    if not skill_dict:
-        raise ValueError("Skill dictionary is required for serialization")
-
-    def fmt(dt: Optional[datetime]) -> Optional[str]:
-        if not dt:
-            return None
-        if isinstance(dt, str):
-            return dt
-        return dt.isoformat()
-
     return Skill(
         id=skill_dict["id"],
         name=skill_dict["name"],
         slug=skill_dict["slug"],
         version=skill_dict.get("version", "1.0.0"),
-        description=skill_dict.get("description", ""),
+        description=skill_dict["description"],
         detailed_description=skill_dict.get("detailed_description"),
         category=skill_dict.get("category", "GENERAL"),
         tags=skill_dict.get("tags", []),
@@ -61,23 +51,24 @@ def serialize_skill(skill_dict: Dict[str, Any]) -> Skill:
         execution_count=skill_dict.get("execution_count", 0),
         avg_rating=float(skill_dict.get("avg_rating", 0) or 0),
         review_count=skill_dict.get("review_count", 0),
-        status=skill_dict.get("status", "draft"),
+        status=skill_dict.get("status", "active"),
         visibility=skill_dict.get("visibility", "public"),
         license=skill_dict.get("license", "MIT"),
         pricing_model=skill_dict.get("pricing_model", "free"),
-        created_at=fmt(skill_dict.get("created_at")),
-        updated_at=fmt(skill_dict.get("updated_at")),
+        created_at=skill_dict.get("created_at", datetime.utcnow()).isoformat() if skill_dict.get("created_at") else datetime.utcnow().isoformat(),
+        updated_at=skill_dict.get("updated_at", datetime.utcnow()).isoformat() if skill_dict.get("updated_at") else datetime.utcnow().isoformat(),
     )
 
 
 def serialize_review(review_dict: Dict[str, Any]) -> SkillReview:
-    def fmt(dt: Optional[datetime]) -> str:
-        if not dt:
+    """Serialize review dict to response model."""
+    def fmt(dt):
+        if dt is None:
             return datetime.utcnow().isoformat()
         if isinstance(dt, str):
             return dt
         return dt.isoformat()
-
+    
     return SkillReview(
         id=review_dict["id"],
         skill_id=review_dict["skill_id"],
@@ -200,7 +191,7 @@ class SkillDetail(Skill):
     input_schema: Dict[str, Any]
     output_schema: Dict[str, Any]
     examples: Optional[List[Dict[str, Any]]]
-    model_preferences: Dict[str, Any]
+    model_preferences: Optional[Dict[str, Any]]
     validation_rules: Optional[List[Dict[str, Any]]]
 
 
@@ -234,7 +225,7 @@ class SkillInstallation(BaseModel):
     version: str
     auto_update: bool
     enabled: bool
-    installed_at: str
+    installed_at: Optional[str]
     last_used_at: Optional[str]
     use_count: int
 
@@ -255,6 +246,18 @@ class SkillReviewCreate(BaseModel):
     rating: int = Field(..., ge=1, le=5)
     title: Optional[str] = None
     review_text: Optional[str] = None
+
+
+class SkillVersion(BaseModel):
+    """Skill version response model."""
+    id: UUID
+    skill_id: UUID
+    version: str
+    changelog: Optional[str]
+    breaking_changes: bool
+    migration_guide: Optional[str]
+    status: str
+    created_at: str
 
 
 class SkillAnalytics(BaseModel):
@@ -413,36 +416,36 @@ async def update_skill(
     current_user: CurrentUser = Depends(require_user),
     db_service: SkillsService = Depends(get_skills_db_service),
 ):
-    """Update a skill (must be owner/editor)."""
+    """Update a skill (creates new version)."""
     try:
-        updates = skill_data.model_dump(exclude_unset=True)
-        if not updates:
-            skill_dict = await db_service.get_skill_by_id(skill_id)
-            if not skill_dict:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Skill {skill_id} not found"
-                )
-            return serialize_skill(skill_dict)
-
-        updated_skill = await db_service.update_skill(
-            skill_id=skill_id,
-            updates=updates,
-            user_id=current_user.id,
-        )
-
-        if not updated_skill:
+        # Get existing skill
+        existing = await db_service.get_skill_by_id(skill_id)
+        if not existing:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Skill {skill_id} not found"
             )
-
-        return serialize_skill(updated_skill)
-    except PermissionError as e:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e)
+        
+        # Check ownership
+        if existing.get("author_id") != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only update your own skills"
+            )
+        
+        # Update skill
+        skill_dict = await db_service.update_skill(
+            skill_id=skill_id,
+            skill_data=skill_data.dict(exclude_unset=True)
         )
+        
+        if not skill_dict:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Skill {skill_id} not found"
+            )
+        
+        return serialize_skill(skill_dict)
     except HTTPException:
         raise
     except Exception as e:
@@ -528,7 +531,7 @@ async def execute_skill(
         # Return result
         return SkillExecutionResult(
             execution_id=str(execution_id),
-            skill_id=UUID(result.skill_id),
+            skill_id=skill_id,
             skill_version=result.skill_version,
             status=result.status.value,
             inputs=result.inputs,
@@ -543,12 +546,13 @@ async def execute_skill(
             cost_usd=result.cost_usd,
             cache_hit=result.cache_hit,
             error_message=result.error_message,
-            executed_at=result.executed_at.isoformat() if result.executed_at else None,
+            executed_at=result.executed_at.isoformat(),
             completed_at=result.completed_at.isoformat() if result.completed_at else None,
         )
     except HTTPException:
         raise
     except Exception as e:
+        logger.exception("Failed to execute skill")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to execute skill: {str(e)}"
@@ -573,13 +577,19 @@ async def install_skill(
             auto_update=auto_update
         )
         
+        if not installation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Skill {skill_id} not found"
+            )
+        
         return SkillInstallation(
             id=installation["id"],
             skill_id=installation["skill_id"],
             user_id=installation["user_id"],
             version=installation["version"],
-            auto_update=installation["auto_update"],
-            enabled=installation["enabled"],
+            auto_update=installation.get("auto_update", True),
+            enabled=installation.get("enabled", True),
             installed_at=installation["installed_at"].isoformat() if installation.get("installed_at") else None,
             last_used_at=installation["last_used_at"].isoformat() if installation.get("last_used_at") else None,
             use_count=installation.get("use_count", 0),
@@ -613,7 +623,7 @@ async def uninstall_skill(
         if not success:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Skill installation not found"
+                detail="Installation not found"
             )
     except HTTPException:
         raise
@@ -640,8 +650,8 @@ async def list_installed_skills(
                 skill_id=inst["skill_id"],
                 user_id=inst["user_id"],
                 version=inst["version"],
-                auto_update=inst["auto_update"],
-                enabled=inst["enabled"],
+                auto_update=inst.get("auto_update", True),
+                enabled=inst.get("enabled", True),
                 installed_at=inst["installed_at"].isoformat() if inst.get("installed_at") else None,
                 last_used_at=inst["last_used_at"].isoformat() if inst.get("last_used_at") else None,
                 use_count=inst.get("use_count", 0),
@@ -717,6 +727,46 @@ async def create_skill_review(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to create review: {str(e)}",
+        )
+
+
+@router.get("/{skill_id}/versions", response_model=List[SkillVersion])
+@limiter.limit("100/minute")
+async def get_skill_versions(
+    skill_id: UUID,
+    current_user: Optional[CurrentUser] = Depends(get_current_active_user),
+    db_service: SkillsService = Depends(get_skills_db_service),
+):
+    """Get version history for a skill."""
+    try:
+        versions = await db_service.list_skill_versions(skill_id)
+        return [
+            SkillVersion(
+                id=v["id"],
+                skill_id=v["skill_id"],
+                version=v["version"],
+                changelog=v.get("changelog"),
+                breaking_changes=v.get("breaking_changes", False),
+                migration_guide=v.get("migration_guide"),
+                status=v.get("status", "active"),
+                created_at=v["created_at"].isoformat() if isinstance(v.get("created_at"), datetime) else v.get("created_at", datetime.utcnow().isoformat()),
+            )
+            for v in versions
+        ]
+    except NotImplementedError:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="Skill versions not yet available for this backend",
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch versions: {str(e)}",
         )
 
 

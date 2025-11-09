@@ -561,6 +561,24 @@ class SkillsDatabaseService:
                 "updated_at": datetime.utcnow().isoformat(),
             }
     
+    async def list_skill_versions(
+        self,
+        skill_id: UUID
+    ) -> List[Dict[str, Any]]:
+        """List versions for a skill"""
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch(
+                """
+                SELECT id, skill_id, version, changelog, breaking_changes, 
+                       migration_guide, status, created_at
+                FROM skill_versions
+                WHERE skill_id = $1
+                ORDER BY created_at DESC
+                """,
+                skill_id
+            )
+            return [dict(row) for row in rows]
+    
     def skill_dict_to_model(self, skill_dict: Dict[str, Any]) -> Skill:
         """Convert database dict to Skill model"""
         # Parse JSON fields
