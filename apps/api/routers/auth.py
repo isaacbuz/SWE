@@ -1,6 +1,7 @@
 """
 Authentication endpoints for JWT tokens, OAuth, and API keys.
 """
+import secrets
 from typing import Optional, List
 from uuid import UUID
 
