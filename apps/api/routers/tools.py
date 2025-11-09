@@ -235,6 +235,7 @@ async def execute_tool(
         request.toolName,
         request.arguments,
         request.options,
+        current_user.id,
     )
     
     execution_time = (time.time() - start_time) * 1000

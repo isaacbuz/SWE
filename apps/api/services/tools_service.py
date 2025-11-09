@@ -2,19 +2,16 @@
 Tool execution service.
 
 This service provides Python bindings for the TypeScript tool execution packages.
-For now, it provides a Python interface that can be extended to call the
-TypeScript services via subprocess or HTTP.
+Calls the Node.js HTTP service for actual tool execution.
 """
 import json
-import subprocess
+import httpx
 from typing import Dict, Any, Optional, List
 from pathlib import Path
+import os
 
-# TODO: Implement actual integration with TypeScript packages
-# Options:
-# 1. Call Node.js scripts via subprocess
-# 2. Create HTTP service wrapper
-# 3. Use Python bindings (if we create them)
+# Tool service URL (can be overridden via environment variable)
+TOOL_SERVICE_URL = os.getenv("TOOL_SERVICE_URL", "http://localhost:3001")
 
 
 class ToolRegistryService:
@@ -35,8 +32,24 @@ class ToolRegistryService:
     
     def _load_tools(self):
         """Load tools from OpenAPI specs."""
-        # TODO: Call TypeScript ToolRegistry via subprocess or HTTP
-        # For now, mock implementation
+        try:
+            # Call tool service HTTP API
+            with httpx.Client(timeout=5.0) as client:
+                response = client.get(f"{TOOL_SERVICE_URL}/tools")
+                if response.status_code == 200:
+                    data = response.json()
+                    self._tools = {
+                        tool["name"]: tool for tool in data.get("tools", [])
+                    }
+                else:
+                    # Fallback to mock if service unavailable
+                    self._load_mock_tools()
+        except Exception:
+            # Fallback to mock if service unavailable
+            self._load_mock_tools()
+    
+    def _load_mock_tools(self):
+        """Load mock tools as fallback."""
         self._tools = {
             "createIssues": {
                 "name": "createIssues",
@@ -84,20 +97,12 @@ class ToolExecutorService:
         # For now, mock handlers
         self._handlers["createIssues"] = self._mock_create_issues
     
-    async def _mock_create_issues(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Mock handler for createIssues."""
-        return {
-            "success": True,
-            "issues": [
-                {"number": 1, "url": "https://github.com/example/repo/issues/1"}
-            ]
-        }
-    
     async def execute(
         self,
         tool_name: str,
         arguments: Dict[str, Any],
         options: Optional[Dict[str, Any]] = None,
+        user_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Execute a tool.
@@ -106,32 +111,54 @@ class ToolExecutorService:
             tool_name: Name of the tool to execute
             arguments: Tool arguments
             options: Execution options
+            user_id: User ID for permissions and audit logging
         
         Returns:
             Execution result
         """
-        # Validate tool exists
-        tool_spec = self.registry.get_tool_by_name(tool_name)
-        if not tool_spec:
-            return {
-                "success": False,
-                "error": f"Tool '{tool_name}' not found",
-            }
-        
-        # Get handler
-        handler = self._handlers.get(tool_name)
-        if not handler:
-            return {
-                "success": False,
-                "error": f"No handler registered for tool '{tool_name}'",
-            }
-        
-        # Execute handler
         try:
-            result = await handler(arguments)
+            # Call tool service HTTP API
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(
+                    f"{TOOL_SERVICE_URL}/tools/execute",
+                    json={
+                        "toolName": tool_name,
+                        "arguments": arguments,
+                        "userId": user_id,
+                        "options": options,
+                    },
+                )
+                
+                if response.status_code == 200:
+                    return {
+                        "success": True,
+                        "data": response.json().get("result"),
+                    }
+                elif response.status_code == 404:
+                    return {
+                        "success": False,
+                        "error": f"Tool '{tool_name}' not found",
+                    }
+                elif response.status_code == 403:
+                    return {
+                        "success": False,
+                        "error": "Permission denied",
+                    }
+                elif response.status_code == 429:
+                    return {
+                        "success": False,
+                        "error": "Rate limit exceeded",
+                    }
+                else:
+                    error_data = response.json() if response.content else {}
+                    return {
+                        "success": False,
+                        "error": error_data.get("error", "Tool execution failed"),
+                    }
+        except httpx.TimeoutException:
             return {
-                "success": True,
-                "data": result,
+                "success": False,
+                "error": "Tool execution timeout",
             }
         except Exception as e:
             return {
