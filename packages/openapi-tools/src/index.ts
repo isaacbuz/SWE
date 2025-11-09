@@ -25,3 +25,6 @@ export {
 } from './converters';
 export type { ProviderFormat, ConvertedTool } from './converters';
 
+export { ToolExecutor } from './executor';
+export type { ExecutorOptions, AuditLog, RateLimitState } from './executor';
+

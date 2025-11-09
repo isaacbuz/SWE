@@ -213,11 +213,58 @@ paths:
 pnpm test
 ```
 
+## Tool Executor
+
+The package includes a secure tool executor with validation, rate limiting, and audit logging:
+
+```typescript
+import { ToolExecutor, ToolRegistry } from '@ai-company/openapi-tools';
+
+const registry = new ToolRegistry();
+await registry.loadSpecs(['./tools.yaml']);
+
+const executor = new ToolExecutor({
+  enableRateLimit: true,
+  enableSanitization: true,
+  enableAuditLog: true,
+  defaultRateLimit: 60, // requests per minute
+});
+
+// Register a tool handler
+executor.register('createUser', async (args) => {
+  // Your implementation
+  return { userId: '123', email: args.email };
+});
+
+// Execute tool with validation
+const tool = registry.getToolByName('createUser')!;
+const result = await executor.execute(
+  tool,
+  { email: 'user@example.com', password: 'secure123' },
+  { userId: 'current-user-id' }
+);
+
+if (result.success) {
+  console.log('User created:', result.result);
+} else {
+  console.error('Error:', result.error);
+}
+```
+
+### Executor Features
+
+- ✅ **Schema Validation**: Validates inputs against JSON Schema using Zod
+- ✅ **Rate Limiting**: Per-tool rate limiting with configurable limits
+- ✅ **Input Sanitization**: XSS and injection attack prevention
+- ✅ **Audit Logging**: Complete audit trail of tool executions
+- ✅ **Error Handling**: Comprehensive error handling and reporting
+- ✅ **Execution Metrics**: Tracks execution time for all tools
+
 ## Related Issues
 
 - Issue #7: OpenAPI Tool Registry Foundation ✅
-- Issue #8: OpenAPI to Tool Spec Converter (in progress)
-- Issue #9: Tool Executor with Schema Validation (pending)
+- Issue #8: OpenAPI to Tool Spec Converter ✅
+- Issue #9: Tool Executor with Schema Validation ✅
 
 ## License
 
