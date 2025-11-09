@@ -4,6 +4,7 @@ Agent management endpoints.
 from typing import List, Optional
 from uuid import UUID
 from enum import Enum
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
@@ -159,7 +160,10 @@ def agent_data_to_model(agent_data: dict) -> Agent:
 @limiter.limit("10/minute")
 async def create_agent(
     agent: AgentCreate,
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    agents_service: AgentsService = Depends(get_agents_service),
+    projects_service: ProjectsService = Depends(get_projects_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> Agent:
     """
     Create and optionally start a new agent.
@@ -169,15 +173,47 @@ async def create_agent(
     - **config**: Agent-specific configuration
     - **auto_start**: Whether to start agent immediately
     """
-    # TODO: Verify project exists and user has access
-    # TODO: Validate agent configuration
-    # TODO: Create agent in database
-    # TODO: If auto_start, queue agent for execution
-
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Agent creation not yet implemented"
-    )
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Verify project exists and user has access
+    project = await projects_service.get_project(agent.project_id, user_id)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Project {agent.project_id} not found"
+        )
+    
+    # Extract model info from config or use defaults
+    model_provider = agent.config.get("model_provider", "anthropic")
+    model_name = agent.config.get("model_name", "claude-3-5-sonnet-20241022")
+    name = agent.config.get("name", f"{agent.agent_type.value} Agent")
+    
+    # Create agent in database
+    try:
+        agent_data = await agents_service.create_agent(
+            project_id=agent.project_id,
+            name=name,
+            agent_type=agent.agent_type.value,
+            model_provider=model_provider,
+            model_name=model_name,
+            config=agent.config,
+            created_by_user_id=user_id
+        )
+        
+        # TODO: If auto_start, queue agent for execution via agent registry
+        
+        return agent_data_to_model(agent_data)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create agent: {str(e)}"
+        )
 
 
 @router.get(
@@ -287,7 +323,9 @@ async def get_agent(
 async def update_agent(
     agent_id: UUID,
     update: AgentUpdate,
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    agents_service: AgentsService = Depends(get_agents_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> Agent:
     """
     Update an agent's configuration or status.
@@ -295,16 +333,43 @@ async def update_agent(
     - **config**: Updated configuration
     - **status**: Updated status (admin only for certain transitions)
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Validate updates
-    # TODO: Update agent in database
-    # TODO: If status changed, handle agent lifecycle
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Map router status to database status
+    db_status = None
+    if update.status:
+        status_map = {
+            "pending": "idle",
+            "running": "running",
+            "completed": "completed",
+            "failed": "failed",
+            "cancelled": "cancelled"
+        }
+        db_status = status_map.get(update.status.value)
+    
+    # Update agent in database
+    agent_data = await agents_service.update_agent(
+        agent_id=agent_id,
+        user_id=user_id,
+        config=update.config,
+        status=db_status
     )
+    
+    if not agent_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Agent {agent_id} not found"
+        )
+    
+    # TODO: If status changed, handle agent lifecycle via agent registry
+    
+    return agent_data_to_model(agent_data)
 
 
 @router.post(
@@ -315,23 +380,42 @@ async def update_agent(
 @limiter.limit("10/minute")
 async def start_agent(
     agent_id: UUID,
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    agents_service: AgentsService = Depends(get_agents_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> Agent:
     """
     Start an agent execution.
 
     Agent must be in PENDING or FAILED status.
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Verify agent can be started
-    # TODO: Queue agent for execution
-    # TODO: Update agent status to RUNNING
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Verify agent exists
+    agent_data = await agents_service.get_agent(agent_id, user_id)
+    if not agent_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Agent {agent_id} not found"
+        )
+    
+    # TODO: Verify agent can be started (not already running)
+    # TODO: Queue agent for execution via agent registry
+    
+    # Update agent status to running
+    updated_agent = await agents_service.update_agent(
+        agent_id=agent_id,
+        user_id=user_id,
+        status="running"
     )
+    
+    return agent_data_to_model(updated_agent)
 
 
 @router.post(
@@ -342,23 +426,47 @@ async def start_agent(
 @limiter.limit("10/minute")
 async def cancel_agent(
     agent_id: UUID,
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    agents_service: AgentsService = Depends(get_agents_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> Agent:
     """
     Cancel a running agent.
 
     Agent must be in RUNNING status.
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Verify agent is running
-    # TODO: Send cancellation signal to agent
-    # TODO: Update agent status to CANCELLED
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Verify agent exists and is running
+    agent_data = await agents_service.get_agent(agent_id, user_id)
+    if not agent_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Agent {agent_id} not found"
+        )
+    
+    if agent_data.get("status") != "running":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Agent {agent_id} is not running"
+        )
+    
+    # TODO: Send cancellation signal to agent via agent registry
+    
+    # Update agent status to cancelled
+    updated_agent = await agents_service.update_agent(
+        agent_id=agent_id,
+        user_id=user_id,
+        status="cancelled"
     )
+    
+    return agent_data_to_model(updated_agent)
 
 
 @router.get(
@@ -371,7 +479,9 @@ async def get_agent_logs(
     agent_id: UUID,
     level: Optional[str] = Query(None, description="Filter by log level"),
     limit: int = Query(100, ge=1, le=1000, description="Max number of logs"),
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    agents_service: AgentsService = Depends(get_agents_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> AgentLogs:
     """
     Get logs for a specific agent.
@@ -380,15 +490,51 @@ async def get_agent_logs(
     - **level**: Filter by log level (DEBUG, INFO, WARNING, ERROR)
     - **limit**: Maximum number of log entries to return
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Fetch logs from storage
-    # TODO: Apply filters and limits
-    # TODO: Return logs
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Verify agent exists
+    agent_data = await agents_service.get_agent(agent_id, user_id)
+    if not agent_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Agent {agent_id} not found"
+        )
+    
+    # Fetch logs from database
+    logs_data = await agents_service.get_agent_logs(agent_id, user_id, limit)
+    
+    # Convert to log models
+    logs = [
+        AgentLog(
+            timestamp=log["started_at"].isoformat() if log.get("started_at") else datetime.utcnow().isoformat(),
+            level="error" if log.get("error_message") else "info",
+            message=log.get("error_message") or f"Execution {log.get('status', 'unknown')}",
+            metadata={
+                "execution_id": str(log["execution_id"]),
+                "status": log.get("status"),
+                "tokens": {
+                    "input": log.get("input_tokens", 0),
+                    "output": log.get("output_tokens", 0)
+                },
+                "cost": float(log.get("cost_usd", 0)) if log.get("cost_usd") else None
+            }
+        )
+        for log in logs_data
+    ]
+    
+    # Apply level filter if provided
+    if level:
+        logs = [log for log in logs if log.level.lower() == level.lower()]
+    
+    return AgentLogs(
+        agent_id=agent_id,
+        logs=logs
     )
 
 
@@ -400,19 +546,44 @@ async def get_agent_logs(
 @limiter.limit("5/minute")
 async def delete_agent(
     agent_id: UUID,
-    current_user: CurrentUser = Depends(require_user)
+    current_user: CurrentUser = Depends(require_user),
+    agents_service: AgentsService = Depends(get_agents_service),
+    users_service: UsersService = Depends(get_users_service)
 ) -> None:
     """
     Delete an agent.
 
     Agent must be in COMPLETED, FAILED, or CANCELLED status.
     """
-    # TODO: Load agent from database
-    # TODO: Verify user has access to agent's project
-    # TODO: Verify agent can be deleted
-    # TODO: Delete agent and associated data
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Agent {agent_id} not found"
-    )
+    # Get user integer ID
+    user_id = await users_service.get_user_id_by_uuid(current_user.id)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Verify agent exists and can be deleted
+    agent_data = await agents_service.get_agent(agent_id, user_id)
+    if not agent_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Agent {agent_id} not found"
+        )
+    
+    # Check if agent can be deleted (not running)
+    if agent_data.get("status") == "running":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot delete running agent {agent_id}. Cancel it first."
+        )
+    
+    # TODO: Cancel any running executions via agent registry
+    
+    # Delete agent
+    deleted = await agents_service.delete_agent(agent_id, user_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Agent {agent_id} not found"
+        )
