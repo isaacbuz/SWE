@@ -1,0 +1,131 @@
+# Alertmanager Configuration
+# Routes alerts to appropriate notification channels
+
+global:
+  # Resolve timeout for alerts
+  resolve_timeout: 5m
+  
+  # Default notification settings
+  slack_api_url: '${SLACK_WEBHOOK_URL}'
+  smtp_smarthost: '${SMTP_HOST}:${SMTP_PORT}'
+  smtp_from: '${SMTP_FROM}'
+  smtp_auth_username: '${SMTP_USERNAME}'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+
+# Route tree for alerts
+route:
+  # Default receiver
+  receiver: 'default'
+  
+  # Group alerts by these labels
+  group_by: ['alertname', 'cluster', 'service']
+  
+  # Group wait time before sending first notification
+  group_wait: 10s
+  
+  # Group interval between two notifications
+  group_interval: 10s
+  
+  # Repeat interval for alerts that haven't been resolved
+  repeat_interval: 12h
+  
+  # Child routes
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      continue: false
+      
+    # Warning alerts - Slack notification
+    - match:
+        severity: warning
+      receiver: 'slack-alerts'
+      continue: false
+      
+    # Info alerts - email only
+    - match:
+        severity: info
+      receiver: 'email-alerts'
+      continue: false
+
+# Inhibition rules (suppress alerts when others are firing)
+inhibit_rules:
+  # Suppress warning alerts when critical alerts are firing
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'cluster', 'service']
+  
+  # Suppress info alerts when warning or critical alerts are firing
+  - source_match:
+      severity: 'warning'
+    target_match:
+      severity: 'info'
+    equal: ['alertname', 'cluster', 'service']
+
+# Receivers (notification channels)
+receivers:
+  # Default receiver (fallback)
+  - name: 'default'
+    slack_configs:
+      - channel: '#alerts'
+        title: 'SWE Platform Alert'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+        send_resolved: true
+  
+  # Critical alerts - multiple channels
+  - name: 'critical-alerts'
+    slack_configs:
+      - channel: '#alerts-critical'
+        title: '🚨 CRITICAL: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Service:* {{ .Labels.service }}
+          *Time:* {{ .StartsAt }}
+          {{ end }}
+        send_resolved: true
+    
+    email_configs:
+      - to: '${ALERT_EMAIL}'
+        headers:
+          Subject: '🚨 CRITICAL Alert: {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>Critical Alert</h2>
+          <p><strong>Alert:</strong> {{ .GroupLabels.alertname }}</p>
+          <p><strong>Description:</strong> {{ range .Alerts }}{{ .Annotations.description }}{{ end }}</p>
+          <p><strong>Service:</strong> {{ range .Alerts }}{{ .Labels.service }}{{ end }}</p>
+          <p><strong>Time:</strong> {{ range .Alerts }}{{ .StartsAt }}{{ end }}</p>
+    
+    # PagerDuty integration (if configured)
+    # pagerduty_configs:
+    #   - service_key: '${PAGERDUTY_SERVICE_KEY}'
+  
+  # Warning alerts - Slack only
+  - name: 'slack-alerts'
+    slack_configs:
+      - channel: '#alerts'
+        title: '⚠️ Warning: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.service }}
+          {{ end }}
+        send_resolved: true
+  
+  # Info alerts - Email only
+  - name: 'email-alerts'
+    email_configs:
+      - to: '${ALERT_EMAIL}'
+        headers:
+          Subject: 'ℹ️ Info Alert: {{ .GroupLabels.alertname }}'
+        html: |
+          <h3>Info Alert</h3>
+          <p><strong>Alert:</strong> {{ .GroupLabels.alertname }}</p>
+          <p><strong>Description:</strong> {{ range .Alerts }}{{ .Annotations.description }}{{ end }}</p>
+

@@ -1,0 +1,175 @@
+groups:
+  - name: swe_platform_alerts
+    interval: 30s
+    rules:
+      # ===== HTTP Metrics Alerts =====
+      
+      - alert: HighErrorRate
+        expr: rate(swe_platform_http_request_errors_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: api
+        annotations:
+          summary: "High HTTP error rate detected"
+          description: "Error rate is {{ $value }} errors/sec. This may indicate service degradation."
+
+      - alert: CriticalErrorRate
+        expr: rate(swe_platform_http_request_errors_total[5m]) > 50
+        for: 2m
+        labels:
+          severity: critical
+          service: api
+        annotations:
+          summary: "CRITICAL: Very high HTTP error rate"
+          description: "Error rate is {{ $value }} errors/sec. Service may be down or severely degraded."
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(swe_platform_http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: api
+        annotations:
+          summary: "High HTTP request latency"
+          description: "p95 latency is {{ $value }}s. This exceeds the 2s threshold."
+
+      - alert: CriticalLatency
+        expr: histogram_quantile(0.95, rate(swe_platform_http_request_duration_seconds_bucket[5m])) > 5
+        for: 2m
+        labels:
+          severity: critical
+          service: api
+        annotations:
+          summary: "CRITICAL: Very high HTTP request latency"
+          description: "p95 latency is {{ $value }}s. Service is severely degraded."
+
+      # ===== LLM Provider Alerts =====
+      
+      - alert: LLMProviderErrors
+        expr: rate(swe_platform_llm_provider_requests_total{status="error"}[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: llm-providers
+        annotations:
+          summary: "High LLM provider error rate"
+          description: "Error rate for {{ $labels.provider }}/{{ $labels.model }} is {{ $value }} errors/sec."
+
+      - alert: LLMProviderDown
+        expr: rate(swe_platform_llm_provider_requests_total{status="error"}[5m]) > 20
+        for: 2m
+        labels:
+          severity: critical
+          service: llm-providers
+        annotations:
+          summary: "CRITICAL: LLM provider appears to be down"
+          description: "Error rate for {{ $labels.provider }}/{{ $labels.model }} is {{ $value }} errors/sec."
+
+      - alert: HighLLMCost
+        expr: rate(swe_platform_llm_provider_cost_usd_total[1h]) > 10
+        for: 1h
+        labels:
+          severity: warning
+          service: llm-providers
+        annotations:
+          summary: "High LLM provider cost"
+          description: "Cost rate is ${{ $value }}/hour for {{ $labels.provider }}/{{ $labels.model }}."
+
+      - alert: ExcessiveLLMCost
+        expr: rate(swe_platform_llm_provider_cost_usd_total[1h]) > 50
+        for: 30m
+        labels:
+          severity: critical
+          service: llm-providers
+        annotations:
+          summary: "CRITICAL: Excessive LLM provider cost"
+          description: "Cost rate is ${{ $value }}/hour. This may indicate a cost anomaly."
+
+      # ===== Tool Execution Alerts =====
+      
+      - alert: ToolExecutionErrors
+        expr: rate(swe_platform_tool_executions_total{status="error"}[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: tools
+        annotations:
+          summary: "High tool execution error rate"
+          description: "Error rate for {{ $labels.tool_name }} is {{ $value }} errors/sec."
+
+      - alert: ToolExecutionFailure
+        expr: rate(swe_platform_tool_executions_total{status="error"}[5m]) > 20
+        for: 2m
+        labels:
+          severity: critical
+          service: tools
+        annotations:
+          summary: "CRITICAL: Tool execution failure"
+          description: "Error rate for {{ $labels.tool_name }} is {{ $value }} errors/sec. Tool may be broken."
+
+      # ===== System Health Alerts =====
+      
+      - alert: LowCacheHitRate
+        expr: |
+          rate(swe_platform_cache_hits_total[5m]) / 
+          (rate(swe_platform_cache_hits_total[5m]) + rate(swe_platform_cache_misses_total[5m])) < 0.5
+        for: 10m
+        labels:
+          severity: info
+          service: cache
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate is {{ $value | humanizePercentage }}. Consider reviewing cache strategy."
+
+      - alert: HighActiveConnections
+        expr: swe_platform_active_connections > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High number of active connections"
+          description: "Active {{ $labels.type }} connections: {{ $value }}. May need to scale."
+
+      - alert: ExcessiveConnections
+        expr: swe_platform_active_connections > 5000
+        for: 2m
+        labels:
+          severity: critical
+          service: system
+        annotations:
+          summary: "CRITICAL: Excessive active connections"
+          description: "Active {{ $labels.type }} connections: {{ $value }}. System may be under attack or misconfigured."
+
+      # ===== Service Availability Alerts =====
+      
+      - alert: ServiceDown
+        expr: up{job=~"swe-platform-.*"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CRITICAL: Service is down"
+          description: "Service {{ $labels.job }} has been down for more than 2 minutes."
+
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes / 1024 / 1024 / 1024 > 1.5
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}GB. Consider scaling or optimizing."
+
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value | humanizePercentage }}. Consider scaling."
+

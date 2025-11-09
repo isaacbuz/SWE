@@ -97,13 +97,14 @@ services:
       - '--storage.tsdb.retention.time=30d'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--alertmanager.url=http://alertmanager:9093'
 
     ports:
       - "${PROMETHEUS_PORT:-9090}:9090"
 
     volumes:
       - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./infrastructure/grafana/alert-rules.yml:/etc/prometheus/alerts/swe-platform.yml:ro
+      - ./infrastructure/prometheus/alerts.yml:/etc/prometheus/alerts/swe-platform.yml:ro
       - prometheus_staging_data:/prometheus
 
     networks:
@@ -117,6 +118,48 @@ services:
         reservations:
           cpus: '0.5'
           memory: 1G
+
+  # ===== Alertmanager (Alert Routing) =====
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: swe-platform-staging-alertmanager
+    restart: unless-stopped
+
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+
+    ports:
+      - "${ALERTMANAGER_PORT:-9093}:9093"
+
+    volumes:
+      - ./infrastructure/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_staging_data:/alertmanager
+
+    environment:
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_FROM: ${SMTP_FROM:-alerts@example.com}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      ALERT_EMAIL: ${ALERT_EMAIL:-alerts@example.com}
+
+    depends_on:
+      - prometheus
+
+    networks:
+      - swe-platform-staging-network
+
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   # ===== Grafana (Visualization) =====
   grafana:
@@ -341,6 +384,8 @@ volumes:
   prometheus_staging_data:
     driver: local
   grafana_staging_data:
+    driver: local
+  alertmanager_staging_data:
     driver: local
   api_staging_data:
     driver: local
