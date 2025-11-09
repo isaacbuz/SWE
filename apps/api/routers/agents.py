@@ -117,35 +117,43 @@ async def get_users_service() -> UsersService:
 
 
 # Helper function to convert agent data to response model
-def agent_data_to_model(agent_data: dict) -> Agent:
+async def agent_data_to_model(agent_data: dict, agents_service: Optional[AgentsService] = None) -> Agent:
     """Convert database agent data to response model"""
-    # Extract result and error from config or last execution
-    result = agent_data.get("config", {}).get("last_result")
-    error = agent_data.get("config", {}).get("last_error")
+    # Extract result and error from configuration or last execution
+    config = agent_data.get("configuration", {}) or {}
+    result = config.get("last_result")
+    error = config.get("last_error")
     
-    # Map database status to router status
-    db_status = agent_data.get("status", "pending")
-    status_map = {
-        "idle": "pending",
-        "running": "running",
-        "completed": "completed",
-        "failed": "failed",
-        "cancelled": "cancelled"
-    }
-    router_status = status_map.get(db_status, "pending")
+    # Agents table doesn't have status column - check latest execution
+    # Default to pending if never used
+    has_been_used = agent_data.get("last_used_at") is not None
+    
+    router_status = "pending"
+    if has_been_used and agents_service:
+        # Try to get latest execution status
+        latest_status = await agents_service.get_latest_execution_status(agent_data["agent_id"])
+        if latest_status:
+            status_map = {
+                "pending": "pending",
+                "running": "running",
+                "success": "completed",
+                "failure": "failed",
+                "timeout": "failed"
+            }
+            router_status = status_map.get(latest_status, "pending")
     
     return Agent(
         id=agent_data["agent_id"],
         project_id=agent_data["project_id"],
         agent_type=AgentType(agent_data["agent_type"]),
         status=AgentStatus(router_status),
-        config=agent_data.get("config", {}),
+        config=config,
         result=result,
         error=error,
         created_at=agent_data["created_at"].isoformat(),
         updated_at=agent_data["updated_at"].isoformat(),
-        started_at=agent_data["last_execution_at"].isoformat() if agent_data.get("last_execution_at") else None,
-        completed_at=agent_data["last_execution_at"].isoformat() if agent_data.get("last_execution_at") and router_status in ["completed", "failed", "cancelled"] else None
+        started_at=agent_data["last_used_at"].isoformat() if agent_data.get("last_used_at") else None,
+        completed_at=agent_data["last_used_at"].isoformat() if agent_data.get("last_used_at") and router_status in ["completed", "failed", "cancelled"] else None
     )
 
 
@@ -208,7 +216,7 @@ async def create_agent(
         
         # TODO: If auto_start, queue agent for execution via agent registry
         
-        return agent_data_to_model(agent_data)
+        return await agent_data_to_model(agent_data, agents_service)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -267,8 +275,9 @@ async def list_agents(
         page_size=page_size
     )
     
-    # Convert to response models
-    items = [agent_data_to_model(agent) for agent in agents_data]
+    # Convert to response models (batch status queries)
+    import asyncio
+    items = await asyncio.gather(*[agent_data_to_model(agent, agents_service) for agent in agents_data])
     
     return AgentList(
         items=items,
@@ -311,7 +320,7 @@ async def get_agent(
             detail=f"Agent {agent_id} not found"
         )
     
-    return agent_data_to_model(agent_data)
+    return await agent_data_to_model(agent_data, agents_service)
 
 
 @router.patch(
@@ -369,7 +378,7 @@ async def update_agent(
     
     # TODO: If status changed, handle agent lifecycle via agent registry
     
-    return agent_data_to_model(agent_data)
+    return await agent_data_to_model(agent_data, agents_service)
 
 
 @router.post(

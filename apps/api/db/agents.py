@@ -30,26 +30,31 @@ class AgentsService:
     ) -> Dict[str, Any]:
         """Create a new agent"""
         async with self.pool.acquire() as conn:
+            # Extract display_name from config or use name
+            display_name = config.get("display_name") or name
+            capabilities = config.get("capabilities", {})
+            configuration = config.get("configuration", config)  # Use config as configuration
+            
             row = await conn.fetchrow(
                 """
                 INSERT INTO agents (
-                    project_id, name, agent_type, model_provider, model_name,
-                    capabilities, config, status, created_by_user_id
+                    project_id, name, display_name, agent_type, model_provider, model_name,
+                    capabilities, configuration, created_by
                 )
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 RETURNING 
-                    agent_id, project_id, name, agent_type, model_provider,
-                    model_name, capabilities, config, status,
-                    is_active, created_at, updated_at
+                    agent_id, project_id, name, display_name, agent_type, model_provider,
+                    model_name, capabilities, configuration, is_active,
+                    created_at, updated_at, last_used_at
                 """,
                 project_id,
                 name,
+                display_name,
                 agent_type,
                 model_provider,
                 model_name,
-                config.get("capabilities", []),  # capabilities
-                config,  # config
-                "pending",  # status
+                capabilities,
+                configuration,
                 created_by_user_id
             )
             
@@ -61,11 +66,11 @@ class AgentsService:
             row = await conn.fetchrow(
                 """
                 SELECT 
-                    a.agent_id, a.project_id, a.name, a.agent_type,
+                    a.agent_id, a.project_id, a.name, a.display_name, a.agent_type,
                     a.model_provider, a.model_name, a.capabilities,
-                    a.config, a.status, a.is_active,
+                    a.configuration, a.is_active,
                     a.success_rate, a.avg_execution_time_ms,
-                    a.created_at, a.updated_at, a.last_execution_at
+                    a.created_at, a.updated_at, a.last_used_at
                 FROM agents a
                 JOIN projects p ON a.project_id = p.project_id
                 WHERE a.agent_id = $1 AND (p.owner_id = $2 OR p.is_public = true)
@@ -106,10 +111,11 @@ class AgentsService:
                 conditions.append(f"a.agent_type = ${param_count}")
                 params.append(agent_type)
             
+            # Note: agents table doesn't have a status column, use is_active instead
             if status:
-                param_count += 1
-                conditions.append(f"a.status = ${param_count}")
-                params.append(status)
+                # Map status to is_active or other conditions if needed
+                # For now, skip status filtering as schema doesn't support it directly
+                pass
             
             if is_active is not None:
                 param_count += 1
@@ -140,11 +146,11 @@ class AgentsService:
             rows = await conn.fetch(
                 f"""
                 SELECT 
-                    a.agent_id, a.project_id, a.name, a.agent_type,
+                    a.agent_id, a.project_id, a.name, a.display_name, a.agent_type,
                     a.model_provider, a.model_name, a.capabilities,
-                    a.config, a.status, a.is_active,
+                    a.configuration, a.is_active,
                     a.success_rate, a.avg_execution_time_ms,
-                    a.created_at, a.updated_at, a.last_execution_at
+                    a.created_at, a.updated_at, a.last_used_at
                 FROM agents a
                 JOIN projects p ON a.project_id = p.project_id
                 WHERE {where_clause}
@@ -176,20 +182,23 @@ class AgentsService:
             param_count = 0
             
             if config is not None:
+                # Update configuration field
                 param_count += 1
-                updates.append(f"config = ${param_count}")
+                updates.append(f"configuration = ${param_count}")
                 params.append(config)
-            
-            if status is not None:
-                param_count += 1
-                updates.append(f"status = ${param_count}")
-                params.append(status)
                 
-                # Update last_execution_at if starting/completing
-                if status == "running":
-                    updates.append("last_execution_at = CURRENT_TIMESTAMP")
-                elif status in ["completed", "failed", "cancelled"]:
-                    updates.append("last_execution_at = CURRENT_TIMESTAMP")
+                # Also update capabilities if provided
+                if "capabilities" in config:
+                    param_count += 1
+                    updates.append(f"capabilities = ${param_count}")
+                    params.append(config["capabilities"])
+            
+            # Note: agents table doesn't have status column
+            # Status is tracked via agent_executions table
+            # Update last_used_at if status indicates activity
+            if status is not None:
+                if status in ["running", "completed", "failed", "cancelled"]:
+                    updates.append("last_used_at = CURRENT_TIMESTAMP")
             
             if not updates:
                 return agent
@@ -207,11 +216,11 @@ class AgentsService:
                 SET {', '.join(updates)}
                 WHERE agent_id = ${param_count}
                 RETURNING 
-                    agent_id, project_id, name, agent_type,
+                    agent_id, project_id, name, display_name, agent_type,
                     model_provider, model_name, capabilities,
-                    config, status, is_active,
+                    configuration, is_active,
                     success_rate, avg_execution_time_ms,
-                    created_at, updated_at, last_execution_at
+                    created_at, updated_at, last_used_at
                 """,
                 *params
             )
@@ -266,4 +275,19 @@ class AgentsService:
             )
             
             return [dict(row) for row in rows]
+    
+    async def get_latest_execution_status(self, agent_id: UUID) -> Optional[str]:
+        """Get latest execution status for an agent"""
+        async with self.pool.acquire() as conn:
+            row = await conn.fetchrow(
+                """
+                SELECT status
+                FROM agent_executions
+                WHERE agent_id = $1
+                ORDER BY started_at DESC
+                LIMIT 1
+                """,
+                agent_id
+            )
+            return row["status"] if row else None
 
