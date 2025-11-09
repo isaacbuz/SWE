@@ -12,6 +12,7 @@ export {
   pushHandlers,
   workflowRunHandlers,
 } from './github/webhookHandlers';
+export { GoogleWorkspaceToolWrapper } from './google/GoogleWorkspaceToolWrapper';
 export { EnvironmentCredentialVault, CredentialVault, Credentials } from './types/CredentialVault';
 export { RateLimiter } from './utils/RateLimiter';
 
